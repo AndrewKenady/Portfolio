@@ -824,6 +824,49 @@
   }
   .wa-ctrl button:active{ border-style:inset; }
   .wa-ctrl button:hover{ background:#FBF9FF; }
+  .wa-shade{
+    flex-shrink:0;
+    width:18px; height:16px;
+    font-size:9px;
+    line-height:1;
+    color:var(--ink);
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    cursor:pointer;
+    padding:0;
+  }
+  .wa-shade:active{ border-style:inset; }
+  /* windowshade mode — just the titlebar, like the real thing */
+  .winamp.shade .wa-lcd, .winamp.shade .wa-ctrl{ display:none; }
+  .winamp.shade{ padding-bottom:0; width:170px; }
+  /* mobile: a slim bottom bar instead of a corner deck */
+  @media (max-width:700px){
+    .winamp{
+      left:8px; right:8px; bottom:8px;
+      width:auto;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;
+      gap:6px;
+      padding:5px 7px;
+    }
+    .wa-top{
+      background:transparent;
+      border-bottom:none;
+      padding:0;
+      gap:6px;
+    }
+    .wa-name{ display:none; }
+    .wa-lcd{ margin:0; padding:4px 8px; }
+    .wa-ctrl{ padding:0; gap:4px; }
+    .wa-ctrl button{ flex:0 0 auto; padding:4px 11px; }
+    .winamp.shade{
+      left:auto; right:8px;
+      width:auto;
+      grid-template-columns:auto;
+      padding:5px 7px;
+    }
+  }
 
   /* sparkle trail canvas */
   #sparkleCanvas{
@@ -850,6 +893,45 @@
     z-index:589;
     pointer-events:none;
   }
+
+  /* ============ the popup engine — OMNICAST™ technology, road-legal edition ============ */
+  .popup{
+    position:fixed;
+    width:min(320px, 86vw);
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    box-shadow:5px 5px 0 rgba(0,0,0,0.45);
+    animation:popIn 0.16s cubic-bezier(0.2,0.9,0.3,1.4);
+  }
+  @keyframes popIn{ from{ transform:scale(0.88); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  .popup .titlebar{ cursor:move; }
+  .popup-body{
+    padding:16px 16px 14px;
+    font-size:13px;
+    line-height:1.55;
+    color:var(--ink);
+  }
+  .popup-body b{ color:var(--ink); }
+  .popup-btns{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    padding:0 14px 14px;
+    flex-wrap:wrap;
+  }
+  .popup-btns button{
+    font-family:Verdana, Geneva, sans-serif;
+    font-weight:bold;
+    font-size:12px;
+    color:var(--ink);
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    padding:6px 18px;
+    cursor:pointer;
+    position:relative;
+  }
+  .popup-btns button:active{ border-style:inset; }
+  .popup-btns button:hover{ background:#FBF9FF; }
 
   /* NEW! blinkers — the tag that built the web */
   .blink{
@@ -1031,6 +1113,7 @@
       <span class="wa-led" id="waLed"></span>
       <span class="wa-name">DKK-AMP</span>
       <span class="wa-eq" id="waEq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <button class="wa-shade" id="waShade" type="button" aria-label="Collapse player">&#9652;</button>
     </div>
     <div class="wa-lcd"><span id="waTrack">&mdash;</span></div>
     <div class="wa-ctrl">
@@ -1137,6 +1220,12 @@
               <td>Designed, built, and operate Pocket Worlds' company-wide AI analyst solo — consolidating a fleet of single-purpose bots into one agentic platform spanning 20+ live data sources. Cited, verified answers from production systems; every action human-approved. Serves every discipline: leadership, data, ops, engineering, trust &amp; safety, community.</td>
             </tr>
             <tr>
+              <td class="t-title"><a href="https://github.com/AndrewKenady/OmniCast" target="_blank" rel="noopener">OmniCast</a></td>
+              <td class="t-year">2026</td>
+              <td class="t-role">Solo Developer</td>
+              <td>A surreal web game about surviving an avalanche of popups — mini-games, scam chats, a stock ticker, and a virtual pet, all living inside the windows attacking you. The (much politer) popup engine haunting this very site is its licensed descendant.</td>
+            </tr>
+            <tr>
               <td class="t-title"><a href="https://www.carlgame.com/" target="_blank" rel="noopener">C.A.R.L.</a></td>
               <td class="t-year">2022</td>
               <td class="t-role">Co-Creator / Dev</td>
@@ -1194,7 +1283,7 @@
               <div class="sb-row"><span>Broadcasting since</span><b>2016</b></div>
               <div class="sb-row"><span>Complete libraries</span><b>N64/VB/GBAV</b></div>
               <div class="sb-row"><span>Convention guest</span><b>Recurring</b></div>
-              <div class="sb-row"><span>IMDb</span><b><a href="https://www.imdb.com/name/nm10395432/" target="_blank" rel="noopener">nm10395432</a></b></div>
+              <div class="sb-row"><span>IMDb</span><b><a href="https://www.imdb.com/name/nm10395432/" target="_blank" rel="noopener">VIEW PAGE &rarr;</a></b></div>
             </div>
             <div class="nowplaying">
               <span class="np-eq">&#9836;&#9836;</span> NOW PLAYING: original compositions on <a href="https://soundcloud.com/nintendrewyt" target="_blank" rel="noopener">SoundCloud</a>
@@ -1292,11 +1381,6 @@
             <b>Voiceover</b>
             <p>Character and commercial VO. Credits include announcer work for SMG4. Reels on request.</p>
             <a href="#contact">Request reels &rarr;</a>
-          </div>
-          <div class="extra">
-            <b>Video Production</b>
-            <p>Writing, editing, and motion graphics — a decade of self-produced broadcast work.</p>
-            <a href="https://www.youtube.com/c/Nintendrew" target="_blank" rel="noopener">Watch &rarr;</a>
           </div>
           <div class="extra">
             <b>Speaking &amp; Events</b>
@@ -1466,6 +1550,11 @@
         }
       }
       notes.sort((a,b) => a.t - b.t);
+      // trim dead air — some MIDIs sit silent for seconds before the first note
+      if (notes.length){
+        const lead = notes[0].t;
+        if (lead > 0.5){ for (const nt of notes) nt.t -= (lead - 0.3); }
+      }
       duration = notes.length ? notes[notes.length-1].t + 2 : 0;
       loaded = notes.length > 60; // a real song, not a parse accident
       return loaded;
@@ -1494,6 +1583,8 @@
         }
         return;
       }
+      // polyphony guard — phones deserve music too, just less of it at once
+      if (MIDI.voices > 40 && vel < 0.5) return;
       const o = actx.createOscillator();
       o.type = CH_WAVE[nt.ch] || 'square';
       o.frequency.value = 440 * Math.pow(2, (nt.n - 69) / 12);
@@ -1504,6 +1595,8 @@
       g.gain.exponentialRampToValueAtTime(Math.max(vel * 0.05, 0.001), t + Math.max(d * 0.7, 0.03));
       g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.06);
       o.connect(g); g.connect(master);
+      MIDI.voices++;
+      o.onended = () => { MIDI.voices--; };
       o.start(t); o.stop(t + d + 0.1);
     }
 
@@ -1531,6 +1624,7 @@
     return {
       noise: null,
       onEnded: null,
+      voices: 0,
       load(buf){ return parse(buf); },
       get loaded(){ return loaded; },
       stop(){ playing = false; clearInterval(schedTimer); },
@@ -1653,6 +1747,12 @@
     btnNext.addEventListener('click', next);
     btnPrev.addEventListener('click', prev);
     btnPlay.addEventListener('click', toggle);
+    const btnShade = document.getElementById('waShade');
+    btnShade.addEventListener('click', () => {
+      const shaded = box.classList.toggle('shade');
+      btnShade.innerHTML = shaded ? '&#9662;' : '&#9652;';
+      btnShade.setAttribute('aria-label', shaded ? 'Expand player' : 'Collapse player');
+    });
     return {
       start(){ shuffle(); pos = 0; loadAndPlay(); }
     };
@@ -2849,6 +2949,123 @@
     document.addEventListener('visibilitychange', () => { if (document.hidden && running) last = 0; });
 
     return { open, close, get running(){ return running; } };
+  })();
+
+  // ===== the popup engine — OMNICAST™ technology, road-legal edition =====
+  (function(){
+    const MAX = matchMedia('(max-width: 700px)').matches ? 2 : 3;
+    let visible = 0;
+    let zTop = 760;
+    let bag = [];
+
+    const POOL = [
+      { t: 'SYSTEM MESSAGE', b: 'Your visit has been noted. Favorably.', btns: [{ l: 'OK' }] },
+      { t: 'CONGRATULATIONS!', b: 'You are the 1,000,000th visitor. There is no prize. But you were counted, and that&rsquo;s something.', btns: [{ l: 'Claim Nothing' }] },
+      { t: 'FREE RAM', b: 'Download more RAM? It&rsquo;s free.', btns: [{ l: 'Download', a: 'toast', arg: 'RAM DELIVERED. +0 MB.' }, { l: 'I Have Enough' }] },
+      { t: 'RECRUITER ALERT', b: 'Hot job openings in your area are viewing this portfolio <b>right now</b>.', btns: [{ l: 'Show Them In', a: 'contact' }, { l: 'Let Them Wait' }] },
+      { t: 'LOW DISK SPACE', b: 'Your nostalgia drive is almost full. Delete childhood memories?', btns: [{ l: 'Never' }, { l: 'Also Never' }] },
+      { t: 'SECURITY NOTICE', b: 'This site is protected by a firewall. Firewalls are sold separately in DEFEND.EXE.', btns: [{ l: 'Launch DEFEND.EXE', a: 'game' }, { l: 'Ignore Threat' }] },
+      { t: 'TOOLBAR OFFER', b: 'Install the Kennedy Toolbar? It does nothing, but it&rsquo;s yours.', btns: [{ l: 'Install', a: 'toast', arg: 'TOOLBAR INSTALLED (SPIRITUALLY).' }, { l: 'Maybe Later' }] },
+      { t: 'VISITOR SURVEY', b: 'How is your visit going?', btns: [{ l: 'Great', a: 'toast', arg: 'RESPONSE RECORDED. RESULTS: GREAT.' }, { l: 'Also Great', a: 'toast', arg: 'RESPONSE RECORDED. RESULTS: GREAT.' }] },
+      { t: 'UPDATE AVAILABLE', b: 'A newer version of this website is available: this one. You&rsquo;re already on it.', btns: [{ l: 'Excellent' }] },
+      { t: 'WEATHER ADVISORY', b: 'Today&rsquo;s forecast: 100% chance of static.', btns: [{ l: 'Dress Accordingly' }] },
+      { t: 'ASSISTANT', b: 'It looks like you&rsquo;re trying to hire a game developer. Would you like help?', btns: [{ l: 'Yes', a: 'contact' }, { l: 'I Can Do This Myself' }] },
+      { t: 'FACILITIES', b: 'Gravity is scheduled for maintenance at 3 PM. Please hold onto something.', btns: [{ l: 'Understood' }] },
+      { t: 'OMNICAST&trade;', b: 'This popup engine is licensed OMNICAST&trade; technology &mdash; from a surreal web game of overwhelming popups by the same developer.', btns: [{ l: 'See OmniCast', a: 'omni' }, { l: 'One Was Enough' }] }
+    ];
+
+    function refill(){
+      bag = POOL.map((_, i) => i);
+      for (let i = bag.length - 1; i > 0; i--){
+        const j = (Math.random() * (i + 1)) | 0;
+        const tmp = bag[i]; bag[i] = bag[j]; bag[j] = tmp;
+      }
+    }
+    refill();
+
+    // a soft, polite ding — this engine has manners now
+    let pac = null;
+    function ding(){
+      try {
+        pac = pac || new (window.AudioContext || window.webkitAudioContext)();
+        [660, 880].forEach((f, i) => {
+          const o = pac.createOscillator(), gn = pac.createGain();
+          o.type = 'triangle';
+          o.frequency.value = f;
+          const t0 = pac.currentTime + i * 0.09;
+          gn.gain.setValueAtTime(0.02, t0);
+          gn.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.25);
+          o.connect(gn); gn.connect(pac.destination);
+          o.start(t0); o.stop(t0 + 0.3);
+        });
+      } catch(e){}
+    }
+
+    function act(a, arg, el){
+      dismiss(el);
+      if (a === 'toast') notify(arg);
+      else if (a === 'contact') document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+      else if (a === 'game') DEFEND.open(false);
+      else if (a === 'omni') window.open('https://github.com/AndrewKenady/OmniCast', '_blank', 'noopener');
+    }
+    function dismiss(el){
+      if (!el.parentNode) return;
+      el.remove();
+      visible--;
+    }
+
+    function spawn(){
+      const cfg = POOL[bag.pop()];
+      if (!bag.length) refill();
+      const el = document.createElement('div');
+      el.className = 'popup';
+      el.style.zIndex = ++zTop;
+      el.style.left = (4 + Math.random() * 52) + 'vw';
+      el.style.top = (12 + Math.random() * 48) + 'vh';
+      el.innerHTML =
+        '<div class="titlebar"><span class="t-label">' + cfg.t + '</span>' +
+        '<span class="t-btns"><i role="button" aria-label="Close" tabindex="0">&times;</i></span></div>' +
+        '<div class="popup-body">' + cfg.b + '</div>' +
+        '<div class="popup-btns"></div>';
+      const btnRow = el.querySelector('.popup-btns');
+      cfg.btns.forEach(bc => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = bc.l;
+        btn.addEventListener('click', () => act(bc.a, bc.arg, el));
+        btnRow.appendChild(btn);
+      });
+      el.querySelector('.t-btns i').addEventListener('click', () => dismiss(el));
+      // dialogs rise when touched
+      el.addEventListener('pointerdown', () => { el.style.zIndex = ++zTop; });
+      // and drag by the titlebar, as nature intended
+      const bar = el.querySelector('.titlebar');
+      bar.addEventListener('pointerdown', e => {
+        if (e.target.closest('.t-btns')) return;
+        e.preventDefault();
+        const r = el.getBoundingClientRect();
+        const ox = e.clientX - r.left, oy = e.clientY - r.top;
+        function mv(ev){
+          el.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
+          el.style.top = Math.max(0, Math.min(innerHeight - 40, ev.clientY - oy)) + 'px';
+        }
+        function up(){ removeEventListener('pointermove', mv); removeEventListener('pointerup', up); }
+        addEventListener('pointermove', mv);
+        addEventListener('pointerup', up);
+      });
+      document.body.appendChild(el);
+      visible++;
+      ding();
+    }
+
+    function schedule(first){
+      const delay = first ? 40000 + Math.random() * 30000 : 70000 + Math.random() * 60000;
+      setTimeout(() => {
+        if (entered && !document.hidden && !DEFEND.running && visible < MAX) spawn();
+        schedule(false);
+      }, delay);
+    }
+    schedule(true);
   })();
 
   // ===== the guestbook — public, anonymous-friendly, proprietor-moderated =====
