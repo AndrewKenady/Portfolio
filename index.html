@@ -1224,14 +1224,19 @@
           <li><a href="https://www.imdb.com/name/nm10395432/" target="_blank" rel="noopener">IMDb</a></li>
           <li><a href="https://www.mobygames.com/person/653849/andrew-kenady/" target="_blank" rel="noopener">MobyGames</a></li>
         </ul>
-        <p style="margin:22px 0 8px;"><b>&#9998; The Guestbook:</b></p>
-        <div class="gb-entries" id="gbEntries" aria-live="polite"></div>
-        <form class="gb-form" id="gbForm">
-          <input type="text" id="gbName" maxlength="24" placeholder="Your name" required>
-          <textarea id="gbMsg" maxlength="280" placeholder="Leave a note..." required></textarea>
-          <button type="submit" class="gb-btn">&#9998; Sign the guestbook</button>
-          <span class="gb-note" id="gbNote"></span>
-        </form>
+        <p style="margin:22px 0 8px;">
+          <button type="button" class="gb-btn" id="gbToggle">&#128214; Open the guestbook</button>
+        </p>
+        <div id="gbWrap" style="display:none;">
+          <div class="gb-entries" id="gbEntries" aria-live="polite"></div>
+          <form class="gb-form" id="gbForm">
+            <input type="text" id="gbName" maxlength="24" placeholder="Your name (optional — anonymity respected)">
+            <textarea id="gbMsg" maxlength="280" placeholder="Leave a note..." required></textarea>
+            <input type="text" id="gbHoney" style="display:none" tabindex="-1" autocomplete="off">
+            <button type="submit" class="gb-btn">&#9998; Sign the guestbook</button>
+            <span class="gb-note" id="gbNote"></span>
+          </form>
+        </div>
       </div>
     </section>
 
@@ -2545,30 +2550,40 @@
     return { open, close, get running(){ return running; } };
   })();
 
-  // ===== the guestbook — signatures stick locally, and a copy reaches Drew =====
+  // ===== the guestbook — public, anonymous-friendly, proprietor-moderated =====
   (function(){
+    // Firebase Realtime Database REST endpoint. Once the project exists, set:
+    //   const GB_DB = 'https://YOUR-PROJECT-default-rtdb.firebaseio.com';
+    // Empty string = local-only fallback (entries persist per visitor).
+    const GB_DB = 'https://portfolio-ec252-default-rtdb.firebaseio.com/';
     const list = document.getElementById('gbEntries');
     const form = document.getElementById('gbForm');
+    const toggle = document.getElementById('gbToggle');
+    const wrap = document.getElementById('gbWrap');
     const nameEl = document.getElementById('gbName');
     const msgEl = document.getElementById('gbMsg');
+    const honeyEl = document.getElementById('gbHoney');
     const noteEl = document.getElementById('gbNote');
     if (!list || !form) return;
-    const SEED = [
-      { n: 'DREW', m: 'First. Also, I live here.', d: 'July 2026' }
-    ];
-    let mine = [];
-    try { mine = JSON.parse(localStorage.getItem('dkk_guestbook') || '[]'); } catch(e){}
+
+    let entries = [{ n: 'DREW', m: 'First. Also, I live here.', t: 0 }];
+    let loadedRemote = false;
+
+    function fmtDate(t){
+      if (!t) return 'July 2026';
+      return new Date(t).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
     function render(){
       list.innerHTML = '';
-      SEED.concat(mine).forEach(e => {
+      entries.forEach(e => {
         const div = document.createElement('div');
         div.className = 'gb-entry';
         const who = document.createElement('span');
         who.className = 'gb-who';
-        who.textContent = e.n;
+        who.textContent = e.n || 'ANONYMOUS';
         const date = document.createElement('span');
         date.className = 'gb-date';
-        date.textContent = e.d;
+        date.textContent = fmtDate(e.t);
         const text = document.createElement('div');
         text.className = 'gb-text';
         text.textContent = e.m;
@@ -2576,21 +2591,72 @@
         list.appendChild(div);
       });
       list.scrollTop = list.scrollHeight;
+      toggle.innerHTML = wrap.style.display === 'none'
+        ? '&#128214; Open the guestbook (' + entries.length + ')'
+        : '&#128214; Close the guestbook';
     }
+
+    function loadRemote(){
+      if (!GB_DB || loadedRemote) return Promise.resolve();
+      return fetch(GB_DB + '/guestbook.json')
+        .then(r => r.json())
+        .then(data => {
+          loadedRemote = true;
+          if (data && typeof data === 'object'){
+            // push keys sort chronologically
+            const remote = Object.keys(data).sort().map(k => data[k])
+              .filter(e => e && e.m).slice(-100);
+            entries = entries.slice(0, 1).concat(remote);
+          }
+          render();
+        })
+        .catch(() => {});
+    }
+    function loadLocal(){
+      try {
+        const mine = JSON.parse(localStorage.getItem('dkk_guestbook') || '[]');
+        entries = entries.concat(mine.map(e => ({ n: e.n, m: e.m, t: e.t || 0 })));
+      } catch(e){}
+    }
+
+    if (!GB_DB) loadLocal();
     render();
+
+    toggle.addEventListener('click', () => {
+      const opening = wrap.style.display === 'none';
+      wrap.style.display = opening ? 'block' : 'none';
+      if (opening) loadRemote().then(() => { list.scrollTop = list.scrollHeight; });
+      render();
+    });
+
     form.addEventListener('submit', ev => {
       ev.preventDefault();
-      const n = nameEl.value.trim().slice(0, 24);
+      if (honeyEl.value) return; // robots sign no books
+      const n = (nameEl.value.trim() || 'ANONYMOUS').slice(0, 24);
       const m = msgEl.value.trim().slice(0, 280);
-      if (!n || !m) return;
-      const d = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      mine.push({ n, m, d });
-      try { localStorage.setItem('dkk_guestbook', JSON.stringify(mine.slice(-30))); } catch(e){}
+      if (!m) return;
+      const entry = { n, m, t: Date.now() };
+      entries.push(entry);
       render();
       form.reset();
       noteEl.textContent = 'SIGNED. THANKS FOR STOPPING BY.';
       setTimeout(() => { noteEl.textContent = ''; }, 4000);
-      // a copy rides out to the proprietor
+      if (GB_DB){
+        fetch(GB_DB + '/guestbook.json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(entry)
+        }).catch(() => {
+          noteEl.textContent = 'SIGNED LOCALLY — THE BOOK IS OFFLINE.';
+        });
+      } else {
+        try {
+          const mine = JSON.parse(localStorage.getItem('dkk_guestbook') || '[]');
+          mine.push(entry);
+          localStorage.setItem('dkk_guestbook', JSON.stringify(mine.slice(-30)));
+        } catch(e){}
+      }
+      // heads-up copy to the proprietor either way
       fetch('https://formsubmit.co/ajax/hello@drewkkennedy.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
