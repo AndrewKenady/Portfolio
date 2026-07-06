@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drew K. Kennedy — Game Developer & Content Creator</title>
+<meta name="description" content="Drew K. Kennedy is a game developer and content creator with 10+ years of shipped titles — C.A.R.L., Draw a Stickman: EPIC, Highrise — and host of Nintendrew (350,000+ subscribers).">
+<meta name="theme-color" content="#0B0428">
+<meta property="og:title" content="Drew K. Kennedy — Game Developer & Content Creator">
+<meta property="og:description" content="10+ years of shipped games. 350,000+ subscribers. Welcome to my corner of the web.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://drewkkennedy.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0428'/%3E%3Crect x='1' y='2' width='14' height='3' fill='%23FF3CAC'/%3E%3Crect x='1' y='5' width='14' height='9' fill='%23F0EDF5'/%3E%3Crect x='3' y='7' width='6' height='1.5' fill='%231E1938'/%3E%3Crect x='3' y='10' width='9' height='1.5' fill='%231E1938'/%3E%3C/svg%3E">
+<style>
+  /* drewkkennedy.com */
+  :root{
+    --night:#0B0428;
+    --night-2:#160A3E;
+    --win:#F0EDF5;
+    --win-2:#E4DFEF;
+    --ink:#1E1938;
+    --ink-soft:#5C5478;
+    --bevel-hi:#FFFFFF;
+    --bevel-lo:#8E86A8;
+    --magenta:#FF3CAC;
+    --cyan:#00E5FF;
+    --violet:#7A2BD9;
+    --gold:#FFD34D;
+    --title-grad:linear-gradient(90deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--night);
+    color:var(--ink);
+    font-family:Verdana, Geneva, sans-serif;
+    font-size:14px;
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+
+  .serif{ font-family:'Times New Roman', Times, serif; }
+  .mono{ font-family:'Courier New', Courier, monospace; }
+
+  ::selection{ background:var(--magenta); color:#fff; }
+  :focus-visible{ outline:3px solid var(--cyan); outline-offset:2px; }
+
+  a{ color:#2B49C5; }
+  a:visited{ color:var(--violet); }
+  a:hover{ color:var(--magenta); }
+
+  .skip{
+    position:absolute; left:-9999px; top:0;
+    background:var(--ink); color:#fff;
+    padding:10px 18px; z-index:1000;
+  }
+  .skip:focus{ left:12px; top:12px; }
+
+  /* ============ STARFIELD (tiled, like a proper background GIF) ============ */
+  .stars{
+    position:fixed; inset:0;
+    z-index:0;
+    pointer-events:none;
+    background-image:
+      radial-gradient(1px 1px at 12px 18px, #fff, transparent),
+      radial-gradient(1px 1px at 68px 44px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1.5px 1.5px at 120px 90px, var(--cyan), transparent),
+      radial-gradient(1px 1px at 160px 24px, rgba(255,255,255,0.65), transparent),
+      radial-gradient(1px 1px at 40px 120px, rgba(255,60,172,0.8), transparent),
+      radial-gradient(1px 1px at 190px 150px, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1.5px 1.5px at 90px 170px, rgba(255,255,255,0.9), transparent);
+    background-size:220px 190px;
+    animation:twinkle 6s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle{ from{ opacity:0.75; } to{ opacity:1; } }
+
+  /* CRT easter-egg overlay */
+  .crt-overlay{
+    position:fixed; inset:0;
+    z-index:900;
+    pointer-events:none;
+    display:none;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px, transparent 2px, transparent 4px);
+  }
+  body.crt .crt-overlay{ display:block; }
+
+  #confettiCanvas{
+    position:fixed; inset:0;
+    width:100%; height:100%;
+    z-index:910;
+    pointer-events:none;
+  }
+
+  .toast{
+    position:fixed;
+    bottom:26px; left:50%;
+    transform:translate(-50%, 20px);
+    z-index:950;
+    background:var(--ink);
+    color:#fff;
+    border:2px outset var(--bevel-hi);
+    padding:12px 20px;
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.4s ease, transform 0.4s ease;
+    max-width:min(560px, 88vw);
+    text-align:center;
+  }
+  .toast.on{ opacity:1; transform:translate(-50%, 0); }
+
+  /* ============ PAGE COLUMN — the classic centered homepage ============ */
+  .page{
+    position:relative;
+    z-index:1;
+    max-width:860px;
+    margin:0 auto;
+    padding:26px 14px 60px;
+  }
+
+  /* ============ HEADER BANNER — vaporwave sunset ============ */
+  .banner{
+    border:2px outset var(--bevel-hi);
+    background:
+      linear-gradient(180deg, #1B0C4A 0%, #4A1663 34%, #B0286E 62%, #FF6B4A 88%, #FFD34D 100%);
+    position:relative;
+    overflow:hidden;
+    text-align:center;
+    padding:52px 20px 64px;
+  }
+  .banner .sun{
+    position:absolute;
+    left:50%; bottom:-46px;
+    transform:translateX(-50%);
+    width:230px; height:230px;
+    border-radius:50%;
+    background:linear-gradient(180deg, #FFD34D 0%, #FF6B4A 45%, #FF3CAC 100%);
+    opacity:0.85;
+    -webkit-mask:repeating-linear-gradient(0deg, #000 0 12px, transparent 12px 19px);
+    mask:repeating-linear-gradient(0deg, #000 0 12px, transparent 12px 19px);
+  }
+  .banner .grid-floor{
+    position:absolute;
+    left:-20%; right:-20%; bottom:0;
+    height:38%;
+    background:
+      repeating-linear-gradient(90deg, rgba(0,229,255,0.35) 0 1px, transparent 1px 52px),
+      repeating-linear-gradient(0deg, rgba(0,229,255,0.35) 0 1px, transparent 1px 26px),
+      linear-gradient(180deg, transparent, rgba(11,4,40,0.6));
+    transform:perspective(220px) rotateX(58deg);
+    transform-origin:bottom;
+  }
+  /* the banner is glass too — faint scanlines + a diagonal glare */
+  .banner::after{
+    content:"";
+    position:absolute; inset:0;
+    z-index:3;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.10) 0 1px, transparent 1px 4px),
+      linear-gradient(115deg, transparent 44%, rgba(255,255,255,0.05) 49%, transparent 56%);
+  }
+  .banner h1{
+    position:relative;
+    z-index:2;
+    font-family:'Times New Roman', Times, serif;
+    font-style:italic;
+    font-weight:bold;
+    font-size:clamp(38px, 8vw, 76px);
+    letter-spacing:0.01em;
+    line-height:1.02;
+    background:linear-gradient(180deg, #FFFFFF 0%, #D8E8FF 38%, #8FB8E8 48%, #FFFFFF 55%, #B29CE8 78%, #FFFFFF 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    filter:drop-shadow(2px 3px 0 rgba(30,10,60,0.85)) drop-shadow(0 0 18px rgba(0,229,255,0.35));
+  }
+  .banner .tagline{
+    position:relative;
+    z-index:2;
+    margin-top:14px;
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:13px;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:#FFF6FB;
+    text-shadow:1px 1px 0 rgba(30,10,60,0.9);
+  }
+
+  /* ============ NAV — beveled buttons, as God intended ============ */
+  .navbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    justify-content:center;
+    background:var(--win-2);
+    border:2px outset var(--bevel-hi);
+    border-top:none;
+    padding:8px;
+  }
+  .navbtn{
+    font-family:Verdana, Geneva, sans-serif;
+    font-weight:bold;
+    font-size:12.5px;
+    text-decoration:none;
+    color:var(--ink) !important;
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    padding:7px 16px;
+    cursor:pointer;
+  }
+  .navbtn:hover{ background:#FBF9FF; color:var(--ink) !important; }
+  .navbtn:active{ border-style:inset; }
+
+  /* ============ MARQUEE ============ */
+  .newsbar{
+    margin-top:14px;
+    border:2px inset var(--bevel-hi);
+    background:#08031C;
+    color:var(--cyan);
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:13px;
+    overflow:hidden;
+    padding:8px 0;
+    white-space:nowrap;
+  }
+  .newsbar .news-track{
+    display:inline-block;
+    padding-left:100%;
+    animation:crawl 30s linear infinite;
+  }
+  .newsbar:hover .news-track{ animation-play-state:paused; }
+  @keyframes crawl{ to{ transform:translateX(-100%); } }
+  .newsbar b{ color:var(--magenta); }
+
+  /* ============ WINDOWS — every section is a window ============ */
+  .window{
+    margin-top:26px;
+    border:2px outset var(--bevel-hi);
+    background:var(--win);
+    box-shadow:4px 4px 0 rgba(0,0,0,0.45);
+  }
+  .titlebar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:var(--title-grad);
+    padding:5px 6px 5px 12px;
+    border-bottom:2px solid var(--bevel-lo);
+  }
+  .titlebar .t-label{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:13.5px;
+    letter-spacing:0.06em;
+    color:#fff;
+    text-shadow:1px 1px 0 rgba(30,10,60,0.8);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .titlebar .t-btns{ display:flex; gap:4px; flex-shrink:0; }
+  .titlebar .t-btns i{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:20px; height:18px;
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    font-style:normal;
+    font-family:Verdana, sans-serif;
+    font-weight:bold;
+    font-size:10px;
+    color:var(--ink);
+    cursor:default;
+    user-select:none;
+  }
+  .titlebar .t-btns i:active{ border-style:inset; }
+  .win-body{ padding:22px 24px 26px; }
+  .win-body > p{ margin-bottom:1em; max-width:70ch; }
+  .win-body b{ color:var(--ink); }
+
+  h2.win-h{
+    font-family:'Times New Roman', Times, serif;
+    font-style:italic;
+    font-size:30px;
+    color:var(--ink);
+    margin-bottom:12px;
+  }
+  .specs{
+    margin-top:18px;
+    border:2px inset var(--bevel-hi);
+    background:#08031C;
+    color:var(--cyan);
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:12.5px;
+    line-height:1.9;
+    padding:10px 14px;
+  }
+  .hr90{
+    border:none;
+    height:3px;
+    margin:16px 0 18px;
+    background:repeating-linear-gradient(90deg, var(--magenta) 0 14px, var(--cyan) 14px 28px);
+  }
+
+  /* ============ TABLES — border=1 cellpadding=6, in spirit ============ */
+  table.classic{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+    background:#FBF9FF;
+  }
+  table.classic th{
+    background:var(--ink);
+    color:#fff;
+    font-family:'Courier New', Courier, monospace;
+    font-size:12.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:8px 10px;
+    text-align:left;
+    border:1px solid var(--bevel-lo);
+  }
+  table.classic td{
+    border:1px solid var(--bevel-lo);
+    padding:10px;
+    vertical-align:top;
+  }
+  table.classic tr:nth-child(even) td{ background:var(--win-2); }
+  table.classic .t-title{ font-weight:bold; white-space:nowrap; }
+  /* portrait: the table becomes a stack of cards */
+  @media (max-width:640px){
+    table.classic thead{ display:none; }
+    table.classic, table.classic tbody, table.classic tr, table.classic td{ display:block; width:100%; }
+    table.classic tr{
+      border:2px outset var(--bevel-hi);
+      margin-bottom:14px;
+      background:#FBF9FF;
+    }
+    table.classic tr:nth-child(even) td{ background:transparent; }
+    table.classic tr:nth-child(even){ background:var(--win-2); }
+    table.classic td{ border:none; padding:2px 14px; }
+    table.classic td.t-title{
+      padding-top:12px;
+      font-size:15px;
+      white-space:normal;
+    }
+    table.classic td.t-year, table.classic td.t-role{
+      display:inline-block;
+      width:auto;
+      white-space:normal;
+      padding-top:2px; padding-bottom:2px;
+    }
+    table.classic td.t-year::after{ content:" ·"; color:var(--bevel-lo); }
+    table.classic td:last-child{ padding-top:6px; padding-bottom:14px; font-size:13px; }
+  }
+  table.classic .t-title a{ text-decoration:none; }
+  table.classic .t-title a:hover{ text-decoration:underline; }
+  table.classic .t-year{ font-family:'Courier New', Courier, monospace; font-weight:bold; white-space:nowrap; }
+  table.classic .t-role{ color:var(--ink-soft); font-size:12.5px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+  .table-note{ margin-top:12px; font-size:12.5px; color:var(--ink-soft); }
+
+  /* two-column layout inside windows (channel) */
+  .cols{ display:grid; grid-template-columns:3fr 2fr; gap:26px; align-items:start; }
+  @media (max-width:700px){ .cols{ grid-template-columns:1fr; } }
+
+  /* stats box */
+  .statbox{
+    border:2px inset var(--bevel-hi);
+    background:#08031C;
+    color:#D5F8FF;
+    font-family:'Courier New', Courier, monospace;
+    font-size:13px;
+    padding:14px 16px;
+  }
+  .statbox .sb-title{
+    color:var(--gold);
+    font-weight:bold;
+    text-align:center;
+    letter-spacing:0.14em;
+    margin-bottom:10px;
+  }
+  .statbox .sb-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    padding:4px 0;
+    border-bottom:1px dotted rgba(213,248,255,0.3);
+  }
+  .statbox .sb-row:last-child{ border-bottom:none; }
+  .statbox .sb-row b{ color:var(--cyan); }
+  .nowplaying{
+    margin-top:14px;
+    border:2px inset var(--bevel-hi);
+    background:#08031C;
+    padding:10px 14px;
+    font-family:'Courier New', Courier, monospace;
+    font-size:12.5px;
+    color:#D5F8FF;
+  }
+  .nowplaying a{ color:var(--gold); }
+  .nowplaying .np-eq{ color:var(--magenta); animation:eqblink 1.1s steps(2) infinite; }
+  @keyframes eqblink{ 50%{ opacity:0.35; } }
+
+  /* timeline as definition rows */
+  .rez-row{
+    display:grid;
+    grid-template-columns:150px 1fr;
+    gap:18px;
+    padding:14px 0;
+    border-bottom:1px dashed var(--bevel-lo);
+  }
+  .rez-row:last-child{ border-bottom:none; }
+  .rez-when{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:13px;
+    color:var(--violet);
+    white-space:nowrap;
+  }
+  .rez-what b{ font-size:15px; }
+  .rez-what .rz-role{
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--magenta);
+    font-weight:bold;
+    margin:2px 0 6px;
+  }
+  .rez-what p{ color:var(--ink-soft); font-size:13.5px; max-width:64ch; }
+  @media (max-width:600px){ .rez-row{ grid-template-columns:1fr; gap:4px; } }
+
+  /* extras grid */
+  .extras-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
+    gap:16px;
+  }
+  .extra{
+    border:2px outset var(--bevel-hi);
+    background:#FBF9FF;
+    padding:16px 18px;
+  }
+  .extra b{ display:block; margin-bottom:6px; font-size:14px; }
+  .extra p{ font-size:13px; color:var(--ink-soft); margin-bottom:8px; }
+  .extra a{ font-size:12.5px; font-weight:bold; }
+
+  /* contact */
+  .email-big{
+    display:inline-block;
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:clamp(16px, 3.4vw, 24px);
+    background:#08031C;
+    color:var(--cyan) !important;
+    border:2px inset var(--bevel-hi);
+    padding:14px 26px;
+    text-decoration:none;
+    margin:6px 0 18px;
+  }
+  .email-big:hover{ color:var(--gold) !important; }
+  .linklist{ columns:2; column-gap:34px; font-size:13.5px; }
+  .linklist li{ margin:0 0 8px 18px; }
+  @media (max-width:600px){ .linklist{ columns:1; } }
+
+  /* guestbook button */
+  .gb-btn{
+    display:inline-block;
+    font-family:Verdana, Geneva, sans-serif;
+    font-weight:bold;
+    font-size:13px;
+    color:var(--ink) !important;
+    text-decoration:none;
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    padding:9px 20px;
+  }
+  .gb-btn:active{ border-style:inset; }
+  .gb-btn:hover{ background:#FBF9FF; }
+
+  /* ============ FOOTER — badges, counter, webring ============ */
+  .footer{
+    margin-top:30px;
+    text-align:center;
+    color:#CFC6E8;
+    font-size:12px;
+  }
+  .badges{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:18px;
+  }
+  .badges svg{
+    width:88px; height:31px;
+    image-rendering:pixelated;
+    border:1px solid rgba(255,255,255,0.25);
+  }
+  .counter{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Courier New', Courier, monospace;
+    font-size:12.5px;
+    color:#CFC6E8;
+    margin-bottom:14px;
+  }
+  .counter .digits{ display:inline-flex; gap:2px; }
+  .counter .digits i{
+    font-style:normal;
+    display:inline-block;
+    width:16px;
+    background:#000;
+    color:#3CFF6E;
+    border:1px solid #444;
+    text-align:center;
+    font-weight:bold;
+    padding:2px 0;
+  }
+  .webring{
+    margin:14px auto 16px;
+    display:inline-block;
+    border:2px outset var(--bevel-hi);
+    background:var(--win);
+    color:var(--ink);
+    padding:10px 16px;
+    font-size:12px;
+  }
+  .webring b{ display:block; margin-bottom:6px; font-size:12.5px; }
+  .webring a{ font-weight:bold; margin:0 6px; }
+  .f-legal{ margin-top:10px; line-height:2; }
+  .f-legal a{ color:#CFC6E8; }
+
+  /* ============ ENTER SITE — the classic way ============ */
+  .splash{
+    position:fixed; inset:0;
+    z-index:800;
+    background-color:var(--night);
+    background-image:
+      radial-gradient(1px 1px at 12px 18px, #fff, transparent),
+      radial-gradient(1px 1px at 68px 44px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1.5px 1.5px at 120px 90px, var(--cyan), transparent),
+      radial-gradient(1px 1px at 160px 24px, rgba(255,255,255,0.65), transparent),
+      radial-gradient(1px 1px at 40px 120px, rgba(255,60,172,0.8), transparent),
+      radial-gradient(1px 1px at 190px 150px, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1.5px 1.5px at 90px 170px, rgba(255,255,255,0.9), transparent);
+    background-size:220px 190px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:24px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:opacity 0.9s ease, visibility 0.9s ease;
+  }
+  .splash.hidden{ opacity:0; visibility:hidden; }
+  /* the rainbow divider — a load-bearing gradient bar */
+  .sp-divider{
+    width:min(560px, 82vw);
+    height:6px;
+    background:linear-gradient(90deg, #FF3CAC, #FFD34D, #3CFF6E, #00E5FF, #7A2BD9, #FF3CAC);
+    background-size:200% 100%;
+    animation:rainbowSlide 3s linear infinite;
+  }
+  @keyframes rainbowSlide{ to{ background-position:200% 0; } }
+  .sp-title{
+    margin-top:34px;
+    font-family:'Times New Roman', Times, serif;
+    font-style:italic;
+    font-weight:bold;
+    font-size:clamp(42px, 9vw, 78px);
+    line-height:1.04;
+    background:linear-gradient(180deg, #FFFFFF 0%, #D8E8FF 38%, #8FB8E8 48%, #FFFFFF 55%, #B29CE8 78%, #FFFFFF 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    filter:drop-shadow(2px 3px 0 rgba(30,10,60,0.85)) drop-shadow(0 0 18px rgba(0,229,255,0.35));
+  }
+  .sp-sub{
+    margin-top:14px;
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:13px;
+    letter-spacing:0.3em;
+    text-transform:uppercase;
+    color:var(--cyan);
+    text-shadow:0 0 12px rgba(0,229,255,0.5);
+  }
+  .sp-enter-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:clamp(18px, 5vw, 42px);
+    margin-top:46px;
+  }
+  .sp-star{
+    width:clamp(34px, 6vw, 50px);
+    height:auto;
+    animation:starTwirl 2.8s linear infinite;
+    filter:drop-shadow(0 0 8px rgba(255,211,77,0.7));
+  }
+  .sp-star.rev{ animation-direction:reverse; }
+  @keyframes starTwirl{ to{ transform:rotate(360deg); } }
+  .sp-enter{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:clamp(22px, 4.6vw, 34px);
+    letter-spacing:0.18em;
+    color:#FFFFFF;
+    text-shadow:0 0 12px rgba(0,229,255,0.9), 0 0 30px rgba(0,229,255,0.5);
+    animation:enterBlink 1.1s infinite;
+    transition:transform 0.15s ease;
+  }
+  /* hard on/off via opacity percents — restarts from the visible phase on unhover,
+     unlike a paused visibility animation, which can resume mid-"off" frame */
+  @keyframes enterBlink{ 0%, 54%{ opacity:1; } 55%, 100%{ opacity:0; } }
+  .splash:hover .sp-enter{ transform:scale(1.06); animation:none; opacity:1; }
+  .sp-divider.btm{ margin-top:46px; }
+  /* the award sticker — an honor this site bestowed upon itself */
+  .sp-award{
+    position:absolute;
+    right:clamp(10px, 7vw, 110px);
+    bottom:clamp(84px, 15vh, 150px);
+    width:clamp(84px, 11vw, 120px);
+    animation:awardWobble 4.6s ease-in-out infinite;
+    filter:drop-shadow(0 4px 10px rgba(0,0,0,0.55));
+  }
+  @keyframes awardWobble{
+    0%,100%{ transform:rotate(-8deg); }
+    50%{ transform:rotate(6deg); }
+  }
+  /* nyan cat — commutes across the bottom, JS flies it and lays the trail */
+  .sp-cat{
+    position:absolute;
+    top:0; left:0;
+    width:66px;
+    height:auto;
+    image-rendering:pixelated;
+    transform:translate(-120px, -120px);
+    will-change:transform;
+  }
+  #trailCanvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+  }
+  .splash-hint{
+    margin-top:26px;
+    font-family:'Courier New', Courier, monospace;
+    font-size:11px;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:#7E74A8;
+    text-align:center;
+  }
+  .splash-hint b{ color:var(--gold); }
+
+  /* sound toggle — appears only if the music actually plays */
+  .sound-btn{
+    position:fixed;
+    bottom:18px; right:18px;
+    z-index:700;
+    display:none;
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:12px;
+    color:var(--ink);
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    padding:8px 14px;
+    cursor:pointer;
+  }
+  .sound-btn:active{ border-style:inset; }
+
+  /* sparkle trail canvas */
+  #sparkleCanvas{
+    position:fixed; inset:0;
+    width:100%; height:100%;
+    z-index:600;
+    pointer-events:none;
+  }
+
+  /* NEW! blinkers — the tag that built the web */
+  .blink{
+    display:inline-block;
+    font-family:Verdana, Geneva, sans-serif;
+    font-weight:bold;
+    font-size:10px;
+    letter-spacing:0.08em;
+    color:#fff;
+    background:var(--magenta);
+    padding:1px 6px;
+    margin-left:6px;
+    vertical-align:middle;
+    animation:blinker 1.1s steps(2, start) infinite;
+  }
+  @keyframes blinker{ to{ visibility:hidden; } }
+
+  /* ============ retro scrollbar — chunky, beveled, correct ============ */
+  ::-webkit-scrollbar{ width:16px; height:16px; }
+  ::-webkit-scrollbar-track{ background:var(--win-2); border:1px solid var(--bevel-lo); }
+  ::-webkit-scrollbar-thumb{
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+  }
+  ::-webkit-scrollbar-thumb:active{ border-style:inset; }
+
+  /* titlebar buttons are live now */
+  .titlebar .t-btns i{ cursor:pointer; }
+  .window.min .win-body{ display:none; }
+  .window.shake{ animation:winShake 0.3s ease; }
+  @keyframes winShake{
+    0%,100%{ transform:translateX(0); }
+    25%{ transform:translateX(-5px); }
+    75%{ transform:translateX(5px); }
+  }
+
+  /* netscape-style status bar — shows where links go */
+  #statusBar{
+    position:fixed;
+    left:0; bottom:0;
+    z-index:650;
+    display:none;
+    max-width:72vw;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    background:var(--win-2);
+    border:2px outset var(--bevel-hi);
+    border-left:none; border-bottom:none;
+    color:var(--ink);
+    font-family:'Courier New', Courier, monospace;
+    font-size:12px;
+    padding:4px 12px;
+  }
+  @media (hover:none){ #statusBar{ display:none !important; } }
+
+  /* ============ DEFEND.EXE ============ */
+  #gameOverlay{
+    position:fixed; inset:0;
+    z-index:850;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(4,2,16,0.86);
+    padding:14px;
+  }
+  #gameOverlay.on{ display:flex; }
+  .game-win{
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    box-shadow:6px 6px 0 rgba(0,0,0,0.5);
+    max-width:96vw;
+  }
+  .game-win .win-inner{ padding:8px; }
+  #gameCanvas{
+    display:block;
+    background:#08031C;
+    border:2px inset var(--bevel-hi);
+    width:min(480px, 92vw, calc(72vh * 0.857));
+    height:auto;
+    aspect-ratio:6/7;
+    image-rendering:pixelated;
+    touch-action:none;
+    cursor:crosshair;
+  }
+  .game-status{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:12.5px;
+    padding:7px 4px 3px;
+    color:var(--ink);
+  }
+  .game-status .gs-lives{ color:var(--magenta); letter-spacing:2px; }
+  .game-hint{
+    font-family:'Courier New', Courier, monospace;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    text-align:center;
+    padding:2px 4px 4px;
+  }
+
+  @media print{
+    .splash, .sound-btn, #sparkleCanvas, .blink, #gameOverlay, #statusBar{ display:none !important; }
+    .stars, .crt-overlay, #confettiCanvas, .toast, .navbar, .newsbar, .badges, .counter, .webring{ display:none !important; }
+    body{ background:#fff; }
+    .window{ box-shadow:none; border-color:#999; }
+    .banner{ background:#fff; padding:20px; }
+    .banner h1{ color:#000; background:none; filter:none; }
+    .banner .sun, .banner .grid-floor{ display:none; }
+    .banner .tagline{ color:#333; text-shadow:none; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+    html{ scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body>
+  <a class="skip" href="#about">Skip to content</a>
+  <div class="stars" aria-hidden="true"></div>
+
+  <!-- ============ ENTER SITE ============ -->
+  <div class="splash" id="splash" role="button" tabindex="0" aria-label="Enter site">
+    <div class="sp-divider" aria-hidden="true"></div>
+    <div class="sp-title">Drew K. Kennedy</div>
+    <div class="sp-sub">&mdash; Welcome to my homepage &mdash;</div>
+    <div class="sp-enter-row">
+      <svg class="sp-star" viewBox="0 0 50 50" aria-hidden="true"><path d="M25 2 L30 18 L47 18 L33 28 L38 45 L25 35 L12 45 L17 28 L3 18 L20 18 Z" fill="#FFD34D" stroke="#FF6B4A" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <span class="sp-enter">[ ENTER ]</span>
+      <svg class="sp-star rev" viewBox="0 0 50 50" aria-hidden="true"><path d="M25 2 L30 18 L47 18 L33 28 L38 45 L25 35 L12 45 L17 28 L3 18 L20 18 Z" fill="#FFD34D" stroke="#FF6B4A" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="sp-divider btm" aria-hidden="true"></div>
+    <div class="splash-hint">Click anywhere or press any key &bull; best experienced with sound <b>&#9834;</b></div>
+    <svg class="sp-award" viewBox="0 0 120 120" aria-hidden="true">
+      <path d="M60 4 L69 16 L83 10 L86 25 L101 24 L97 39 L111 45 L101 56 L111 67 L97 73 L101 88 L86 87 L83 102 L69 96 L60 108 L51 96 L37 102 L34 87 L19 88 L23 73 L9 67 L19 56 L9 45 L23 39 L19 24 L34 25 L37 10 L51 16 Z" fill="#FFD34D" stroke="#FF6B4A" stroke-width="2" stroke-linejoin="round"/>
+      <text x="60" y="50" text-anchor="middle" font-family="Verdana, sans-serif" font-size="11" font-weight="bold" fill="#B0286E">TOP 5%</text>
+      <text x="60" y="64" text-anchor="middle" font-family="Verdana, sans-serif" font-size="8.5" font-weight="bold" fill="#1E1938">OF THE</text>
+      <text x="60" y="78" text-anchor="middle" font-family="Verdana, sans-serif" font-size="11" font-weight="bold" fill="#B0286E">WEB!</text>
+    </svg>
+    <canvas id="trailCanvas" aria-hidden="true"></canvas>
+    <svg class="sp-cat" id="spCat" viewBox="9 0 27 21" aria-hidden="true" shape-rendering="crispEdges">
+      <g id="catTail">
+        <rect x="9" y="10" width="3" height="2" fill="#8E8E93"/>
+      </g>
+      <!-- pop-tart body -->
+      <rect x="11" y="5" width="16" height="13" fill="#FFCC99"/>
+      <rect x="12" y="6" width="14" height="11" fill="#FF99FF"/>
+      <rect x="14" y="8"  width="1" height="1" fill="#FF33CC"/>
+      <rect x="19" y="9"  width="1" height="1" fill="#FF33CC"/>
+      <rect x="16" y="12" width="1" height="1" fill="#FF33CC"/>
+      <rect x="22" y="8"  width="1" height="1" fill="#FF33CC"/>
+      <rect x="21" y="13" width="1" height="1" fill="#FF33CC"/>
+      <rect x="14" y="14" width="1" height="1" fill="#FF33CC"/>
+      <g id="catHead">
+        <rect x="25" y="7"  width="2" height="2" fill="#8E8E93"/>
+        <rect x="32" y="7"  width="2" height="2" fill="#8E8E93"/>
+        <rect x="24" y="9"  width="11" height="8" fill="#8E8E93"/>
+        <rect x="27" y="12" width="1" height="1" fill="#0B0428"/>
+        <rect x="31" y="12" width="1" height="1" fill="#0B0428"/>
+        <rect x="25" y="14" width="1" height="1" fill="#FF9999"/>
+        <rect x="33" y="14" width="1" height="1" fill="#FF9999"/>
+        <rect x="28" y="15" width="3" height="1" fill="#0B0428"/>
+      </g>
+      <g id="catFeet">
+        <rect x="13" y="18" width="2" height="2" fill="#8E8E93"/>
+        <rect x="17" y="18" width="2" height="2" fill="#8E8E93"/>
+        <rect x="21" y="18" width="2" height="2" fill="#8E8E93"/>
+        <rect x="26" y="18" width="2" height="2" fill="#8E8E93"/>
+      </g>
+    </svg>
+  </div>
+
+  <audio id="bgAudio" loop preload="none">
+    <source src="bg.mp3" type="audio/mpeg">
+  </audio>
+  <button class="sound-btn" id="soundBtn" type="button" aria-label="Toggle music">&#9834; SOUND: ON</button>
+  <canvas id="sparkleCanvas" aria-hidden="true"></canvas>
+  <div id="statusBar" aria-hidden="true"></div>
+
+  <!-- ============ DEFEND.EXE — do not click the X ============ -->
+  <div id="gameOverlay" role="dialog" aria-label="DEFEND.EXE minigame">
+    <div class="game-win">
+      <div class="titlebar">
+        <span class="t-label">DEFEND.EXE &mdash; (Not Responding)</span>
+        <span class="t-btns"><i id="gameClose" role="button" aria-label="Close game" tabindex="0">&times;</i></span>
+      </div>
+      <div class="win-inner">
+        <div class="game-status">
+          <span>SCORE <span id="gScore">0</span></span>
+          <span>HI <span id="gHi">0</span></span>
+          <span class="gs-lives" id="gLives">&hearts;&hearts;&hearts;</span>
+        </div>
+        <canvas id="gameCanvas" width="480" height="560"></canvas>
+        <div class="game-hint">&larr;&rarr; / A D MOVE &bull; SPACE FIRE &bull; ESC QUIT &bull; TOUCH: DRAG TO MOVE, AUTO-FIRE</div>
+      </div>
+    </div>
+  </div>
+  <div class="crt-overlay" aria-hidden="true"></div>
+  <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="page">
+
+    <!-- ============ BANNER ============ -->
+    <header class="banner" id="top">
+      <div class="grid-floor" aria-hidden="true"></div>
+      <div class="sun" aria-hidden="true"></div>
+      <h1>Drew K. Kennedy</h1>
+      <div class="tagline">Game Developer &nbsp;&bull;&nbsp; Content Creator</div>
+    </header>
+
+    <!-- ============ NAV ============ -->
+    <nav class="navbar" aria-label="Primary">
+      <a class="navbtn" href="#about">About</a>
+      <a class="navbtn" href="#work">Work</a>
+      <a class="navbtn" href="#channel">Channel</a>
+      <a class="navbtn" href="#resume">R&eacute;sum&eacute;</a>
+      <a class="navbtn" href="#extras">Extras</a>
+      <a class="navbtn" href="#contact">Contact</a>
+    </nav>
+
+    <!-- ============ NEWS CRAWL ============ -->
+    <div class="newsbar" aria-hidden="true">
+      <div class="news-track">
+        <b>+++ SITE NEWS +++</b>&nbsp; Now: Senior Software Engineer II at Pocket Worlds, running live event worlds for Highrise &nbsp;&bull;&nbsp; C.A.R.L. available on Steam, Switch, PlayStation &amp; Xbox &nbsp;&bull;&nbsp; Nintendrew passes 350,000 subscribers &nbsp;&bull;&nbsp; R&eacute;sum&eacute; available on request &nbsp;&bull;&nbsp; Thanks for stopping by &nbsp;<b>+++</b>
+      </div>
+    </div>
+
+    <!-- ============ ABOUT.TXT ============ -->
+    <section class="window" id="about">
+      <div class="titlebar">
+        <span class="t-label">ABOUT.TXT — Notepad</span>
+        <span class="t-btns" aria-hidden="true"><i>_</i><i>&#9633;</i><i>&times;</i></span>
+      </div>
+      <div class="win-body">
+        <h2 class="win-h">Hello, visitor.</h2>
+        <hr class="hr90">
+        <p>I'm Drew — a game developer and content creator based in Austin, TX, with <b>10+ years of shipped titles</b> and an audience of <b>350,000+ subscribers</b> who trust me to know video game history cold.</p>
+        <p>By day I'm a <b>Senior Software Engineer II at Pocket Worlds</b>, where I own the <b>live event world gameplay experiences</b> that ship to thousands of Highrise players every week — concept to code to live ops. I also <b>architected, built, and operate the company's internal AI platform</b>: an agentic analyst that answers cross-team questions with cited data from production systems, for every discipline from leadership to community. The thesis: every question it absorbs is an expert interruption that didn't happen — and the value compounds with every discipline it spans.</p>
+        <p>Before that: co-created and shipped <b>C.A.R.L.</b> to PC and every major console, led development on <b>Draw a Stickman: EPIC 2</b>, and spent a decade making <b>Nintendrew</b> the internet's home for retro gaming deep dives. I also compose, edit, and do voiceover — the full production stack, one person.</p>
+        <p>Austin, TX. Two cats. One very complete N64 library. Make yourself at home — the guestbook is at the bottom.</p>
+        <div class="specs" role="note" aria-label="Skills">C:\&gt; SPECS &nbsp;&mdash;&nbsp; C#/Unity &bull; Unreal/UEFN &bull; Lua &bull; TypeScript &bull; XNA &bull; Gameplay &amp; Live Ops &bull; Music Production &bull; Voiceover &bull; Video Production</div>
+      </div>
+    </section>
+
+    <!-- ============ WORK.EXE ============ -->
+    <section class="window" id="work">
+      <div class="titlebar">
+        <span class="t-label">WORK.EXE — Shipped Titles</span>
+        <span class="t-btns" aria-hidden="true"><i>_</i><i>&#9633;</i><i>&times;</i></span>
+      </div>
+      <div class="win-body">
+        <h2 class="win-h">Selected work.</h2>
+        <hr class="hr90">
+        <table class="classic">
+          <thead>
+            <tr><th>Title</th><th>Year</th><th>Role</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="t-title"><a href="https://highrise.game/" target="_blank" rel="noopener">Highrise — Event Worlds</a><span class="blink">NEW!</span></td>
+              <td class="t-year">2025&ndash;now</td>
+              <td class="t-role">Sr. Software Eng. II</td>
+              <td>I lead engineering on the live event gameplay shipped to thousands of players weekly — design, systems, live ops — and built HR Stream, the platform that lets live video hosts run interactive events like Bingo and Trivia. (Pocket Worlds)</td>
+            </tr>
+            <tr>
+              <td class="t-title">Internal AI Platform</td>
+              <td class="t-year">2025&ndash;now</td>
+              <td class="t-role">Architect &amp; Owner</td>
+              <td>Designed, built, and operate Pocket Worlds' company-wide AI analyst solo — consolidating a fleet of single-purpose bots into one agentic platform spanning 20+ live data sources. Cited, verified answers from production systems; every action human-approved. Serves every discipline: leadership, data, ops, engineering, trust &amp; safety, community.</td>
+            </tr>
+            <tr>
+              <td class="t-title"><a href="https://www.carlgame.com/" target="_blank" rel="noopener">C.A.R.L.</a></td>
+              <td class="t-year">2022</td>
+              <td class="t-role">Co-Creator / Dev</td>
+              <td>Retro-style platformer built with Matt Bitner, in the lineage of Cave Story and Jazz Jackrabbit. Steam, Switch, PlayStation, Xbox.</td>
+            </tr>
+            <tr>
+              <td class="t-title"><a href="https://www.mobygames.com/game/98806/draw-a-stickman-epic-2/" target="_blank" rel="noopener">Draw a Stickman: EPIC 2</a></td>
+              <td class="t-year">2015</td>
+              <td class="t-role">Lead Developer</td>
+              <td>Led development of the draw-your-own-hero sequel. C#/Unity, shipped across desktop and mobile, later ported to Switch.</td>
+            </tr>
+            <tr>
+              <td class="t-title"><a href="https://www.mobygames.com/game/113423/battlepillars-gold-edition/" target="_blank" rel="noopener">Battlepillars</a></td>
+              <td class="t-year">2014</td>
+              <td class="t-role">Developer (of two)</td>
+              <td>Real-time strategy with heavily armed caterpillars, built by a two-person team. iOS, Android, and Steam.</td>
+            </tr>
+            <tr>
+              <td class="t-title"><a href="https://www.mobygames.com/game/68665/draw-a-stickman-epic/" target="_blank" rel="noopener">Draw a Stickman: EPIC</a></td>
+              <td class="t-year">2012</td>
+              <td class="t-role">Developer</td>
+              <td>Core gameplay engineering on the original. Tens of millions of downloads across six platforms.</td>
+            </tr>
+            <tr>
+              <td class="t-title">Prototypes &amp; Tools</td>
+              <td class="t-year">ongoing</td>
+              <td class="t-role">Everything</td>
+              <td>Playable experiences built in Unreal (UEFN), a browser voxel sandbox with procedural textures and synthesized audio, AI-assisted music tooling, homebrew experiments. Ask me about these.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="table-note">Earlier credits published under Andrew Kenady — full list on <a href="https://www.mobygames.com/person/653849/andrew-kenady/" target="_blank" rel="noopener">MobyGames</a>.</p>
+      </div>
+    </section>
+
+    <!-- ============ NINTENDREW.AVI ============ -->
+    <section class="window" id="channel">
+      <div class="titlebar">
+        <span class="t-label">NINTENDREW.AVI — Media Player</span>
+        <span class="t-btns" aria-hidden="true"><i>_</i><i>&#9633;</i><i>&times;</i></span>
+      </div>
+      <div class="win-body">
+        <h2 class="win-h">The channel.</h2>
+        <hr class="hr90">
+        <div class="cols">
+          <div>
+            <p>Since 2016 I've hosted <b><a href="https://www.youtube.com/c/Nintendrew" target="_blank" rel="noopener">Nintendrew</a></b>, a YouTube channel dedicated to video game history and preservation — obscure prototypes, ambitious homebrew, console mods, and the hardware everyone else forgot.</p>
+            <p>Practically, that's a decade of <b>scripting, shooting, editing, scoring, and publishing</b> broadcast-quality video on a schedule, plus the audience instincts that come from a comment section 350,000 strong. Frequent collaborations with Scott the Woz, Nathaniel Bandy, SMG4, and SimpleFlips.</p>
+            <p>For a studio, that means a developer who can also <b>speak publicly, demo convincingly, and represent the product</b> — conventions included. I'm a recurring guest at Retropalooza and the channel has its own IMDb page.</p>
+          </div>
+          <div>
+            <div class="statbox" role="table" aria-label="Channel statistics">
+              <div class="sb-title">*** CHANNEL STATS ***</div>
+              <div class="sb-row"><span>Subscribers</span><b>350,000+</b></div>
+              <div class="sb-row"><span>Broadcasting since</span><b>2016</b></div>
+              <div class="sb-row"><span>Complete libraries</span><b>N64/VB/GBAV</b></div>
+              <div class="sb-row"><span>Convention guest</span><b>Recurring</b></div>
+              <div class="sb-row"><span>IMDb page</span><b>Yes, really</b></div>
+            </div>
+            <div class="nowplaying">
+              <span class="np-eq">&#9836;&#9836;</span> NOW PLAYING: original compositions on <a href="https://soundcloud.com/nintendrewyt" target="_blank" rel="noopener">SoundCloud</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RESUME.DOC ============ -->
+    <section class="window" id="resume">
+      <div class="titlebar">
+        <span class="t-label">RESUME.DOC — WordPad</span>
+        <span class="t-btns" aria-hidden="true"><i>_</i><i>&#9633;</i><i>&times;</i></span>
+      </div>
+      <div class="win-body">
+        <h2 class="win-h">Experience.</h2>
+        <hr class="hr90">
+        <div class="rez-row">
+          <div class="rez-when">JAN 2025 — NOW</div>
+          <div class="rez-what">
+            <b>Pocket Worlds — Austin, TX</b>
+            <div class="rz-role">Senior Software Engineer II &middot; Gameplay &amp; Live Events</div>
+            <p>Lead engineering of weekly live-service gameplay events for Highrise, shipping player-facing content on fixed production cadences in Unity/C#. Designed and built HR Stream, a gameplay platform that lets live video hosts run interactive events like Bingo and Trivia. Separately, architected and operate the company's internal AI platform end-to-end — plus generative AI pipelines for marketing creative and agent-assisted engineering workflows across the org.</p>
+          </div>
+        </div>
+        <div class="rez-row">
+          <div class="rez-when">2016 — NOW</div>
+          <div class="rez-what">
+            <b>Nintendrew</b>
+            <div class="rz-role">Content Creator</div>
+            <p>Writing, filming, scoring, and editing for a 350,000+ subscriber YouTube channel — reviews, retrospectives, DIY builds, and retro collecting, produced solo since 2016.</p>
+          </div>
+        </div>
+        <div class="rez-row">
+          <div class="rez-when">2020 — 2025</div>
+          <div class="rez-what">
+            <b>Independent Game Developer</b>
+            <div class="rz-role">Co-Creator &middot; C.A.R.L.</div>
+            <p>Designed and developed C.A.R.L., a 2D puzzle-platformer released on PC, Switch, Xbox, and PlayStation — core gameplay systems in Unity/C#, cross-platform build pipelines, and platform-specific deployment in a two-person team.</p>
+          </div>
+        </div>
+        <div class="rez-row">
+          <div class="rez-when">2016 — 2017</div>
+          <div class="rez-what">
+            <b>Augterra — San Mateo, CA</b>
+            <div class="rz-role">Senior Unity Developer</div>
+            <p>Owned the code base and build management end-to-end; developed rapid prototypes for <i>Karobi</i>, an unreleased AR card battle game.</p>
+          </div>
+        </div>
+        <div class="rez-row">
+          <div class="rez-when">2015 — 2017</div>
+          <div class="rez-what">
+            <b>NC2 Media — Franklin, TN</b>
+            <div class="rz-role">Game Engineer &middot; C#, Unity</div>
+            <p>Built and iterated on multiple simultaneously-developed Unity titles for an unannounced project in a closed-door R&amp;D lab.</p>
+          </div>
+        </div>
+        <div class="rez-row">
+          <div class="rez-when">2013 — 2015</div>
+          <div class="rez-what">
+            <b>Hitcents — Bowling Green, KY</b>
+            <div class="rz-role">Game Developer &rarr; Lead Game Developer</div>
+            <p>Core gameplay engineering, then small-team leadership, across Draw a Stickman: EPIC 1 &amp; 2 and Battlepillars — C# with XNA and Unity, shipping to Windows, macOS, Linux, iOS, Android, and Windows Phone.</p>
+          </div>
+        </div>
+        <div class="rez-row">
+          <div class="rez-when">EDUCATION</div>
+          <div class="rez-what">
+            <b>The Gatton Academy of Mathematics and Science</b>
+            <div class="rz-role">Graduate &middot; Later CS Tutor</div>
+            <p>Graduated from the nation's #1-ranked high school (Newsweek, three consecutive years), then returned as a computer science tutor.</p>
+          </div>
+        </div>
+        <p style="margin-top:16px;">A conventional one-page r&eacute;sum&eacute; is available on request — <a href="mailto:hello@drewkkennedy.com?subject=R%C3%A9sum%C3%A9%20request">email me</a>.</p>
+      </div>
+    </section>
+
+    <!-- ============ EXTRAS ============ -->
+    <section class="window" id="extras">
+      <div class="titlebar">
+        <span class="t-label">EXTRAS — Bonus Disc</span>
+        <span class="t-btns" aria-hidden="true"><i>_</i><i>&#9633;</i><i>&times;</i></span>
+      </div>
+      <div class="win-body">
+        <h2 class="win-h">Also in the toolkit.</h2>
+        <hr class="hr90">
+        <div class="extras-grid">
+          <div class="extra">
+            <b>Music Production</b>
+            <p>Original composition and scoring, chiptune to full production. Game soundtracks a specialty.</p>
+            <a href="https://soundcloud.com/nintendrewyt" target="_blank" rel="noopener">Listen &rarr;</a>
+          </div>
+          <div class="extra">
+            <b>Voiceover</b>
+            <p>Character and commercial VO. Credits include announcer work for SMG4. Reels on request.</p>
+            <a href="#contact">Request reels &rarr;</a>
+          </div>
+          <div class="extra">
+            <b>Video Production</b>
+            <p>Writing, editing, and motion graphics — a decade of self-produced broadcast work.</p>
+            <a href="https://www.youtube.com/c/Nintendrew" target="_blank" rel="noopener">Watch &rarr;</a>
+          </div>
+          <div class="extra">
+            <b>Speaking &amp; Events</b>
+            <p>Convention panels, guest spots, and developer talks. Comfortable on any stage. Con bookings go through my representation.</p>
+            <a href="https://www.malicemediallc.com/contact-us" target="_blank" rel="noopener">Book me via Malice Media &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="window" id="contact">
+      <div class="titlebar">
+        <span class="t-label">CONTACT.HTM — Guestbook</span>
+        <span class="t-btns" aria-hidden="true"><i>_</i><i>&#9633;</i><i>&times;</i></span>
+      </div>
+      <div class="win-body">
+        <h2 class="win-h">Get in touch.</h2>
+        <hr class="hr90">
+        <p>Hiring or collaborating? I answer everything personally, usually fast. For convention and event bookings, contact <a href="https://www.malicemediallc.com/contact-us" target="_blank" rel="noopener">Malice Media</a>.</p>
+        <a class="email-big" href="mailto:hello@drewkkennedy.com">hello@drewkkennedy.com</a>
+        <p style="margin-bottom:8px;"><b>Cool links (mine):</b></p>
+        <ul class="linklist">
+          <li><a href="https://www.youtube.com/c/Nintendrew" target="_blank" rel="noopener">YouTube — Nintendrew</a></li>
+          <li><a href="https://www.linkedin.com/in/andrewkenady/" target="_blank" rel="noopener">LinkedIn</a></li>
+          <li><a href="https://bsky.app/profile/nintendrew.bsky.social" target="_blank" rel="noopener">Bluesky</a></li>
+          <li><a href="https://www.instagram.com/nintendrewyt/" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://www.tiktok.com/@nintendrew" target="_blank" rel="noopener">TikTok</a></li>
+          <li><a href="https://soundcloud.com/nintendrewyt" target="_blank" rel="noopener">SoundCloud</a></li>
+          <li><a href="https://www.imdb.com/name/nm10395432/" target="_blank" rel="noopener">IMDb</a></li>
+          <li><a href="https://www.mobygames.com/person/653849/andrew-kenady/" target="_blank" rel="noopener">MobyGames</a></li>
+        </ul>
+        <p style="margin-top:18px;"><a class="gb-btn" href="mailto:hello@drewkkennedy.com?subject=Signing%20the%20guestbook">&#9998; Sign the guestbook</a></p>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="footer">
+      <div class="badges" aria-hidden="true">
+        <svg viewBox="0 0 88 31"><rect width="88" height="31" fill="#08031C"/><rect x="2" y="2" width="84" height="27" fill="none" stroke="#00E5FF" stroke-width="1"/><text x="44" y="13" text-anchor="middle" font-family="Courier New, monospace" font-size="8" font-weight="bold" fill="#00E5FF">Y2K</text><text x="44" y="24" text-anchor="middle" font-family="Courier New, monospace" font-size="8" fill="#3CFF6E">COMPLIANT &#10003;</text></svg>
+        <svg viewBox="0 0 88 31"><rect width="88" height="31" fill="#1B0C4A"/><rect x="2" y="2" width="84" height="27" fill="none" stroke="#FFD34D" stroke-width="1"/><text x="44" y="13" text-anchor="middle" font-family="Courier New, monospace" font-size="8" font-weight="bold" fill="#FFD34D">&#9733; EST. 1993 &#9733;</text><text x="44" y="24" text-anchor="middle" font-family="Courier New, monospace" font-size="8" fill="#fff">AUSTIN, TEXAS</text></svg>
+        <svg viewBox="0 0 88 31"><rect width="88" height="31" fill="#08031C"/><rect x="2" y="2" width="84" height="27" fill="none" stroke="#3CFF6E" stroke-width="1"/><text x="44" y="13" text-anchor="middle" font-family="Courier New, monospace" font-size="8" font-weight="bold" fill="#3CFF6E">SHIPPING</text><text x="44" y="24" text-anchor="middle" font-family="Courier New, monospace" font-size="8" fill="#3CFF6E">SINCE 2012</text></svg>
+        <svg viewBox="0 0 88 31"><rect width="88" height="31" fill="#2A0E35"/><rect x="2" y="2" width="84" height="27" fill="none" stroke="#FF3CAC" stroke-width="1"/><text x="44" y="13" text-anchor="middle" font-family="Courier New, monospace" font-size="8" font-weight="bold" fill="#FF3CAC">BEST VIEWED</text><text x="44" y="24" text-anchor="middle" font-family="Courier New, monospace" font-size="8" fill="#fff">AT ANY SIZE</text></svg>
+      </div>
+      <div class="counter">You are visitor N&ordm; <span class="digits" id="counterDigits"></span> &nbsp;(probably)</div>
+      <br>
+      <div class="webring">
+        <b>&#128279; The Kennedy Web Ring</b>
+        <a href="https://www.youtube.com/c/Nintendrew" target="_blank" rel="noopener">&larr; Prev</a> &bull;
+        <a href="https://www.carlgame.com/" target="_blank" rel="noopener">Random</a> &bull;
+        <a href="https://soundcloud.com/nintendrewyt" target="_blank" rel="noopener">Next &rarr;</a>
+      </div>
+      <div class="f-legal">
+        &copy; 2026 Drew K. Kennedy &bull; Some credits published under Andrew Kenady<br>
+        Last updated: <span id="lastUpdated">recently</span> &bull; Thanks for surfing by<br>
+        <a href="#top">&#9650; Back to top</a>
+      </div>
+    </footer>
+
+  </div>
+
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ===== the enter page — first input doubles as audio consent =====
+  const splash = document.getElementById('splash');
+  const bgAudio = document.getElementById('bgAudio');
+  const soundBtn = document.getElementById('soundBtn');
+  let audioOn = false;
+  let entered = false;
+
+  // returning visitors within the same session skip the gate
+  let seenSplash = false;
+  try { seenSplash = sessionStorage.getItem('dkk_entered') === '1'; } catch(e){}
+  if (seenSplash){
+    splash.classList.add('hidden');
+    entered = true;
+  } else {
+    document.body.style.overflow = 'hidden';
+    splash.focus({ preventScroll: true });
+  }
+
+  // marquee the page title while the door is still closed
+  const REAL_TITLE = document.title;
+  let titleTimer = null;
+  if (!seenSplash){
+    let tstr = '★ DREW K. KENNEDY ★ GAME DEVELOPER ★ CONTENT CREATOR ';
+    titleTimer = setInterval(() => {
+      tstr = tstr.slice(1) + tstr[0];
+      document.title = tstr;
+    }, 400);
+  }
+
+  function enterSite(){
+    if (entered) return;
+    entered = true;
+    if (titleTimer){ clearInterval(titleTimer); document.title = REAL_TITLE; }
+    try { sessionStorage.setItem('dkk_entered', '1'); } catch(e){}
+    // the input is a user gesture — if bg.mp3 exists, the music may begin
+    bgAudio.volume = 0.5;
+    bgAudio.play().then(() => {
+      audioOn = true;
+      soundBtn.style.display = 'block';
+      soundBtn.innerHTML = '&#9834; SOUND: ON';
+    }).catch(() => { /* no file yet, or blocked — the gate still did its job */ });
+    splash.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+  splash.addEventListener('click', enterSite);
+
+  // ===== nyan cat flight — a stepped wave, shedding rainbow that fades =====
+  (function(){
+    if (prefersReducedMotion) return;
+    const cat = document.getElementById('spCat');
+    const tc = document.getElementById('trailCanvas');
+    if (!cat || !tc) return;
+    const tctx = tc.getContext('2d');
+    const feet = document.getElementById('catFeet');
+    const head = document.getElementById('catHead');
+    const tail = document.getElementById('catTail');
+    const COLORS = ['#FF3B30', '#FF9500', '#FFE800', '#33E019', '#00A2FF', '#8A5CF6'];
+    const CAT_W = 66;                 // rendered sprite width, px
+    const STRIPE_H = 4.6;             // one rainbow band
+    const TRAIL_H = STRIPE_H * 6;     // full stack matches the pop-tart
+    const FADE_MS = 2400;
+    const SPEED = 110;                // px per second
+    let segs = [];
+    let lastSpawnX = -Infinity;
+    let t0 = null;
+    let raf = null;
+
+    function size(){
+      tc.width = splash.clientWidth * devicePixelRatio;
+      tc.height = splash.clientHeight * devicePixelRatio;
+      tctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    size();
+    addEventListener('resize', size);
+
+    function frame(now){
+      if (entered){ tctx.clearRect(0, 0, splash.clientWidth, splash.clientHeight); return; }
+      if (t0 === null) t0 = now;
+      const t = (now - t0) / 1000;
+      const W = splash.clientWidth;
+      const H = splash.clientHeight;
+      const span = W + 320;
+      const x = -160 + ((t * SPEED) % span);
+      // stepped three-level wave — brisk, like the reference footage
+      const baseY = H - 92;
+      const y = baseY + Math.round(Math.sin(t * 6.2) * 1.4) * 8;
+      cat.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+
+      // two-frame sprite work: feet paddle, head bobs, tail wags
+      const tick = Math.floor(now / 130) % 2;
+      feet.setAttribute('transform', tick ? 'translate(1.2 0)' : 'translate(-1.2 0)');
+      head.setAttribute('transform', tick ? 'translate(0 0.9)' : 'translate(0 0)');
+      tail.setAttribute('transform', tick ? 'translate(0 -0.9)' : 'translate(0 0.5)');
+
+      // shed a segment every few px of travel (handles the wrap, too)
+      if (x < lastSpawnX) lastSpawnX = -Infinity;
+      if (x - lastSpawnX >= 7){
+        lastSpawnX = x;
+        segs.push({ x: x + 4, y: y + 12, born: now }); // tail-aligned with the pop-tart stripes
+      }
+
+      tctx.clearRect(0, 0, W, H);
+      segs = segs.filter(s => now - s.born < FADE_MS);
+      for (const s of segs){
+        const a = 1 - (now - s.born) / FADE_MS;
+        tctx.globalAlpha = a * 0.9;
+        for (let i = 0; i < 6; i++){
+          tctx.fillStyle = COLORS[i];
+          tctx.fillRect(s.x, s.y + i * STRIPE_H, 8.5, STRIPE_H + 0.5);
+        }
+      }
+      tctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+    // spare the battery when the tab is hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden){ if (raf) cancelAnimationFrame(raf); raf = null; }
+      else if (!raf && !entered){ t0 = null; lastSpawnX = -Infinity; segs = []; raf = requestAnimationFrame(frame); }
+    });
+  })();
+  addEventListener('keydown', e => {
+    if (entered) return;
+    if (e.key === 'Tab' || e.metaKey || e.ctrlKey || e.altKey || /^F\d+$/.test(e.key)) return; // browser business stays browser business
+    e.preventDefault();
+    enterSite();
+  });
+
+  soundBtn.addEventListener('click', () => {
+    if (audioOn){
+      bgAudio.pause();
+      audioOn = false;
+      soundBtn.innerHTML = '&#9834; SOUND: OFF';
+    } else {
+      bgAudio.play().then(() => {
+        audioOn = true;
+        soundBtn.innerHTML = '&#9834; SOUND: ON';
+      }).catch(() => {});
+    }
+  });
+
+  // ===== sparkle trail — fine pointers only, and never under reduced motion =====
+  (function(){
+    if (prefersReducedMotion || !window.matchMedia('(pointer: fine)').matches) return;
+    const sc = document.getElementById('sparkleCanvas');
+    const sctx = sc.getContext('2d');
+    let sparks = [];
+    let running = false;
+    function size(){
+      sc.width = innerWidth * devicePixelRatio;
+      sc.height = innerHeight * devicePixelRatio;
+      sctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    size();
+    addEventListener('resize', size);
+    const colors = ['#FFD34D', '#00E5FF', '#FF3CAC', '#FFFFFF'];
+    let last = 0;
+    addEventListener('pointermove', e => {
+      const now = performance.now();
+      if (now - last < 28) return; // throttle
+      last = now;
+      sparks.push({
+        x: e.clientX + (Math.random() - 0.5) * 6,
+        y: e.clientY + (Math.random() - 0.5) * 6,
+        vy: 0.4 + Math.random() * 0.7,
+        r: 1.5 + Math.random() * 2.5,
+        c: colors[(Math.random() * colors.length) | 0],
+        life: 46
+      });
+      if (!running){ running = true; requestAnimationFrame(step); }
+    });
+    function drawStar(x, y, r, c, a){
+      sctx.save();
+      sctx.globalAlpha = a;
+      sctx.strokeStyle = c;
+      sctx.lineWidth = 1.2;
+      sctx.beginPath();
+      sctx.moveTo(x - r, y); sctx.lineTo(x + r, y);
+      sctx.moveTo(x, y - r); sctx.lineTo(x, y + r);
+      sctx.stroke();
+      sctx.restore();
+    }
+    function step(){
+      sctx.clearRect(0, 0, innerWidth, innerHeight);
+      sparks = sparks.filter(s => s.life > 0);
+      for (const s of sparks){
+        s.y += s.vy; s.life--;
+        drawStar(s.x, s.y, s.r * (s.life / 46), s.c, s.life / 46);
+      }
+      if (sparks.length){ requestAnimationFrame(step); }
+      else { running = false; sctx.clearRect(0, 0, innerWidth, innerHeight); }
+    }
+  })();
+
+  // toast
+  const toast = document.getElementById('toast');
+  let toastTimer = null;
+  function notify(msg){
+    toast.textContent = msg;
+    toast.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('on'), 3800);
+  }
+
+  // confetti — pixel squares, launches up, falls under gravity
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  let pieces = [];
+  let confettiRunning = false;
+  function sizeCanvas(){
+    canvas.width = innerWidth * devicePixelRatio;
+    canvas.height = innerHeight * devicePixelRatio;
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  }
+  sizeCanvas();
+  addEventListener('resize', sizeCanvas);
+  function burstConfetti(){
+    if (prefersReducedMotion) return;
+    const colors = ['#FF3CAC', '#00E5FF', '#FFD34D', '#3CFF6E', '#FFFFFF'];
+    for (let i = 0; i < 140; i++){
+      pieces.push({
+        x: innerWidth / 2 + (Math.random() - 0.5) * 260,
+        y: innerHeight + 10,
+        vx: (Math.random() - 0.5) * 7,
+        vy: -(10 + Math.random() * 9),
+        s: 5 + Math.random() * 6,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.3,
+        c: colors[i % colors.length],
+        life: 240
+      });
+    }
+    if (!confettiRunning){ confettiRunning = true; requestAnimationFrame(stepConfetti); }
+  }
+  function stepConfetti(){
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    pieces = pieces.filter(p => p.life > 0 && p.y < innerHeight + 40);
+    for (const p of pieces){
+      p.vy += 0.22; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = Math.min(1, p.life / 60);
+      ctx.fillStyle = p.c;
+      ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s);
+      ctx.restore();
+    }
+    if (pieces.length){ requestAnimationFrame(stepConfetti); }
+    else { confettiRunning = false; ctx.clearRect(0, 0, innerWidth, innerHeight); }
+  }
+
+  // the Konami code — summons DEFEND.EXE (with a bonus life, as tradition demands)
+  const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  let kIdx = 0;
+  addEventListener('keydown', e => {
+    if (e.target.matches('input, textarea')) return;
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    kIdx = (key === KONAMI[kIdx]) ? kIdx + 1 : (key === KONAMI[0] ? 1 : 0);
+    if (kIdx === KONAMI.length){
+      kIdx = 0;
+      burstConfetti();
+      DEFEND.open(true);
+    }
+  });
+
+  // visitor counter — odometer digits, localStorage-honest
+  (function(){
+    let n = 1337;
+    try {
+      n = parseInt(localStorage.getItem('dkk_visits') || '0', 10) + 1;
+      localStorage.setItem('dkk_visits', String(n));
+      n += 1336; // every counter started somewhere
+    } catch (e) {}
+    const digits = String(n).padStart(6, '0').split('');
+    document.getElementById('counterDigits').innerHTML = digits.map(d => '<i>' + d + '</i>').join('');
+  })();
+
+  // last updated — document.lastModified, like the old days
+  (function(){
+    const d = new Date(document.lastModified);
+    if (!isNaN(d)){
+      document.getElementById('lastUpdated').textContent =
+        d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+    }
+  })();
+
+  // ===== window controls — [_] works, [□] protests, [×] has consequences =====
+  document.querySelectorAll('.window .titlebar .t-btns').forEach(btns => {
+    const win = btns.closest('.window');
+    const [minB, maxB, closeB] = btns.querySelectorAll('i');
+    if (minB) minB.addEventListener('click', () => win.classList.toggle('min'));
+    if (maxB) maxB.addEventListener('click', () => {
+      win.classList.remove('shake');
+      void win.offsetWidth; // restart the animation
+      win.classList.add('shake');
+    });
+    if (closeB) closeB.addEventListener('click', () => {
+      notify('OH NO. THE SITE IS FIGHTING BACK.');
+      DEFEND.open(false);
+    });
+  });
+
+  // ===== status bar — where links go, announced honestly =====
+  const statusBar = document.getElementById('statusBar');
+  if (window.matchMedia('(hover:hover)').matches){
+    document.querySelectorAll('a[href]').forEach(a => {
+      a.addEventListener('mouseenter', () => {
+        statusBar.textContent = a.href.startsWith('mailto:') ? a.href : '→ ' + a.href;
+        statusBar.style.display = 'block';
+      });
+      a.addEventListener('mouseleave', () => { statusBar.style.display = 'none'; });
+    });
+  }
+
+  // ===== DEFEND.EXE — the site attacks; you have a ship =====
+  const DEFEND = (function(){
+    const overlay = document.getElementById('gameOverlay');
+    const cv = document.getElementById('gameCanvas');
+    const g = cv.getContext('2d');
+    const elScore = document.getElementById('gScore');
+    const elHi = document.getElementById('gHi');
+    const elLives = document.getElementById('gLives');
+    const W = 480, H = 560;
+    let running = false, over = false, raf = null, last = 0;
+    let score = 0, lives = 3, wave = 0, crtWasOn = false;
+    let hi = 0;
+    try { hi = parseInt(localStorage.getItem('dkk_hiscore') || '0', 10); } catch(e){}
+    let ship, pShots, eShots, foes, dir, parts, fireHeld, moveL, moveR, touchX, invuln;
+
+    // --- tiny WebAudio bleeps, forgiving if unavailable ---
+    let ac = null;
+    function beep(freq, dur, type, vol){
+      try {
+        ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+        const o = ac.createOscillator(), gn = ac.createGain();
+        o.type = type || 'square';
+        o.frequency.value = freq;
+        gn.gain.setValueAtTime(vol || 0.03, ac.currentTime);
+        gn.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + dur);
+        o.connect(gn); gn.connect(ac.destination);
+        o.start(); o.stop(ac.currentTime + dur);
+      } catch(e){}
+    }
+
+    function reset(full){
+      if (full){ score = 0; lives = 3; wave = 0; }
+      ship = { x: W/2, y: H-46, w: 30, h: 18 };
+      pShots = []; eShots = []; parts = [];
+      fireHeld = false; moveL = false; moveR = false; touchX = null;
+      invuln = 0; over = false;
+      spawnWave();
+      paint();
+    }
+
+    function spawnWave(){
+      wave++;
+      foes = []; dir = 1;
+      const rows = Math.min(3 + Math.floor((wave-1)/2), 5);
+      const kinds = ['window','button','new','digit','button'];
+      for (let r = 0; r < rows; r++){
+        for (let c = 0; c < 7; c++){
+          foes.push({
+            x: 34 + c*60, y: 64 + r*44,
+            w: 46, h: 26,
+            kind: kinds[r], dig: (Math.random()*10)|0,
+            pts: [30,20,10,15,20][r]
+          });
+        }
+      }
+    }
+
+    function open(viaKonami){
+      if (running) { if (viaKonami){ lives++; drawLives(); notify('CHEAT ACCEPTED. +1 LIFE.'); } return; }
+      running = true;
+      crtWasOn = document.body.classList.contains('crt');
+      document.body.classList.add('crt');
+      document.body.style.overflow = 'hidden';
+      overlay.classList.add('on');
+      elHi.textContent = hi;
+      reset(true);
+      if (viaKonami){ lives = 4; notify('KONAMI ACKNOWLEDGED. BONUS LIFE.'); }
+      drawLives();
+      last = 0;
+      raf = requestAnimationFrame(loop);
+    }
+    function close(){
+      running = false;
+      if (raf) cancelAnimationFrame(raf);
+      overlay.classList.remove('on');
+      if (!crtWasOn) document.body.classList.remove('crt');
+      document.body.style.overflow = '';
+    }
+
+    function drawLives(){ elLives.innerHTML = '&hearts;'.repeat(Math.max(lives,0)) || '&mdash;'; }
+
+    function boom(x, y, col){
+      for (let i = 0; i < 14; i++){
+        parts.push({ x, y, vx:(Math.random()-0.5)*160, vy:(Math.random()-0.5)*160, life:0.5, c:col });
+      }
+    }
+
+    function update(dt){
+      // ship
+      const spd = 280;
+      if (moveL) ship.x -= spd*dt;
+      if (moveR) ship.x += spd*dt;
+      if (touchX !== null) ship.x += Math.max(-spd*dt, Math.min(spd*dt, touchX - ship.x));
+      ship.x = Math.max(20, Math.min(W-20, ship.x));
+      if (invuln > 0) invuln -= dt;
+
+      // formation march
+      const alive = foes.length;
+      const mSpd = (26 + wave*9 + (1 - alive/35) * 70) * dt;
+      let edge = false;
+      for (const f of foes){
+        f.x += mSpd * dir;
+        if (f.x < 12 || f.x + f.w > W-12) edge = true;
+      }
+      if (edge){ dir *= -1; for (const f of foes){ f.y += 15; f.x += mSpd * dir; } }
+
+      // enemy fire
+      if (Math.random() < (0.012 + wave*0.004) && alive){
+        const f = foes[(Math.random()*alive)|0];
+        eShots.push({ x: f.x+f.w/2, y: f.y+f.h, w: 8, h: 10 });
+        beep(180, 0.08, 'sawtooth', 0.015);
+      }
+
+      for (const s of pShots) s.y -= 420*dt;
+      for (const s of eShots) s.y += (130 + wave*14)*dt;
+      pShots = pShots.filter(s => s.y > -12);
+      eShots = eShots.filter(s => s.y < H+12);
+      for (const p of parts){ p.x += p.vx*dt; p.y += p.vy*dt; p.life -= dt; }
+      parts = parts.filter(p => p.life > 0);
+
+      // player shots vs foes
+      for (const s of pShots){
+        for (let i = foes.length-1; i >= 0; i--){
+          const f = foes[i];
+          if (s.x > f.x && s.x < f.x+f.w && s.y > f.y && s.y < f.y+f.h){
+            boom(f.x+f.w/2, f.y+f.h/2, '#FF3CAC');
+            score += f.pts;
+            foes.splice(i, 1);
+            s.y = -99;
+            beep(520, 0.07, 'square', 0.03);
+            break;
+          }
+        }
+      }
+      elScore.textContent = score;
+
+      // enemy shots vs ship
+      if (invuln <= 0){
+        for (const s of eShots){
+          if (Math.abs(s.x - ship.x) < ship.w/2 + 4 && Math.abs(s.y - ship.y) < ship.h/2 + 6){
+            s.y = H+99;
+            hitShip();
+            break;
+          }
+        }
+        // invasion complete?
+        for (const f of foes){ if (f.y + f.h >= ship.y - 8){ hitShip(true); break; } }
+      }
+
+      if (!foes.length){
+        score += 100 * wave;
+        beep(760, 0.2, 'triangle', 0.04);
+        spawnWave();
+      }
+    }
+
+    function hitShip(invaded){
+      lives--;
+      drawLives();
+      boom(ship.x, ship.y, '#00E5FF');
+      beep(90, 0.35, 'sawtooth', 0.05);
+      invuln = 1.4;
+      if (invaded || lives <= 0){ gameOver(); }
+    }
+
+    function gameOver(){
+      over = true;
+      if (score > hi){
+        hi = score;
+        try { localStorage.setItem('dkk_hiscore', String(hi)); } catch(e){}
+        elHi.textContent = hi;
+      }
+    }
+
+    // --- drawing the attacking UI ---
+    function drawFoe(f){
+      if (f.kind === 'window'){
+        g.fillStyle = '#F0EDF5'; g.fillRect(f.x, f.y, f.w, f.h);
+        const grad = g.createLinearGradient(f.x, 0, f.x+f.w, 0);
+        grad.addColorStop(0, '#FF3CAC'); grad.addColorStop(1, '#2B86C5');
+        g.fillStyle = grad; g.fillRect(f.x, f.y, f.w, 8);
+        g.fillStyle = '#8E86A8';
+        g.fillRect(f.x+5, f.y+13, f.w-10, 3);
+        g.fillRect(f.x+5, f.y+19, f.w-16, 3);
+      } else if (f.kind === 'button'){
+        g.fillStyle = '#F0EDF5'; g.fillRect(f.x, f.y, f.w, f.h);
+        g.fillStyle = '#FFFFFF'; g.fillRect(f.x, f.y, f.w, 2); g.fillRect(f.x, f.y, 2, f.h);
+        g.fillStyle = '#8E86A8'; g.fillRect(f.x, f.y+f.h-2, f.w, 2); g.fillRect(f.x+f.w-2, f.y, 2, f.h);
+        g.fillStyle = '#1E1938'; g.font = 'bold 11px Verdana'; g.textAlign = 'center';
+        g.fillText('OK', f.x+f.w/2, f.y+f.h/2+4);
+      } else if (f.kind === 'new'){
+        g.fillStyle = '#FF3CAC'; g.fillRect(f.x+4, f.y+3, f.w-8, f.h-6);
+        g.fillStyle = '#FFFFFF'; g.font = 'bold 11px Verdana'; g.textAlign = 'center';
+        g.fillText('NEW!', f.x+f.w/2, f.y+f.h/2+4);
+      } else {
+        g.fillStyle = '#000000'; g.fillRect(f.x+8, f.y+2, f.w-16, f.h-4);
+        g.fillStyle = '#3CFF6E'; g.font = 'bold 14px Courier New'; g.textAlign = 'center';
+        g.fillText(String(f.dig), f.x+f.w/2, f.y+f.h/2+5);
+      }
+    }
+
+    function paint(){
+      g.clearRect(0, 0, W, H);
+      // starfield
+      g.fillStyle = 'rgba(255,255,255,0.5)';
+      for (let i = 0; i < 40; i++){
+        g.fillRect(((i*97)%W), ((i*173)%H), 1.5, 1.5);
+      }
+      for (const f of foes) drawFoe(f);
+      // shots
+      g.fillStyle = '#00E5FF';
+      for (const s of pShots) g.fillRect(s.x-2, s.y-8, 4, 10);
+      for (const s of eShots){
+        g.fillStyle = '#F0EDF5'; g.fillRect(s.x-5, s.y-6, 11, 12);
+        g.fillStyle = '#E03C31'; g.font = 'bold 10px Verdana'; g.textAlign = 'center';
+        g.fillText('!', s.x+0.5, s.y+3.5);
+      }
+      // particles
+      for (const p of parts){
+        g.globalAlpha = Math.max(p.life*2, 0);
+        g.fillStyle = p.c;
+        g.fillRect(p.x-2, p.y-2, 4, 4);
+      }
+      g.globalAlpha = 1;
+      // ship — unless blinking through invulnerability
+      if (invuln <= 0 || (invuln*10|0) % 2 === 0){
+        const sx = ship.x, sy = ship.y;
+        g.fillStyle = '#00E5FF';
+        g.fillRect(sx-15, sy, 30, 8);
+        g.fillRect(sx-9, sy-6, 18, 6);
+        g.fillRect(sx-2.5, sy-12, 5, 6);
+        g.fillStyle = '#FF3CAC';
+        g.fillRect(sx-15, sy+8, 6, 3);
+        g.fillRect(sx+9, sy+8, 6, 3);
+      }
+      if (over){
+        g.fillStyle = 'rgba(4,2,16,0.78)';
+        g.fillRect(0, 0, W, H);
+        g.textAlign = 'center';
+        g.fillStyle = '#FF3CAC';
+        g.font = 'bold 34px Courier New';
+        g.fillText('GAME OVER', W/2, H/2 - 46);
+        g.fillStyle = '#F0EDF5';
+        g.font = 'bold 15px Courier New';
+        g.fillText('THE SITE REMAINS.', W/2, H/2 - 14);
+        g.fillText('SCORE ' + score + (score >= hi && score > 0 ? '  ★ NEW HI ★' : ''), W/2, H/2 + 16);
+        g.fillStyle = '#3CFF6E';
+        g.font = '13px Courier New';
+        g.fillText('SPACE: REMATCH   ESC: TRUCE', W/2, H/2 + 48);
+        g.fillStyle = '#8F85B8';
+        g.font = '12px Courier New';
+        g.fillText('p.s. i build games for a living — hire me', W/2, H/2 + 82);
+      }
+    }
+
+    function loop(ts){
+      if (!running) return;
+      if (!last) last = ts;
+      const dt = Math.min((ts-last)/1000, 0.05);
+      last = ts;
+      if (!over){
+        if (fireHeld) tryFire(ts);
+        update(dt);
+      }
+      paint();
+      raf = requestAnimationFrame(loop);
+    }
+
+    let lastFire = 0;
+    function tryFire(now){
+      if (now - lastFire < 210) return;
+      lastFire = now;
+      pShots.push({ x: ship.x, y: ship.y-14 });
+      beep(880, 0.05, 'square', 0.02);
+    }
+
+    // --- input ---
+    addEventListener('keydown', e => {
+      if (!running) return;
+      if (e.key === 'Escape'){ close(); return; }
+      if (e.key === 'ArrowLeft' || e.key === 'a') moveL = true;
+      if (e.key === 'ArrowRight' || e.key === 'd') moveR = true;
+      if (e.key === ' '){
+        e.preventDefault();
+        if (over){ reset(true); drawLives(); } else fireHeld = true;
+      }
+      if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) e.preventDefault();
+    });
+    addEventListener('keyup', e => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') moveL = false;
+      if (e.key === 'ArrowRight' || e.key === 'd') moveR = false;
+      if (e.key === ' ') fireHeld = false;
+    });
+    cv.addEventListener('pointerdown', e => {
+      if (over){ reset(true); drawLives(); return; }
+      fireHeld = true;
+      touchX = (e.offsetX / cv.clientWidth) * W;
+    });
+    cv.addEventListener('pointermove', e => {
+      if (e.buttons) touchX = (e.offsetX / cv.clientWidth) * W;
+    });
+    addEventListener('pointerup', () => { fireHeld = false; touchX = null; });
+    document.getElementById('gameClose').addEventListener('click', close);
+    document.addEventListener('visibilitychange', () => { if (document.hidden && running) last = 0; });
+
+    return { open, close, get running(){ return running; } };
+  })();
+
+  // for the ones who open the console
+  console.log('%c↑↑↓↓←→←→BA', 'font-family: monospace; font-size: 16px; font-weight: bold; color: #FF3CAC;');
+  console.log('%cYou found the back door. Two tips: never click the X on a window you love, and the code above still works.\nhello@drewkkennedy.com', 'font-family: monospace; font-size: 11px; color: #5C5478;');
+</script>
+</body>
+</html>
