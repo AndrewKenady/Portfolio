@@ -398,6 +398,8 @@
   }
   .statbox .sb-row:last-child{ border-bottom:none; }
   .statbox .sb-row b{ color:var(--cyan); }
+  .statbox a, .statbox a:visited{ color:var(--cyan); text-decoration:underline; text-underline-offset:2px; }
+  .statbox a:hover{ color:var(--gold); }
   .nowplaying{
     margin-top:14px;
     border:2px inset var(--bevel-hi);
@@ -1076,7 +1078,7 @@
           <div>
             <p>Since 2016 I've hosted <b><a href="https://www.youtube.com/c/Nintendrew" target="_blank" rel="noopener">Nintendrew</a></b>, a YouTube channel dedicated to video game history and preservation — obscure prototypes, ambitious homebrew, console mods, and the hardware everyone else forgot.</p>
             <p>Practically, that's a decade of <b>scripting, shooting, editing, scoring, and publishing</b> broadcast-quality video on a schedule, plus the audience instincts that come from a comment section 350,000 strong. Frequent collaborations with Scott the Woz, Nathaniel Bandy, SMG4, and SimpleFlips.</p>
-            <p>For a studio, that means a developer who can also <b>speak publicly, demo convincingly, and represent the product</b> — conventions included. I'm a recurring guest at Retropalooza and the channel has its own IMDb page.</p>
+            <p>For a studio, that means a developer who can also <b>speak publicly, demo convincingly, and represent the product</b> — conventions included. I'm a recurring guest at Retropalooza, and the channel is <a href="https://www.imdb.com/name/nm10395432/" target="_blank" rel="noopener">listed on IMDb</a>.</p>
           </div>
           <div>
             <div class="statbox" role="table" aria-label="Channel statistics">
@@ -1085,7 +1087,7 @@
               <div class="sb-row"><span>Broadcasting since</span><b>2016</b></div>
               <div class="sb-row"><span>Complete libraries</span><b>N64/VB/GBAV</b></div>
               <div class="sb-row"><span>Convention guest</span><b>Recurring</b></div>
-              <div class="sb-row"><span>IMDb page</span><b>Yes, really</b></div>
+              <div class="sb-row"><span>IMDb</span><b><a href="https://www.imdb.com/name/nm10395432/" target="_blank" rel="noopener">nm10395432</a></b></div>
             </div>
             <div class="nowplaying">
               <span class="np-eq">&#9836;&#9836;</span> NOW PLAYING: original compositions on <a href="https://soundcloud.com/nintendrewyt" target="_blank" rel="noopener">SoundCloud</a>
@@ -1278,27 +1280,17 @@
   let audioOn = false;
   let entered = false;
 
-  // returning visitors within the same session skip the gate
-  let seenSplash = false;
-  try { seenSplash = sessionStorage.getItem('dkk_entered') === '1'; } catch(e){}
-  if (seenSplash){
-    splash.classList.add('hidden');
-    entered = true;
-  } else {
-    document.body.style.overflow = 'hidden';
-    splash.focus({ preventScroll: true });
-  }
+  // the gate greets everyone, every time — that's how the music gets its user gesture
+  document.body.style.overflow = 'hidden';
+  splash.focus({ preventScroll: true });
 
   // marquee the page title while the door is still closed
   const REAL_TITLE = document.title;
-  let titleTimer = null;
-  if (!seenSplash){
-    let tstr = '★ DREW K. KENNEDY ★ GAME DEVELOPER ★ CONTENT CREATOR ★ HOST & PANELIST ';
-    titleTimer = setInterval(() => {
-      tstr = tstr.slice(1) + tstr[0];
-      document.title = tstr;
-    }, 400);
-  }
+  let tstr = '★ DREW K. KENNEDY ★ GAME DEVELOPER ★ CONTENT CREATOR ★ HOST & PANELIST ';
+  let titleTimer = setInterval(() => {
+    tstr = tstr.slice(1) + tstr[0];
+    document.title = tstr;
+  }, 400);
 
   // ===== MIDI ENGINE — because the background music is a real .mid file =====
   const MIDI = (function(){
@@ -1481,7 +1473,6 @@
     if (entered) return;
     entered = true;
     if (titleTimer){ clearInterval(titleTimer); document.title = REAL_TITLE; }
-    try { sessionStorage.setItem('dkk_entered', '1'); } catch(e){}
     startMusic(); // the click is the user gesture the audio needs
     splash.classList.add('hidden');
     document.body.style.overflow = '';
@@ -1793,7 +1784,10 @@
     let score = 0, bytes = 0, lives = 3, level = 1, shields = 0;
     let up = { rapid:0, cannon:0, speed:0 };
     let ship, pShots, eShots, foes, boss, parts, floats, shake = 0;
-    let fireHeld = false, moveL = false, moveR = false, touchX = null, invuln = 0;
+    let fireHeld = false, moveL = false, moveR = false, moveU = false, moveD = false;
+    let touchX = null, touchY = null, invuln = 0;
+    let shipTrail = [];
+    const Y_MIN = H - 175, Y_MAX = H - 34; // the flight band — low orbit only
     let modeT = 0;           // seconds in current mode
     let shopSel = 0, shopItems = [];
     let entry = { chars:[0,0,0], slot:0 };
@@ -1933,9 +1927,11 @@
     }
     function startLevel(n){
       level = n;
-      ship = { x: W/2, y: H - 46, w: 30, h: 18 };
+      ship = { x: W/2, y: H - 46, w: 30, h: 18, tilt: 0 };
+      shipTrail = [];
       invuln = 1;
-      fireHeld = false; moveL = false; moveR = false; touchX = null;
+      fireHeld = false; moveL = false; moveR = false; moveU = false; moveD = false;
+      touchX = null; touchY = null;
       parts = []; floats = [];
       spawnLevel(n);
       setMode('intro');
@@ -1946,7 +1942,7 @@
       mode = m; modeT = 0;
       elHint.innerHTML = {
         intro: 'GET READY',
-        play:  '&larr;&rarr; / A D MOVE &bull; SPACE FIRE &bull; ESC QUIT',
+        play:  '&larr;&darr;&uarr;&rarr; / WASD FLY &bull; SPACE FIRE &bull; ESC QUIT',
         shop:  '&uarr;&darr; SELECT &bull; SPACE BUY &bull; TAP ITEMS ON TOUCH',
         over:  'SPACE: CONTINUE',
         entry: '&uarr;&darr; CHANGE &bull; &larr;&rarr; SLOT &bull; SPACE OK &bull; OR JUST TYPE',
@@ -2068,12 +2064,35 @@
 
       const spec = levelSpec(level);
 
-      // ship
+      // ship — full 2D flight within the band
       const spd = 280 * Math.pow(1.2, up.speed);
-      if (moveL) ship.x -= spd * dt;
-      if (moveR) ship.x += spd * dt;
-      if (touchX !== null) ship.x += Math.max(-spd*dt, Math.min(spd*dt, touchX - ship.x));
-      ship.x = Math.max(20, Math.min(W - 20, ship.x));
+      let dx = 0, dy = 0;
+      if (moveL) dx -= spd * dt;
+      if (moveR) dx += spd * dt;
+      if (moveU) dy -= spd * 0.8 * dt;
+      if (moveD) dy += spd * 0.8 * dt;
+      if (touchX !== null) dx = Math.max(-spd*dt, Math.min(spd*dt, touchX - ship.x));
+      if (touchY !== null) dy = Math.max(-spd*0.8*dt, Math.min(spd*0.8*dt, touchY - ship.y));
+      ship.x = Math.max(20, Math.min(W - 20, ship.x + dx));
+      ship.y = Math.max(Y_MIN, Math.min(Y_MAX, ship.y + dy));
+      // bank into the strafe
+      const targetTilt = Math.max(-0.3, Math.min(0.3, dx / Math.max(spd * dt, 0.001) * 0.3));
+      ship.tilt += (targetTilt - ship.tilt) * Math.min(dt * 12, 1);
+      // afterimage trail
+      shipTrail.push({ x: ship.x, y: ship.y, tilt: ship.tilt });
+      if (shipTrail.length > 12) shipTrail.shift();
+      // engine wash — burns hotter under thrust
+      const thrust = (Math.abs(dx) + Math.abs(dy)) > 0.1;
+      if (Math.random() < (thrust ? 0.9 : 0.4)){
+        parts.push({
+          x: ship.x + (Math.random()-0.5) * 8 - ship.tilt * 20,
+          y: ship.y + 12,
+          vx: (Math.random()-0.5) * 30 - ship.tilt * 60,
+          vy: 60 + Math.random() * (thrust ? 90 : 40),
+          life: 0.22 + Math.random() * 0.12,
+          c: Math.random() < 0.6 ? '#00E5FF' : (Math.random() < 0.5 ? '#FF3CAC' : '#FFD34D')
+        });
+      }
       if (invuln > 0) invuln -= dt;
       if (fireHeld) tryFire(time * 1000);
 
@@ -2291,22 +2310,52 @@
       g.fillStyle = '#E03C31'; g.fillRect(62, 24, (W - 124) * Math.max(boss.hp / boss.hpMax, 0), 6);
     }
 
-    function drawShip(){
-      if (invuln > 0 && ((invuln * 10) | 0) % 2 === 1) return;
-      const sx = ship.x, sy = ship.y;
+    function shipGeo(alpha, hot){
+      // drawn at origin — caller sets the transform
+      g.globalAlpha = alpha;
+      if (hot){
+        // engine flame — flickers every frame
+        const fl = 9 + Math.random() * 7;
+        g.fillStyle = '#FF3CAC';
+        g.beginPath();
+        g.moveTo(-5, 11); g.lineTo(5, 11); g.lineTo(0, 11 + fl);
+        g.closePath(); g.fill();
+        g.fillStyle = '#FFD34D';
+        g.beginPath();
+        g.moveTo(-2.5, 11); g.lineTo(2.5, 11); g.lineTo(0, 11 + fl * 0.55);
+        g.closePath(); g.fill();
+      }
       g.fillStyle = '#00E5FF';
-      g.fillRect(sx-15, sy, 30, 8);
-      g.fillRect(sx-9, sy-6, 18, 6);
-      g.fillRect(sx-2.5, sy-12, 5, 6);
+      g.fillRect(-15, 0, 30, 8);
+      g.fillRect(-9, -6, 18, 6);
+      g.fillRect(-2.5, -12, 5, 6);
       g.fillStyle = '#FF3CAC';
-      g.fillRect(sx-15, sy+8, 6, 3);
-      g.fillRect(sx+9, sy+8, 6, 3);
+      g.fillRect(-15, 8, 6, 3);
+      g.fillRect(9, 8, 6, 3);
+      g.globalAlpha = 1;
+    }
+    function drawShip(){
+      // afterimages first, oldest faintest
+      for (let i = 0; i < shipTrail.length - 1; i += 3){
+        const tr = shipTrail[i];
+        g.save();
+        g.translate(tr.x, tr.y);
+        g.rotate(tr.tilt);
+        shipGeo(0.04 + (i / shipTrail.length) * 0.1, false);
+        g.restore();
+      }
+      if (invuln > 0 && ((invuln * 10) | 0) % 2 === 1) return;
+      g.save();
+      g.translate(ship.x, ship.y);
+      g.rotate(ship.tilt);
+      shipGeo(1, true);
+      g.restore();
       if (shields > 0){
         g.strokeStyle = shields > 1 ? '#FFD34D' : '#3CFF6E';
         g.lineWidth = 1.5;
         g.globalAlpha = 0.7 + Math.sin(time * 6) * 0.3;
         g.beginPath();
-        g.arc(sx, sy, 26, 0, Math.PI * 2);
+        g.arc(ship.x, ship.y, 26, 0, Math.PI * 2);
         g.stroke();
         g.globalAlpha = 1;
       }
@@ -2506,11 +2555,15 @@
       // play / intro
       if (e.key === 'ArrowLeft' || e.key === 'a') moveL = true;
       if (e.key === 'ArrowRight' || e.key === 'd') moveR = true;
+      if (e.key === 'ArrowUp' || e.key === 'w') moveU = true;
+      if (e.key === 'ArrowDown' || e.key === 's') moveD = true;
       if (e.key === ' ') fireHeld = true;
     });
     addEventListener('keyup', e => {
       if (e.key === 'ArrowLeft' || e.key === 'a') moveL = false;
       if (e.key === 'ArrowRight' || e.key === 'd') moveR = false;
+      if (e.key === 'ArrowUp' || e.key === 'w') moveU = false;
+      if (e.key === 'ArrowDown' || e.key === 's') moveD = false;
       if (e.key === ' ') fireHeld = false;
     });
     cv.addEventListener('pointerdown', e => {
@@ -2539,11 +2592,15 @@
       if (mode === 'over'){ advanceFromOver(); return; }
       fireHeld = true;
       touchX = px;
+      touchY = Math.max(Y_MIN, Math.min(Y_MAX, py));
     });
     cv.addEventListener('pointermove', e => {
-      if (e.buttons && (mode === 'play' || mode === 'intro')) touchX = (e.offsetX / cv.clientWidth) * W;
+      if (e.buttons && (mode === 'play' || mode === 'intro')){
+        touchX = (e.offsetX / cv.clientWidth) * W;
+        touchY = Math.max(Y_MIN, Math.min(Y_MAX, (e.offsetY / cv.clientHeight) * H));
+      }
     });
-    addEventListener('pointerup', () => { fireHeld = false; touchX = null; });
+    addEventListener('pointerup', () => { fireHeld = false; touchX = null; touchY = null; });
     document.getElementById('gameClose').addEventListener('click', close);
     document.addEventListener('visibilitychange', () => { if (document.hidden && running) last = 0; });
 
