@@ -1720,7 +1720,7 @@
       if (x < lastSpawnX) lastSpawnX = -Infinity;
       if (x - lastSpawnX >= 7){
         lastSpawnX = x;
-        segs.push({ x: x + 4, y: y + 12, born: now }); // tail-aligned with the pop-tart stripes
+        segs.push({ x: x + 16, y: y + 12, born: now }); // spawns under the pop-tart, emerges from behind the butt
       }
 
       tctx.clearRect(0, 0, W, H);
@@ -1855,7 +1855,7 @@
       if (x < lastSpawnX) lastSpawnX = -Infinity;
       if (x - lastSpawnX >= 7){
         lastSpawnX = x;
-        segs.push({ x: x + 3, y: y + 10, born: now });
+        segs.push({ x: x + 13, y: y + 10, born: now }); // under the body — no gap at the butt
       }
       nctx.clearRect(0, 0, innerWidth, innerHeight);
       segs = segs.filter(s => now - s.born < FADE_MS);
