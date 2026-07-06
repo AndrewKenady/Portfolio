@@ -489,7 +489,16 @@
   .gb-btn:active{ border-style:inset; }
   .gb-btn:hover{ background:#FBF9FF; }
 
-  .myspace-cta{ display:inline-block; margin:6px 0 16px; }
+  .contact-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px 26px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .contact-row .email-big{ margin:6px 0; }
+  .myspace-cta{ display:inline-block; margin:0; }
   .myspace-cta img{ width:180px; height:auto; image-rendering:auto; mix-blend-mode:multiply; }
   .myspace-cta:hover img{ filter:drop-shadow(0 0 10px rgba(0,229,255,0.7)); }
 
@@ -729,28 +738,116 @@
   }
   .splash-hint b{ color:var(--gold); }
 
-  /* sound toggle — appears only if the music actually plays */
-  .sound-btn{
+  /* the deck — winamp-shaped, appears only if the music actually plays */
+  .winamp{
     position:fixed;
     bottom:18px; right:18px;
     z-index:700;
-    display:none;
+    width:236px;
+    background:linear-gradient(180deg, #241F33 0%, #14101F 100%);
+    border:2px outset var(--bevel-hi);
+    box-shadow:4px 4px 0 rgba(0,0,0,0.5);
+    padding:0 0 8px;
+    user-select:none;
+  }
+  .wa-top{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--title-grad);
+    padding:4px 8px;
+    border-bottom:2px solid var(--bevel-lo);
+  }
+  .wa-led{
+    width:7px; height:7px;
+    border-radius:50%;
+    background:#3CFF6E;
+    box-shadow:0 0 6px rgba(60,255,110,0.9);
+    animation:waLed 1.2s ease-in-out infinite;
+    flex-shrink:0;
+  }
+  .winamp.paused .wa-led{ animation:none; background:#8F85B8; box-shadow:none; }
+  @keyframes waLed{ 50%{ opacity:0.4; } }
+  .wa-name{
     font-family:'Courier New', Courier, monospace;
     font-weight:bold;
-    font-size:12px;
+    font-size:10.5px;
+    letter-spacing:0.28em;
+    color:#fff;
+    text-shadow:1px 1px 0 rgba(30,10,60,0.8);
+    flex:1;
+  }
+  .wa-eq{ display:flex; align-items:flex-end; gap:2px; height:11px; }
+  .wa-eq i{
+    display:block;
+    width:3px; height:100%;
+    background:#3CFF6E;
+    transform-origin:bottom;
+    animation:waBar 0.8s ease-in-out infinite;
+  }
+  .wa-eq i:nth-child(2){ animation-delay:0.15s; animation-duration:0.65s; }
+  .wa-eq i:nth-child(3){ animation-delay:0.3s; animation-duration:0.9s; }
+  .wa-eq i:nth-child(4){ animation-delay:0.1s; animation-duration:0.7s; }
+  .wa-eq i:nth-child(5){ animation-delay:0.22s; animation-duration:0.85s; }
+  @keyframes waBar{ 0%,100%{ transform:scaleY(0.25); } 50%{ transform:scaleY(1); } }
+  .winamp.paused .wa-eq i{ animation-play-state:paused; transform:scaleY(0.2); background:#8F85B8; }
+  .wa-lcd{
+    margin:8px 8px 6px;
+    background:#020108;
+    border:2px inset var(--bevel-hi);
+    padding:5px 8px;
+    overflow:hidden;
+    white-space:nowrap;
+  }
+  .wa-lcd span{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:11.5px;
+    color:var(--cyan);
+    text-shadow:0 0 6px rgba(0,229,255,0.6);
+  }
+  .wa-ctrl{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    padding:0 8px;
+  }
+  .wa-ctrl button{
+    flex:1;
+    font-size:13px;
+    line-height:1;
     color:var(--ink);
     background:var(--win);
     border:2px outset var(--bevel-hi);
-    padding:8px 14px;
+    padding:5px 0;
     cursor:pointer;
   }
-  .sound-btn:active{ border-style:inset; }
+  .wa-ctrl button:active{ border-style:inset; }
+  .wa-ctrl button:hover{ background:#FBF9FF; }
 
   /* sparkle trail canvas */
   #sparkleCanvas{
     position:fixed; inset:0;
     width:100%; height:100%;
     z-index:600;
+    pointer-events:none;
+  }
+
+  /* the site cat — a free-range nyan with viewport clearance */
+  .page-cat{
+    position:fixed;
+    top:0; left:0;
+    width:56px;
+    height:auto;
+    z-index:590;
+    pointer-events:none;
+    image-rendering:pixelated;
+    will-change:transform;
+  }
+  #nyanPageCanvas{
+    position:fixed; inset:0;
+    width:100%; height:100%;
+    z-index:589;
     pointer-events:none;
   }
 
@@ -858,7 +955,7 @@
   }
 
   @media print{
-    .splash, .sound-btn, #sparkleCanvas, .blink, #gameOverlay, #statusBar{ display:none !important; }
+    .splash, .winamp, #sparkleCanvas, .blink, #gameOverlay, #statusBar, .page-cat, #nyanPageCanvas{ display:none !important; }
     .stars, .crt-overlay, #confettiCanvas, .toast, .navbar, .newsbar, .badges, .counter, .webring{ display:none !important; }
     body{ background:#fff; }
     .window{ box-shadow:none; border-color:#999; }
@@ -928,10 +1025,20 @@
     </svg>
   </div>
 
-  <audio id="bgAudio" loop preload="none">
-    <source src="bg.mp3" type="audio/mpeg">
-  </audio>
-  <button class="sound-btn" id="soundBtn" type="button" aria-label="Toggle music">&#9834; SOUND: ON</button>
+  <!-- the deck — it whips the llama's cousin, legally distinct -->
+  <div class="winamp" id="winamp" style="display:none;" aria-label="Music player">
+    <div class="wa-top">
+      <span class="wa-led" id="waLed"></span>
+      <span class="wa-name">DKK-AMP</span>
+      <span class="wa-eq" id="waEq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+    </div>
+    <div class="wa-lcd"><span id="waTrack">&mdash;</span></div>
+    <div class="wa-ctrl">
+      <button id="waPrev" type="button" aria-label="Previous track">&#9198;</button>
+      <button id="waPlay" type="button" aria-label="Play or pause">&#9199;</button>
+      <button id="waNext" type="button" aria-label="Next track">&#9197;</button>
+    </div>
+  </div>
   <canvas id="sparkleCanvas" aria-hidden="true"></canvas>
   <div id="statusBar" aria-hidden="true"></div>
 
@@ -1210,11 +1317,12 @@
         <h2 class="win-h">Get in touch.</h2>
         <hr class="hr90">
         <p>Hiring or collaborating? I answer everything personally, usually fast. For convention and event bookings, contact <a href="https://www.malicemediallc.com/contact-us" target="_blank" rel="noopener">Malice Media</a>.</p>
-        <a class="email-big" href="mailto:hello@drewkkennedy.com">hello@drewkkennedy.com</a>
-        <br>
-        <a class="myspace-cta" href="mailto:hello@drewkkennedy.com" title="It says hit me up, so hit me up">
-          <img src="misc/myspace.gif" alt="Hit me up on MySpace" width="180" height="96" loading="lazy">
-        </a>
+        <div class="contact-row">
+          <a class="email-big" href="mailto:hello@drewkkennedy.com">hello@drewkkennedy.com</a>
+          <a class="myspace-cta" href="mailto:hello@drewkkennedy.com" title="It says hit me up, so hit me up">
+            <img src="misc/myspace.gif" alt="Hit me up on MySpace" width="180" height="96" loading="lazy">
+          </a>
+        </div>
         <p style="margin-bottom:8px;"><b>Cool links (mine):</b></p>
         <ul class="linklist">
           <li><a href="https://www.youtube.com/c/Nintendrew" target="_blank" rel="noopener">YouTube — Nintendrew</a></li>
@@ -1275,9 +1383,6 @@
 
   // ===== the enter page — first input doubles as audio consent =====
   const splash = document.getElementById('splash');
-  const bgAudio = document.getElementById('bgAudio');
-  const soundBtn = document.getElementById('soundBtn');
-  let audioOn = false;
   let entered = false;
 
   // the gate greets everyone, every time — that's how the music gets its user gesture
@@ -1411,17 +1516,26 @@
         const when = songStart + nt.t;
         if (when > now - 0.05) voice(nt, when);
       }
-      if (cursor >= notes.length && now > songStart + duration){ // loop the tape
-        songStart = now + 1.2;
-        cursor = 0;
+      if (cursor >= notes.length && now > songStart + duration){ // side A over
+        if (MIDI.onEnded){
+          playing = false;
+          clearInterval(schedTimer);
+          MIDI.onEnded();
+        } else { // no playlist? loop the tape
+          songStart = now + 1.2;
+          cursor = 0;
+        }
       }
     }
 
     return {
       noise: null,
+      onEnded: null,
       load(buf){ return parse(buf); },
       get loaded(){ return loaded; },
+      stop(){ playing = false; clearInterval(schedTimer); },
       start(){
+        clearInterval(schedTimer);
         actx = actx || new (window.AudioContext || window.webkitAudioContext)();
         if (!master){
           master = actx.createGain();
@@ -1444,36 +1558,111 @@
     };
   })();
 
-  let musicMode = null; // 'midi' | 'mp3'
-  function startMusic(){
-    fetch('misc/September.mid')
-      .then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
-      .then(buf => {
+  // ===== the playlist — shuffled fresh on every visit =====
+  const PLAYLIST = [
+    { f: 'September.mid',                                          t: 'Earth, Wind & Fire — September' },
+    { f: 'Queen - Bohemian Rhapsody.mid',                          t: 'Queen — Bohemian Rhapsody' },
+    { f: "Don't-Stop-Me-Now.mid",                                  t: "Queen — Don't Stop Me Now" },
+    { f: 'Never-Gonna-Give-You-Up.mid',                            t: 'Rick Astley — Never Gonna Give You Up' },
+    { f: 'toto-africa.mid',                                        t: 'Toto — Africa' },
+    { f: 'Smells-Like-Teen-Spirit.mid',                            t: 'Nirvana — Smells Like Teen Spirit' },
+    { f: 'Careless-Whisper.mid',                                   t: 'George Michael — Careless Whisper' },
+    { f: 'Imagine dragons - Radioactive.mid',                      t: 'Imagine Dragons — Radioactive' },
+    { f: 'Skrillex - Scary Monsters and nice splities (all parts).mid', t: 'Skrillex — Scary Monsters & Nice Sprites' },
+    { f: 'Mii Channel.mid',                                        t: 'Mii Channel' },
+    { f: 'Simpsons.mid',                                           t: 'The Simpsons' },
+    { f: 'Mortal Kombat - Theme.mid',                              t: 'Mortal Kombat' },
+    { f: 'The Elder Scrolls V Skyrim - Dragonborn Theme.mid',      t: 'Skyrim — Dragonborn' }
+  ];
+
+  const PLAYER = (function(){
+    const box = document.getElementById('winamp');
+    const lcd = document.getElementById('waTrack');
+    const btnPrev = document.getElementById('waPrev');
+    const btnPlay = document.getElementById('waPlay');
+    const btnNext = document.getElementById('waNext');
+    let order = [], pos = 0, playing = false, everStarted = false, skips = 0;
+    const cache = new Map();
+    let marqStr = '';
+
+    function shuffle(){
+      order = PLAYLIST.map((_, i) => i);
+      for (let i = order.length - 1; i > 0; i--){
+        const j = (Math.random() * (i + 1)) | 0;
+        const tmp = order[i]; order[i] = order[j]; order[j] = tmp;
+      }
+    }
+    function cur(){ return PLAYLIST[order[pos]]; }
+    function setLcd(){
+      marqStr = (pos + 1) + '/' + order.length + '  ' + cur().t + '  ★  ';
+      lcd.textContent = marqStr;
+    }
+    // the LCD crawls, as is right and proper
+    setInterval(() => {
+      if (!playing || !marqStr) return;
+      marqStr = marqStr.slice(1) + marqStr[0];
+      lcd.textContent = marqStr;
+    }, 260);
+
+    function loadAndPlay(){
+      const tr = cur();
+      const got = cache.has(tr.f)
+        ? Promise.resolve(cache.get(tr.f))
+        : fetch('misc/' + encodeURIComponent(tr.f))
+            .then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
+            .then(b => { cache.set(tr.f, b); return b; });
+      got.then(buf => {
         if (!MIDI.load(buf)) throw 0;
+        skips = 0;
         MIDI.start();
-        musicMode = 'midi';
-        audioOn = true;
-        soundBtn.style.display = 'block';
-        soundBtn.innerHTML = '&#9834; SOUND: ON';
-        soundBtn.title = 'Now playing: September.mid';
-      })
-      .catch(() => {
-        // no MIDI reachable (e.g., file:// preview) — fall back to the mp3 hook
-        bgAudio.volume = 0.5;
-        bgAudio.play().then(() => {
-          musicMode = 'mp3';
-          audioOn = true;
-          soundBtn.style.display = 'block';
-          soundBtn.innerHTML = '&#9834; SOUND: ON';
-        }).catch(() => {});
+        playing = true;
+        everStarted = true;
+        box.style.display = 'block';
+        box.classList.remove('paused');
+        setLcd();
+      }).catch(() => {
+        // unreadable or missing (e.g., file:// preview) — skip, but don't spin forever
+        if (++skips < PLAYLIST.length) next();
+        else box.style.display = 'none';
       });
-  }
+    }
+    function next(){
+      MIDI.stop();
+      pos++;
+      if (pos >= order.length){ shuffle(); pos = 0; } // reshuffle each full spin
+      loadAndPlay();
+    }
+    function prev(){
+      MIDI.stop();
+      pos = (pos + order.length - 1) % order.length;
+      loadAndPlay();
+    }
+    function toggle(){
+      if (!everStarted) return;
+      if (playing){
+        MIDI.pause();
+        playing = false;
+        box.classList.add('paused');
+      } else {
+        MIDI.resume();
+        playing = true;
+        box.classList.remove('paused');
+      }
+    }
+    MIDI.onEnded = next;
+    btnNext.addEventListener('click', next);
+    btnPrev.addEventListener('click', prev);
+    btnPlay.addEventListener('click', toggle);
+    return {
+      start(){ shuffle(); pos = 0; loadAndPlay(); }
+    };
+  })();
 
   function enterSite(){
     if (entered) return;
     entered = true;
     if (titleTimer){ clearInterval(titleTimer); document.title = REAL_TITLE; }
-    startMusic(); // the click is the user gesture the audio needs
+    PLAYER.start(); // the click is the user gesture the audio needs
     splash.classList.add('hidden');
     document.body.style.overflow = '';
   }
@@ -1561,24 +1750,6 @@
     enterSite();
   });
 
-  soundBtn.addEventListener('click', () => {
-    if (audioOn){
-      if (musicMode === 'midi') MIDI.pause(); else bgAudio.pause();
-      audioOn = false;
-      soundBtn.innerHTML = '&#9834; SOUND: OFF';
-    } else {
-      if (musicMode === 'midi'){
-        MIDI.resume();
-        audioOn = true;
-        soundBtn.innerHTML = '&#9834; SOUND: ON';
-      } else {
-        bgAudio.play().then(() => {
-          audioOn = true;
-          soundBtn.innerHTML = '&#9834; SOUND: ON';
-        }).catch(() => {});
-      }
-    }
-  });
 
   // ===== sparkle trail — fine pointers only, and never under reduced motion =====
   (function(){
@@ -1631,6 +1802,79 @@
       if (sparks.length){ requestAnimationFrame(step); }
       else { running = false; sctx.clearRect(0, 0, innerWidth, innerHeight); }
     }
+  })();
+
+  // ===== the site cat — same cat, bigger sky, new altitude every lap =====
+  (function(){
+    if (prefersReducedMotion) return;
+    const proto = document.getElementById('spCat');
+    if (!proto) return;
+    const cat = proto.cloneNode(true);
+    cat.removeAttribute('id');
+    cat.classList.remove('sp-cat');
+    cat.classList.add('page-cat');
+    const feet = cat.querySelector('#catFeet');
+    const head = cat.querySelector('#catHead');
+    const tail = cat.querySelector('#catTail');
+    cat.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+    const canvas2 = document.createElement('canvas');
+    canvas2.id = 'nyanPageCanvas';
+    canvas2.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(canvas2);
+    document.body.appendChild(cat);
+    const nctx = canvas2.getContext('2d');
+    const COLORS = ['#FF3B30', '#FF9500', '#FFE800', '#33E019', '#00A2FF', '#8A5CF6'];
+    const STRIPE_H = 3.9, FADE_MS = 2200, SPEED = 95;
+    let segs = [], lastSpawnX = -Infinity, t0 = null, raf = null, lastLap = -1;
+    let baseY = 0;
+    function pickAltitude(){
+      // anywhere with clearance: below the nav strip, above the very bottom
+      baseY = 90 + Math.random() * Math.max(innerHeight - 260, 60);
+    }
+    pickAltitude();
+    function size(){
+      canvas2.width = innerWidth * devicePixelRatio;
+      canvas2.height = innerHeight * devicePixelRatio;
+      nctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    size();
+    addEventListener('resize', size);
+    function frame(now){
+      if (t0 === null) t0 = now;
+      const t = (now - t0) / 1000;
+      const span = innerWidth + 320;
+      const lap = Math.floor((t * SPEED) / span);
+      if (lap !== lastLap){ lastLap = lap; pickAltitude(); lastSpawnX = -Infinity; }
+      const x = -160 + ((t * SPEED) % span);
+      const y = baseY + Math.round(Math.sin(t * 5.4) * 1.4) * 7;
+      cat.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      const tick = Math.floor(now / 140) % 2;
+      feet.setAttribute('transform', tick ? 'translate(1.2 0)' : 'translate(-1.2 0)');
+      head.setAttribute('transform', tick ? 'translate(0 0.9)' : 'translate(0 0)');
+      tail.setAttribute('transform', tick ? 'translate(0 -0.9)' : 'translate(0 0.5)');
+      if (x < lastSpawnX) lastSpawnX = -Infinity;
+      if (x - lastSpawnX >= 7){
+        lastSpawnX = x;
+        segs.push({ x: x + 3, y: y + 10, born: now });
+      }
+      nctx.clearRect(0, 0, innerWidth, innerHeight);
+      segs = segs.filter(s => now - s.born < FADE_MS);
+      for (const s of segs){
+        const a = 1 - (now - s.born) / FADE_MS;
+        nctx.globalAlpha = a * 0.8;
+        for (let i = 0; i < 6; i++){
+          nctx.fillStyle = COLORS[i];
+          nctx.fillRect(s.x, s.y + i * STRIPE_H, 8, STRIPE_H + 0.5);
+        }
+      }
+      nctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden){ if (raf) cancelAnimationFrame(raf); raf = null; }
+      else if (!raf){ t0 = null; lastLap = -1; segs = []; lastSpawnX = -Infinity; raf = requestAnimationFrame(frame); }
+    });
   })();
 
   // toast
