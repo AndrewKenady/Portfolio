@@ -3040,17 +3040,27 @@
     const tb = win.querySelector('.titlebar');
 
     if (goingMini){
+      // current in-flow height — small if the window is minimized (titlebar only)
+      const footprintH = win.offsetHeight;
       const cs = getComputedStyle(win);
       const mt = cs.marginTop, mb = cs.marginBottom;
       const ph = document.createElement('div');
       ph.className = 'mini-ph';
-      ph.style.height = win.offsetHeight + 'px';
+      ph.style.height = footprintH + 'px';
       ph.style.marginTop = mt;
       ph.style.marginBottom = mb;
       win.parentNode.insertBefore(ph, win);
-      win._ph = ph; win._mt = mt; win._mb = mb; win._fullH = win.offsetHeight;
+      win._ph = ph; win._mt = mt; win._mb = mb;
 
+      // mini and min are mutually exclusive: un-minimize so the body shows, then
+      // measure the TRUE full geometry (a minimized window would otherwise report
+      // titlebar-only height and a zero-size body, breaking the restore)
+      win.classList.remove('min');
+      win.classList.add('mini');
+      win.style.right = 'auto'; win.style.bottom = 'auto';
       const fullW = first.width;
+      win.style.width = fullW + 'px';              // lock full width (fixed shrink-to-fits otherwise)
+      const fullH = win.offsetHeight;              // full height with the body shown
       const k = MINI_W / fullW;                    // body shrinks by this
       const bodyW = body.offsetWidth;
       const scaledBodyH = Math.round(body.offsetHeight * k);
@@ -3058,23 +3068,21 @@
       const endH = tb.offsetHeight + visBodyH;     // titlebar (full) + (maybe clipped) body
       // only show the "more below" fade when the body is actually taller than the tile
       win.classList.toggle('clipped', scaledBodyH > MINI_BODY_H + 1);
-      win._fullW = fullW; win._bodyW = bodyW; win._k = k; win._endH = endH;
+      win._fullW = fullW; win._fullH = fullH; win._bodyW = bodyW; win._k = k; win._endH = endH;
 
       const cx = miniCascade.x, cy = miniCascade.y;
       miniCascade.x += 30; miniCascade.y += 30;
       if (miniCascade.y > innerHeight - 200){ miniCascade = { x: 40, y: 96 }; }
 
-      win.classList.remove('min');
-      win.classList.add('mini');
       body.style.width = bodyW + 'px';             // lock so it won't reflow
       body.style.transformOrigin = 'top left';
-      win.style.right = 'auto'; win.style.bottom = 'auto';
       floatZ = floatZ >= 884 ? 841 : floatZ + 1; win.style.zIndex = floatZ;
 
-      // start frame: full window at its old spot
+      // start frame: current on-screen spot, full width, current footprint height —
+      // so a minimized window unfolds from titlebar-only into the mini tile
       win.style.transition = body.style.transition = 'none';
       win.style.left = first.left + 'px'; win.style.top = first.top + 'px';
-      win.style.width = fullW + 'px'; win.style.height = first.height + 'px';
+      win.style.height = footprintH + 'px';
       body.style.transform = 'none';
 
       if (prefersReducedMotion){
