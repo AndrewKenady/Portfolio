@@ -1475,9 +1475,7 @@
     margin:0 !important;
     z-index:715;
     box-shadow:5px 5px 0 rgba(0,0,0,0.55);
-    animation:miniPop 0.18s cubic-bezier(0.2,0.9,0.3,1.4);
   }
-  @keyframes miniPop{ from{ transform:scale(0.8); opacity:0.4; } to{ transform:scale(1); opacity:1; } }
   .window.mini .titlebar{ cursor:grab; }
   .window.mini .titlebar:active{ cursor:grabbing; }
   .window.mini .win-body{
@@ -2984,8 +2982,12 @@
   // ===== window controls — [_] minimizes, [□] pops a tiny preview, [×] fights back =====
   let miniCascade = { x: 40, y: 96 };
   function toggleMini(win){
-    const mini = win.classList.toggle('mini');
-    if (mini){
+    // FLIP: measure where it is now, flip the state, then tween the transform
+    // from the old geometry back to identity so it visibly scales + glides
+    const first = win.getBoundingClientRect();
+    const goingMini = !win.classList.contains('mini');
+    win.classList.toggle('mini');
+    if (goingMini){
       win.classList.remove('min');
       win.style.left = miniCascade.x + 'px';
       win.style.top = miniCascade.y + 'px';
@@ -2999,6 +3001,22 @@
       win.style.position = win.style.left = win.style.top = '';
       win.style.right = win.style.bottom = win.style.zIndex = win.style.margin = '';
     }
+    if (prefersReducedMotion) return;
+    const last = win.getBoundingClientRect();
+    if (!first.width || !last.width) return;
+    const dx = first.left - last.left;
+    const dy = first.top - last.top;
+    const s = first.width / last.width; // uniform scale — no aspect distortion
+    win.style.transformOrigin = 'top left';
+    win.style.transition = 'none';
+    win.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')';
+    void win.offsetWidth; // commit the start frame before transitioning
+    win.style.transition = 'transform 0.34s cubic-bezier(0.22,0.75,0.3,1)';
+    win.style.transform = 'none';
+    win.addEventListener('transitionend', function done(){
+      win.style.transition = win.style.transform = win.style.transformOrigin = '';
+      win.removeEventListener('transitionend', done);
+    }, { once: true });
   }
   document.querySelectorAll('.window .titlebar .t-btns').forEach(btns => {
     const win = btns.closest('.window');
