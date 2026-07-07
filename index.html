@@ -4310,6 +4310,7 @@
 
     if (!GB_DB) loadLocal();
     render();
+    loadRemote(); // fetch signatures up front — the count on the button should be honest
 
     toggle.addEventListener('click', () => {
       const opening = wrap.style.display === 'none';
