@@ -4572,6 +4572,22 @@
       }, delay);
     }
     schedule(true);
+
+    // welcome back — popups can't spawn while the tab is hidden, so returning
+    // after a while greets you with a small burst instead of dead air
+    let hiddenAt = 0;
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden){ hiddenAt = performance.now(); return; }
+      if (!entered || DEFEND.running || !hiddenAt) return;
+      if (performance.now() - hiddenAt < 30000) return; // only after a real absence
+      hiddenAt = 0;
+      const burst = Math.min(MAX - visible, 3);
+      for (let i = 0; i < burst; i++){
+        setTimeout(() => {
+          if (entered && !document.hidden && !DEFEND.running && visible < MAX) spawn();
+        }, i * 650);
+      }
+    });
   })();
 
   // ===== the guestbook — public, anonymous-friendly, proprietor-moderated =====
