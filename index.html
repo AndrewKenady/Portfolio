@@ -877,16 +877,19 @@
     pointer-events:none;
   }
 
-  /* the site cat — a free-range nyan with viewport clearance */
+  /* the site cat — free-range, and clickable: it divides under observation */
   .page-cat{
     position:fixed;
     top:0; left:0;
     width:56px;
     height:auto;
     z-index:590;
-    pointer-events:none;
+    pointer-events:auto;
+    cursor:pointer;
     image-rendering:pixelated;
     will-change:transform;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
   }
   #nyanPageCanvas{
     position:fixed; inset:0;
@@ -949,6 +952,121 @@
     animation:blinker 1.1s steps(2, start) infinite;
   }
   @keyframes blinker{ to{ visibility:hidden; } }
+
+  /* ============ THE KENNEDY TOOLBAR — it does nothing, but it's yours ============ */
+  .ktb{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:6px;
+    background:var(--win-2);
+    border:2px outset var(--bevel-hi);
+    border-top:none;
+    padding:5px 8px;
+  }
+  .ktb-logo{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:10.5px;
+    letter-spacing:0.14em;
+    color:var(--violet);
+    padding:0 4px;
+    white-space:nowrap;
+  }
+  .ktb button{
+    font-family:Verdana, Geneva, sans-serif;
+    font-weight:bold;
+    font-size:11px;
+    color:var(--ink);
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    padding:3px 10px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .ktb button:active{ border-style:inset; }
+  .ktb button:hover{ background:#FBF9FF; }
+  .ktb-search{ display:flex; gap:4px; align-items:center; margin-left:auto; }
+  .ktb-search input{
+    border:2px inset var(--bevel-hi);
+    background:#fff;
+    color:var(--ink);
+    font-family:Verdana, Geneva, sans-serif;
+    font-size:11px;
+    padding:3px 6px;
+    width:130px;
+  }
+  .ktb .found{ animation:ktbFound 0.5s steps(2) 3; }
+  @keyframes ktbFound{ 50%{ background:var(--gold); } }
+  @media (max-width:640px){ .ktb-search{ margin-left:0; } }
+
+  /* ============ DKK STORE + CERTIFICATE.EXE — commerce, technically ============ */
+  .store-popup{ width:min(380px, 92vw); }
+  .store-popup input{
+    display:block;
+    width:100%;
+    margin-top:8px;
+    border:2px inset var(--bevel-hi);
+    background:#fff;
+    color:var(--ink);
+    font-family:Verdana, Geneva, sans-serif;
+    font-size:13px;
+    padding:6px 8px;
+  }
+  .store-lines{ font-family:'Courier New', Courier, monospace; font-size:12.5px; line-height:1.8; }
+  #certOverlay{
+    position:fixed; inset:0;
+    z-index:860;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(4,2,16,0.72);
+    padding:16px;
+  }
+  #certOverlay.on{ display:flex; }
+  .cert-win{
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    box-shadow:6px 6px 0 rgba(0,0,0,0.5);
+    max-width:min(560px, 94vw);
+    max-height:92vh;
+    overflow:auto;
+  }
+  .cert-paper{
+    margin:10px;
+    padding:6px;
+    background:#FFFEF8;
+    border:4px double var(--ink);
+  }
+  .cert-inner{
+    border:1px solid var(--bevel-lo);
+    padding:24px 22px 18px;
+    text-align:center;
+    font-family:'Times New Roman', Times, serif;
+    color:var(--ink);
+  }
+  .cert-inner .c-head{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:10.5px;
+    letter-spacing:0.26em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .cert-inner h3{ font-style:italic; font-size:30px; margin:10px 0 2px; }
+  .cert-inner p{ font-size:13px; margin:8px 0; }
+  .cert-inner .c-name{
+    display:inline-block;
+    font-size:22px;
+    font-weight:bold;
+    border-bottom:1px solid var(--ink);
+    padding:0 26px 2px;
+    margin:6px 0 2px;
+  }
+  .cert-inner .c-no{ font-family:'Courier New', Courier, monospace; font-weight:bold; color:var(--violet); }
+  .cert-inner .c-sig{ margin-top:14px; font-style:italic; font-size:20px; }
+  .cert-inner .c-sub{ font-size:9.5px; letter-spacing:0.12em; color:var(--ink-soft); margin-top:4px; }
+  .cert-btns{ display:flex; justify-content:center; gap:10px; padding:2px 10px 12px; }
 
   /* ============ retro scrollbar — chunky, beveled, correct ============ */
   ::-webkit-scrollbar{ width:16px; height:16px; }
@@ -1149,7 +1267,13 @@
 
   @media print{
     .splash, .winamp, #sparkleCanvas, .blink, #gameOverlay, #statusBar, .page-cat, #nyanPageCanvas{ display:none !important; }
-    .stars, .crt-overlay, #confettiCanvas, .toast, .navbar, .newsbar, .badges, .counter, .webring{ display:none !important; }
+    .stars, .crt-overlay, #confettiCanvas, .toast, .navbar, .newsbar, .badges, .counter, .webring, .ktb, .popup{ display:none !important; }
+    body:not(.cert-mode) #certOverlay{ display:none !important; }
+    /* CERTIFICATE.EXE print mode — the certificate, and nothing else */
+    body.cert-mode > :not(#certOverlay){ display:none !important; }
+    body.cert-mode #certOverlay{ display:block; position:static; background:none; padding:0; }
+    body.cert-mode .cert-win{ border:none; box-shadow:none; max-width:none; max-height:none; overflow:visible; }
+    body.cert-mode .cert-win .titlebar, body.cert-mode .cert-btns{ display:none; }
     body{ background:#fff; }
     .window{ box-shadow:none; border-color:#999; }
     .banner{ background:#fff; padding:20px; }
@@ -1253,6 +1377,31 @@
         </div>
         <canvas id="gameCanvas" width="480" height="560"></canvas>
         <div class="game-hint" id="gHint">&larr;&rarr; / A D MOVE &bull; SPACE FIRE &bull; ESC QUIT &bull; TOUCH: DRAG + AUTO-FIRE</div>
+      </div>
+    </div>
+  </div>
+  <!-- ============ CERTIFICATE.EXE — a real document from a real store ============ -->
+  <div id="certOverlay" role="dialog" aria-label="Commemorative visitor certificate">
+    <div class="cert-win">
+      <div class="titlebar">
+        <span class="t-label">CERTIFICATE.EXE &mdash; Print Preview</span>
+        <span class="t-btns"><i id="certClose" role="button" aria-label="Close certificate" tabindex="0">&times;</i></span>
+      </div>
+      <div class="cert-paper">
+        <div class="cert-inner">
+          <div class="c-head">The Official Website of Drew K. Kennedy</div>
+          <h3>Certificate of Visitation</h3>
+          <p>This certifies that</p>
+          <div class="c-name" id="certWho">ANONYMOUS VISITOR</div>
+          <p>personally visited <b>drewkkennedy.com</b>, beheld its wonders in their entirety, and completed a legitimate commercial transaction valued at <b>$0.00</b>.</p>
+          <p>Visitor N&ordm; <span class="c-no" id="certNo">000000</span> &bull; Order <span class="c-no" id="certOrder">&mdash;</span><br><span id="certDate"></span></p>
+          <div class="c-sig">Drew K. Kennedy</div>
+          <div class="c-sub">PROPRIETOR &bull; THIS DOCUMENT BECAME REAL WHEN YOU PRINTED IT</div>
+        </div>
+      </div>
+      <div class="cert-btns">
+        <button type="button" class="gb-btn" id="certPrint">&#128424; Print</button>
+        <button type="button" class="gb-btn" id="certCloseBtn">Close</button>
       </div>
     </div>
   </div>
@@ -2015,34 +2164,78 @@
     }
   })();
 
-  // ===== the site cat — same cat, bigger sky, new altitude every lap =====
+  // ===== the site cats — click one, get two (max 8); ignore them 2s, they reunite =====
   (function(){
     if (prefersReducedMotion) return;
     const proto = document.getElementById('spCat');
     if (!proto) return;
-    const cat = proto.cloneNode(true);
-    cat.removeAttribute('id');
-    cat.classList.remove('sp-cat');
-    cat.classList.add('page-cat');
-    const feet = cat.querySelector('#catFeet');
-    const head = cat.querySelector('#catHead');
-    const tail = cat.querySelector('#catTail');
-    cat.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
     const canvas2 = document.createElement('canvas');
     canvas2.id = 'nyanPageCanvas';
     canvas2.setAttribute('aria-hidden', 'true');
     document.body.appendChild(canvas2);
-    document.body.appendChild(cat);
     const nctx = canvas2.getContext('2d');
     const COLORS = ['#FF3B30', '#FF9500', '#FFE800', '#33E019', '#00A2FF', '#8A5CF6'];
     const STRIPE_H = 3.9, FADE_MS = 2200, SPEED = 95;
-    let segs = [], lastSpawnX = -Infinity, t0 = null, raf = null, lastLap = -1;
-    let baseY = 0;
+    const MAX_CATS = 8, MERGE_AFTER = 2000;
+    let segs = [], raf = null, last = 0, time = 0;
+    let lastTouch = -Infinity;
+    let cats = [];
+    let saidDivided = false, saidMax = false;
+
     function pickAltitude(){
       // anywhere with clearance: below the nav strip, above the very bottom
-      baseY = 90 + Math.random() * Math.max(innerHeight - 260, 60);
+      return 90 + Math.random() * Math.max(innerHeight - 260, 60);
     }
-    pickAltitude();
+    function puff(x, y, now){
+      // a little burst of rainbow — mitosis has a visual
+      for (let i = 0; i < 4; i++) segs.push({ x: x + i * 9, y: y + 10, born: now });
+    }
+
+    function makeCat(x, baseY){
+      const el = proto.cloneNode(true);
+      el.removeAttribute('id');
+      el.classList.remove('sp-cat');
+      el.classList.add('page-cat');
+      const feet = el.querySelector('#catFeet');
+      const head = el.querySelector('#catHead');
+      const tail = el.querySelector('#catTail');
+      el.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+      document.body.appendChild(el);
+      const c = {
+        el, feet, head, tail,
+        x, baseY,
+        y: baseY,
+        targetY: baseY,
+        speed: SPEED * (0.85 + Math.random() * 0.3),
+        phase: Math.random() * Math.PI * 2,
+        prevX: x,
+        trailAcc: 0
+      };
+      el.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        split(c);
+      });
+      return c;
+    }
+
+    function split(c){
+      lastTouch = performance.now();
+      if (cats.length >= MAX_CATS){
+        if (!saidMax){ saidMax = true; notify('MAXIMUM CAT DENSITY REACHED. (8)'); }
+        return;
+      }
+      const kitten = makeCat(c.x, c.baseY);
+      kitten.y = c.y;
+      // diverge — one drifts up, one down, both keeping viewport clearance
+      const spread = 50 + Math.random() * 70;
+      const lo = 90, hi = Math.max(innerHeight - 170, lo + 60);
+      c.targetY = Math.min(hi, Math.max(lo, c.baseY - spread));
+      kitten.targetY = Math.min(hi, Math.max(lo, c.baseY + spread));
+      cats.push(kitten);
+      puff(c.x + 6, c.y, performance.now());
+      if (!saidDivided){ saidDivided = true; notify('THE CAT HAS DIVIDED. THIS IS NORMAL.'); }
+    }
+
     function size(){
       canvas2.width = innerWidth * devicePixelRatio;
       canvas2.height = innerHeight * devicePixelRatio;
@@ -2050,24 +2243,55 @@
     }
     size();
     addEventListener('resize', size);
+
+    cats.push(makeCat(-160, pickAltitude()));
+
     function frame(now){
-      if (t0 === null) t0 = now;
-      const t = (now - t0) / 1000;
-      const span = innerWidth + 320;
-      const lap = Math.floor((t * SPEED) / span);
-      if (lap !== lastLap){ lastLap = lap; pickAltitude(); lastSpawnX = -Infinity; }
-      const x = -160 + ((t * SPEED) % span);
-      const y = baseY + Math.round(Math.sin(t * 5.4) * 1.4) * 7;
-      cat.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      if (!last) last = now;
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      time += dt;
       const tick = Math.floor(now / 140) % 2;
-      feet.setAttribute('transform', tick ? 'translate(1.2 0)' : 'translate(-1.2 0)');
-      head.setAttribute('transform', tick ? 'translate(0 0.9)' : 'translate(0 0)');
-      tail.setAttribute('transform', tick ? 'translate(0 -0.9)' : 'translate(0 0.5)');
-      if (x < lastSpawnX) lastSpawnX = -Infinity;
-      if (x - lastSpawnX >= 7){
-        lastSpawnX = x;
-        segs.push({ x: x + 13, y: y + 10, born: now }); // under the body — no gap at the butt
+      const merging = cats.length > 1 && now - lastTouch > MERGE_AFTER;
+      const leader = cats[0];
+
+      for (let i = cats.length - 1; i >= 0; i--){
+        const c = cats[i];
+        if (merging && i > 0){
+          // homing back into the leader — the colony forgets it was ever many
+          const k = Math.min(1, dt * 4);
+          c.x += (leader.x - c.x) * k;
+          c.baseY += (leader.baseY - c.baseY) * k;
+          c.y = c.baseY + Math.round(Math.sin(time * 5.4 + c.phase) * 1.4) * 7;
+          if (Math.abs(leader.x - c.x) < 18 && Math.abs(leader.baseY - c.baseY) < 18){
+            puff(c.x, c.y, now);
+            c.el.remove();
+            cats.splice(i, 1);
+            continue;
+          }
+        } else {
+          c.x += c.speed * dt;
+          if (c.x > innerWidth + 160){
+            c.x = -160;
+            c.prevX = c.x;
+            c.targetY = pickAltitude();
+          }
+          c.baseY += (c.targetY - c.baseY) * Math.min(1, dt * 2.5);
+          c.y = c.baseY + Math.round(Math.sin(time * 5.4 + c.phase) * 1.4) * 7;
+        }
+        c.el.style.transform = 'translate(' + c.x + 'px,' + c.y + 'px)';
+        c.feet.setAttribute('transform', tick ? 'translate(1.2 0)' : 'translate(-1.2 0)');
+        c.head.setAttribute('transform', tick ? 'translate(0 0.9)' : 'translate(0 0)');
+        c.tail.setAttribute('transform', tick ? 'translate(0 -0.9)' : 'translate(0 0.5)');
+        // shed trail by distance traveled, whichever direction that is
+        c.trailAcc += Math.abs(c.x - c.prevX);
+        c.prevX = c.x;
+        if (c.trailAcc >= 7){
+          c.trailAcc = 0;
+          segs.push({ x: c.x + 13, y: c.y + 10, born: now }); // under the body — no gap at the butt
+        }
       }
+
       nctx.clearRect(0, 0, innerWidth, innerHeight);
       segs = segs.filter(s => now - s.born < FADE_MS);
       for (const s of segs){
@@ -2084,7 +2308,7 @@
     raf = requestAnimationFrame(frame);
     document.addEventListener('visibilitychange', () => {
       if (document.hidden){ if (raf) cancelAnimationFrame(raf); raf = null; }
-      else if (!raf){ t0 = null; lastLap = -1; segs = []; lastSpawnX = -Infinity; raf = requestAnimationFrame(frame); }
+      else if (!raf){ last = 0; segs = []; raf = requestAnimationFrame(frame); }
     });
   })();
 
@@ -2167,6 +2391,7 @@
       localStorage.setItem('dkk_visits', String(n));
       n += 1336; // every counter started somewhere
     } catch (e) {}
+    window.VISITOR_N = n; // the certificate authority needs this
     const digits = String(n).padStart(6, '0').split('');
     document.getElementById('counterDigits').innerHTML = digits.map(d => '<i>' + d + '</i>').join('');
   })();
@@ -3062,6 +3287,192 @@
     return { open, close, get running(){ return running; } };
   })();
 
+  // ===== CERTIFICATE.EXE — a real document, suitable for framing =====
+  const CERT = (function(){
+    const overlay = document.getElementById('certOverlay');
+    function show(name, orderNo){
+      document.getElementById('certWho').textContent = name;
+      document.getElementById('certNo').textContent = String(window.VISITOR_N || 1337).padStart(6, '0');
+      document.getElementById('certOrder').textContent = orderNo;
+      document.getElementById('certDate').textContent =
+        new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+      overlay.classList.add('on');
+    }
+    function hide(){ overlay.classList.remove('on'); }
+    document.getElementById('certClose').addEventListener('click', hide);
+    document.getElementById('certCloseBtn').addEventListener('click', hide);
+    document.getElementById('certPrint').addEventListener('click', () => {
+      document.body.classList.add('cert-mode');
+      window.print();
+    });
+    addEventListener('afterprint', () => document.body.classList.remove('cert-mode'));
+    return { show };
+  })();
+
+  // ===== DKK STORE — a complete checkout experience for a free certificate =====
+  const STORE = (function(){
+    let win = null, certName = 'ANONYMOUS VISITOR', orders = 0;
+    function close(){ if (win){ win.remove(); win = null; } }
+    function popup(title, bodyHTML, btns){
+      close();
+      win = document.createElement('div');
+      win.className = 'popup store-popup';
+      win.style.zIndex = 890;
+      const w = Math.min(380, innerWidth * 0.92);
+      win.style.left = Math.max(8, (innerWidth - w) / 2) + 'px';
+      win.style.top = Math.max(10, innerHeight * 0.22) + 'px';
+      win.innerHTML =
+        '<div class="titlebar"><span class="t-label">' + title + '</span>' +
+        '<span class="t-btns"><i role="button" aria-label="Close" tabindex="0">&times;</i></span></div>' +
+        '<div class="popup-body">' + bodyHTML + '</div>' +
+        '<div class="popup-btns"></div>';
+      const row = win.querySelector('.popup-btns');
+      btns.forEach(bc => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = bc.l;
+        b.addEventListener('click', bc.fn);
+        row.appendChild(b);
+      });
+      win.querySelector('.t-btns i').addEventListener('click', () => {
+        close();
+        notify('CHECKOUT ABANDONED. YOUR CART WILL BE SAVED FOREVER.');
+      });
+      document.body.appendChild(win);
+    }
+    function stepProduct(){
+      popup('DKK STORE &mdash; 1 OF 1 PRODUCTS',
+        '<b>Commemorative Visitor Certificate</b><br>Certifies, in writing, that you visited this website. Printable. Frameable. Legally meaningless.<br><br>' +
+        '<span class="store-lines">PRICE ...... $0.00<br>IN STOCK ... &infin;<br>RATING ..... &starf;&starf;&starf;&starf;&starf; (1 review, mine)</span>',
+        [
+          { l:'Add to Cart', fn:stepCart },
+          { l:'Just Browsing', fn:() => { close(); notify('ITEM RETURNED TO SHELF. IT DID NOT MIND.'); } }
+        ]);
+    }
+    function stepCart(){
+      popup('YOUR CART (1 ITEM)',
+        '<span class="store-lines">1 &times; VISITOR CERT ... $0.00<br>SUBTOTAL ......... $0.00<br>SHIPPING ......... $0.00<br>TAX .............. $0.00<br><b>TOTAL ............ $0.00</b></span>',
+        [
+          { l:'Checkout', fn:stepShipping },
+          { l:'Abandon Cart', fn:() => { close(); notify('CART ABANDONED. IT UNDERSTANDS.'); } }
+        ]);
+    }
+    function stepShipping(){
+      popup('SHIPPING INFORMATION',
+        'Name to appear on the certificate:' +
+        '<input id="storeName" type="text" maxlength="24" placeholder="ANONYMOUS VISITOR">' +
+        '<span style="display:block;margin-top:6px;font-size:11px;color:var(--ink-soft);">No address needed. It ships directly to your screen.</span>',
+        [{ l:'Continue', fn:() => {
+            const v = document.getElementById('storeName').value.trim();
+            certName = (v || 'ANONYMOUS VISITOR').toUpperCase().slice(0, 24);
+            stepPayment();
+          } }]);
+    }
+    function stepPayment(){
+      popup('PAYMENT &mdash; SECURE (TRUST ME)',
+        '<span class="store-lines">METHOD ... EXPOSURE (pre-selected)<br>DUE ...... $0.00<br>STATUS ... <b id="storePay">CHARGING YOUR NOTHING&hellip;</b></span>',
+        [{ l:'Place Order', fn:stepConfirm }]);
+      setTimeout(() => {
+        const el = document.getElementById('storePay');
+        if (el) el.textContent = 'APPROVED';
+      }, 900);
+    }
+    function stepConfirm(){
+      orders++;
+      const orderNo = 'DKK-' + String((window.VISITOR_N || 1337) * 10 + orders).padStart(7, '0');
+      popup('ORDER CONFIRMED',
+        'Order <b>#' + orderNo + '</b> has been placed.<br>Estimated delivery: <b>NOW.</b>',
+        [{ l:'Open Certificate', fn:() => { close(); CERT.show(certName, orderNo); } }]);
+      burstConfetti();
+    }
+    return { open: stepProduct };
+  })();
+
+  // ===== THE KENNEDY TOOLBAR — it does nothing, but it's yours =====
+  const TOOLBAR = (function(){
+    const KEY = 'dkk_toolbar';
+    let bar = null, unArm = null;
+    const SYNERGY = [
+      'SYNERGY LEVELS: NOMINAL.',
+      'PARADIGM SHIFTED. SHIFTING BACK.',
+      'LEVERAGING CORE COMPETENCIES... DONE. NOTHING HAPPENED.',
+      'CIRCLING BACK. ETA: NEVER.',
+      'VALUE ADDED: 0. VALUE LOST: 0. PERFECT BALANCE.',
+      'BASE TOUCHED. THE BASE SAYS HI.'
+    ];
+    let synIdx = 0;
+    const WEATHER = ['STATIC', 'HEAVY STATIC', 'STATIC W/ A CHANCE OF SIGNAL', 'WALL-TO-WALL STATIC', 'STATIC'];
+
+    function build(){
+      if (bar) return;
+      bar = document.createElement('div');
+      bar.className = 'ktb';
+      bar.setAttribute('aria-label', 'Kennedy Toolbar');
+      bar.innerHTML =
+        '<span class="ktb-logo">KENNEDY&trade; TOOLBAR v1.0</span>' +
+        '<button type="button" data-k="home">&#8962; Home</button>' +
+        '<button type="button" data-k="syn">Synergize</button>' +
+        '<button type="button" data-k="wx">Weather: STATIC</button>' +
+        '<button type="button" data-k="store">&#128717; Store</button>' +
+        '<button type="button" data-k="un">Uninstall</button>' +
+        '<form class="ktb-search"><input type="text" maxlength="32" placeholder="Search the toolbar..." aria-label="Search the toolbar"><button type="submit">Go</button></form>';
+      document.querySelector('.navbar').insertAdjacentElement('afterend', bar);
+
+      bar.querySelector('[data-k="home"]').addEventListener('click', () => {
+        document.getElementById('top').scrollIntoView({ behavior:'smooth' });
+        notify('YOU ARE HOME. YOU WERE ALWAYS HOME.');
+      });
+      bar.querySelector('[data-k="syn"]').addEventListener('click', () => {
+        notify(SYNERGY[synIdx++ % SYNERGY.length]);
+      });
+      const wx = bar.querySelector('[data-k="wx"]');
+      wx.addEventListener('click', () => {
+        wx.textContent = 'Weather: ' + WEATHER[(Math.random() * WEATHER.length) | 0];
+      });
+      bar.querySelector('[data-k="store"]').addEventListener('click', () => STORE.open());
+      const un = bar.querySelector('[data-k="un"]');
+      un.addEventListener('click', () => {
+        if (un.dataset.armed){
+          bar.remove(); bar = null;
+          try { localStorage.removeItem(KEY); } catch(e){}
+          notify('TOOLBAR UNINSTALLED. IT LEFT A NOTE: "NO HARD FEELINGS."');
+        } else {
+          un.dataset.armed = '1';
+          un.textContent = 'Uninstall?!';
+          notify('THE TOOLBAR HAS GROWN ATTACHED TO YOU. CLICK AGAIN TO BREAK ITS HEART.');
+          clearTimeout(unArm);
+          unArm = setTimeout(() => {
+            if (bar){ delete un.dataset.armed; un.textContent = 'Uninstall'; }
+          }, 6000);
+        }
+      });
+      const form = bar.querySelector('.ktb-search');
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const q = form.querySelector('input').value.trim().toLowerCase();
+        if (!q){ notify('YOU SEARCHED FOR NOTHING. FOUND IT.'); return; }
+        const hit = Array.from(bar.querySelectorAll('button')).find(b => b.textContent.toLowerCase().includes(q));
+        if (hit){
+          hit.classList.remove('found'); void hit.offsetWidth; hit.classList.add('found');
+          notify('1 RESULT FOUND. IT WAS IN THE TOOLBAR.');
+        } else {
+          notify('0 RESULTS. THE TOOLBAR ONLY SEARCHES ITSELF.');
+        }
+      });
+    }
+
+    function install(){
+      if (bar){ notify('THE KENNEDY TOOLBAR IS ALREADY INSTALLED. IT SAW YOU CHECKING.'); return; }
+      build();
+      try { localStorage.setItem(KEY, '1'); } catch(e){}
+      burstConfetti();
+      notify('KENNEDY TOOLBAR INSTALLED. IT DOES NOTHING. IT IS YOURS.');
+    }
+    // returning visitors get their toolbar back, silently, like it never left
+    try { if (localStorage.getItem(KEY)) build(); } catch(e){}
+    return { install, get installed(){ return !!bar; } };
+  })();
+
   // ===== the popup engine — OMNICAST™ technology, road-legal edition =====
   (function(){
     const MAX = matchMedia('(max-width: 700px)').matches ? 2 : 3;
@@ -3076,7 +3487,8 @@
       { t: 'RECRUITER ALERT', b: 'Hot job openings in your area are viewing this portfolio <b>right now</b>.', btns: [{ l: 'Show Them In', a: 'contact' }, { l: 'Let Them Wait' }] },
       { t: 'LOW DISK SPACE', b: 'Your nostalgia drive is almost full. Delete childhood memories?', btns: [{ l: 'Never' }, { l: 'Also Never' }] },
       { t: 'SECURITY NOTICE', b: 'This site is protected by a firewall. Firewalls are sold separately in DEFEND.EXE.', btns: [{ l: 'Launch DEFEND.EXE', a: 'game' }, { l: 'Ignore Threat' }] },
-      { t: 'TOOLBAR OFFER', b: 'Install the Kennedy Toolbar? It does nothing, but it&rsquo;s yours.', btns: [{ l: 'Install', a: 'toast', arg: 'TOOLBAR INSTALLED (SPIRITUALLY).' }, { l: 'Maybe Later' }] },
+      { t: 'TOOLBAR OFFER', b: 'Install the Kennedy Toolbar? It does nothing, but it&rsquo;s yours.', btns: [{ l: 'Install', a: 'toolbar' }, { l: 'Maybe Later' }] },
+      { t: 'DKK STORE', b: 'New in the store: the <b>Commemorative Visitor Certificate</b>. Own a piece of this website. $0.00, free instant shipping.', btns: [{ l: 'View Product', a: 'store' }, { l: 'Window Shopping' }] },
       { t: 'VISITOR SURVEY', b: 'How is your visit going?', btns: [{ l: 'Great', a: 'toast', arg: 'RESPONSE RECORDED. RESULTS: GREAT.' }, { l: 'Also Great', a: 'toast', arg: 'RESPONSE RECORDED. RESULTS: GREAT.' }] },
       { t: 'UPDATE AVAILABLE', b: 'A newer version of this website is available: this one. You&rsquo;re already on it.', btns: [{ l: 'Excellent' }] },
       { t: 'WEATHER ADVISORY', b: 'Today&rsquo;s forecast: 100% chance of static.', btns: [{ l: 'Dress Accordingly' }] },
@@ -3118,6 +3530,8 @@
       else if (a === 'contact') document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
       else if (a === 'game') DEFEND.open(false);
       else if (a === 'omni') window.open('https://omni-cast.net/', '_blank', 'noopener');
+      else if (a === 'toolbar') TOOLBAR.install();
+      else if (a === 'store') STORE.open();
     }
     function dismiss(el){
       if (!el.parentNode) return;
@@ -3126,8 +3540,12 @@
     }
 
     function spawn(){
-      const cfg = POOL[bag.pop()];
+      let cfg = POOL[bag.pop()];
       if (!bag.length) refill();
+      // once the toolbar is real, the offer becomes a status report
+      if (cfg.t === 'TOOLBAR OFFER' && TOOLBAR.installed){
+        cfg = { t: 'TOOLBAR STATUS', b: 'The Kennedy Toolbar is functioning nominally. No action is required. No action is possible.', btns: [{ l: 'Good' }] };
+      }
       const el = document.createElement('div');
       el.className = 'popup';
       el.style.zIndex = ++zTop;
