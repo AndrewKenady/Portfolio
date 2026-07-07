@@ -1008,6 +1008,8 @@
   }
   .ktb button:active{ border-style:inset; }
   .ktb button:hover{ background:#FBF9FF; }
+  .ktb button:disabled{ opacity:0.5; cursor:default; color:var(--ink-soft); }
+  .ktb button:disabled:hover{ background:var(--win); }
   .ktb-search{ display:flex; gap:4px; align-items:center; margin-left:auto; }
   .ktb-search input{
     border:2px inset var(--bevel-hi);
@@ -1485,12 +1487,12 @@
   .window.mini .titlebar:active{ cursor:grabbing; }
   .window.mini .win-body{ transform-origin:top left; pointer-events:none; }
   .window.mini.min .win-body{ display:none; }
-  /* a dark fade at the bottom — only when the body is taller than the tile,
+  /* a soft fade at the bottom — only when the body is taller than the tile,
      signalling "there's more below" */
   .window.mini.clipped::after{
     content:"";
     position:absolute; left:0; right:0; bottom:0; height:46px;
-    background:linear-gradient(180deg, transparent, rgba(11,4,40,0.82));
+    background:linear-gradient(180deg, transparent, var(--win));
     pointer-events:none;
   }
 
@@ -4466,8 +4468,23 @@
         document.getElementById('top').scrollIntoView({ behavior:'smooth' });
         notify('YOU ARE HOME. YOU WERE ALWAYS HOME.');
       });
-      bar.querySelector('[data-k="syn"]').addEventListener('click', () => {
+      const syn = bar.querySelector('[data-k="syn"]');
+      syn.addEventListener('click', () => {
+        if (syn.disabled) return;
         notify(SYNERGY[synIdx++ % SYNERGY.length]);
+        // synergy must recharge — no spamming the paradigm
+        syn.disabled = true;
+        let t = 5;
+        syn.innerHTML = '&#8987; Recharging ' + t + 's';
+        const iv = setInterval(() => {
+          if (--t <= 0){
+            clearInterval(iv);
+            syn.disabled = false;
+            syn.innerHTML = '&#129309; Synergize';
+          } else {
+            syn.innerHTML = '&#8987; Recharging ' + t + 's';
+          }
+        }, 1000);
       });
       const wx = bar.querySelector('[data-k="wx"]');
       wx.addEventListener('click', () => {
