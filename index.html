@@ -2463,13 +2463,15 @@
       }
     }
     function cur(){ return PLAYLIST[order[pos]]; }
-    function setLcd(){
-      const base = (pos + 1) + '/' + order.length + '  ' + cur().t;
+    function setLcdRaw(base){
       lcd.textContent = base;
       // crawl only if the title overflows the LCD — short titles sit still,
       // long ones parade. rotating a string that fits just looks broken.
       crawl = lcd.offsetWidth > lcd.parentNode.clientWidth - 17;
       marqStr = crawl ? base + '  ★  ' : base;
+    }
+    function setLcd(){
+      setLcdRaw((pos + 1) + '/' + order.length + '  ' + cur().t);
     }
     // the LCD crawls (when it must), as is right and proper
     setInterval(() => {
@@ -2525,6 +2527,27 @@
         box.classList.remove('paused');
       }
     }
+    // the dancing baby's b-side — off the shuffle rotation, on demand only.
+    // always restarts from the top, cutting whatever's currently playing.
+    function playSecret(){
+      const key = 'secret/Hooked-On-A-Feeling.mid';
+      MIDI.stop();
+      const got = cache.has(key)
+        ? Promise.resolve(cache.get(key))
+        : fetch('misc/secret/' + encodeURIComponent('Hooked-On-A-Feeling.mid'))
+            .then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
+            .then(b => { cache.set(key, b); return b; });
+      got.then(buf => {
+        if (!MIDI.load(buf)) throw 0;
+        MIDI.start();
+        playing = true;
+        everStarted = true;
+        box.style.display = 'block';
+        box.classList.remove('paused', 'shade');
+        setLcdRaw('★ SECRET ★  Blue Swede — Hooked on a Feeling');
+      }).catch(() => {});
+    }
+
     MIDI.onEnded = next;
     btnNext.addEventListener('click', next);
     btnPrev.addEventListener('click', prev);
@@ -2537,8 +2560,25 @@
       if (!shaded && everStarted) setLcd(); // the LCD was hidden — re-measure the crawl
     });
     return {
-      start(){ shuffle(); pos = 0; loadAndPlay(); }
+      start(){ shuffle(); pos = 0; loadAndPlay(); },
+      playSecret
     };
+  })();
+
+  // ===== the dancing baby spins its record — a hidden B.J.-Thomas b-side =====
+  (function(){
+    const baby = document.querySelector('.dancing-baby');
+    if (!baby) return;
+    baby.style.cursor = 'pointer';
+    baby.setAttribute('role', 'button');
+    baby.setAttribute('tabindex', '0');
+    baby.setAttribute('aria-label', 'Play the dancing baby’s song');
+    baby.title = 'ooga-chaka';
+    const go = () => { PLAYER.playSecret(); notify('OOGA-CHAKA! OOGA-OOGA...'); };
+    baby.addEventListener('click', go);
+    baby.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); }
+    });
   })();
 
   function enterSite(){
