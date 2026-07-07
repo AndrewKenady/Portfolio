@@ -298,12 +298,33 @@
     margin-top:18px;
     border:2px inset var(--bevel-hi);
     background:#08031C;
-    color:var(--cyan);
+    color:#D5F8FF;
     font-family:'Courier New', Courier, monospace;
     font-weight:bold;
     font-size:12.5px;
-    line-height:1.9;
-    padding:10px 14px;
+    line-height:1.7;
+    padding:12px 15px;
+  }
+  .specs .spec-title{
+    color:var(--gold);
+    letter-spacing:0.1em;
+    padding-bottom:7px;
+    margin-bottom:8px;
+    border-bottom:1px dotted rgba(213,248,255,0.3);
+  }
+  .spec-row{ display:flex; gap:12px; padding:3px 0; }
+  .spec-row + .spec-row{ border-top:1px dotted rgba(213,248,255,0.12); }
+  .spec-k{
+    flex:0 0 118px;
+    color:var(--gold);
+    letter-spacing:0.04em;
+    white-space:nowrap;
+  }
+  .spec-v{ color:#CDE6F2; font-weight:normal; }
+  .spec-v b{ color:var(--cyan); font-weight:bold; }
+  @media (max-width:540px){
+    .spec-row{ flex-direction:column; gap:1px; padding:6px 0; }
+    .spec-k{ flex-basis:auto; }
   }
   .hr90{
     border:none;
@@ -1788,7 +1809,19 @@
         <p>By day I'm a <b>Senior Software Engineer II at Pocket Worlds</b>, where I own the <b>live event world gameplay experiences</b> that ship to thousands of Highrise players every week — concept to code to live ops. I also <b>architected, built, and operate the company's internal AI platform</b>: an agentic analyst that answers cross-team questions with cited data from production systems, for every discipline from leadership to community. The thesis: every question it absorbs is an expert interruption that didn't happen — and the value compounds with every discipline it spans.</p>
         <p>Before that: co-created and shipped <b>C.A.R.L.</b> to PC and every major console, led development on <b>Draw a Stickman: EPIC 2</b>, and spent a decade making <b>Nintendrew</b> the internet's home for retro gaming deep dives. I also compose, edit, and do voiceover!</p>
         <p>Austin, TX. Two cats. One very complete N64 library. Make yourself at home — the guestbook is at the bottom.</p>
-        <div class="specs" role="note" aria-label="Skills">C:\&gt; SPECS &nbsp;&mdash;&nbsp; C#/Unity &bull; Unreal/UEFN &bull; Lua &bull; TypeScript &bull; XNA &bull; Gameplay &amp; Live Ops &bull; Music Production &bull; Voiceover &bull; Video Production</div>
+        <div class="specs" role="note" aria-label="Skills and specifications">
+          <div class="spec-title">C:\&gt; SYSTEM SPECIFICATIONS</div>
+          <div class="spec-row"><span class="spec-k">LANGUAGES</span><span class="spec-v"><b>C#</b> &middot; Lua &middot; TypeScript &middot; Java &middot; SQL &middot; HTML/CSS</span></div>
+          <div class="spec-row"><span class="spec-k">ENGINES</span><span class="spec-v"><b>Unity</b> &middot; <b>Unreal / UEFN</b> &middot; XNA &middot; MonoGame &middot; Xamarin</span></div>
+          <div class="spec-row"><span class="spec-k">GAMEPLAY</span><span class="spec-v"><b>Gameplay Programming</b> &middot; Game Design &middot; Shaders &middot; 3D Math &middot; Physics &middot; Optimization &middot; Prototyping</span></div>
+          <div class="spec-row"><span class="spec-k">AI &amp; ML</span><span class="spec-v"><b>LLMs &amp; Agentic AI</b> &middot; Machine Learning &middot; AI Pipelines &amp; Tooling</span></div>
+          <div class="spec-row"><span class="spec-k">PLATFORMS</span><span class="spec-v"><b>Steam / Steamworks</b> &middot; Switch &middot; PlayStation &middot; Xbox &middot; iOS &middot; Android &middot; Windows &middot; macOS &middot; Linux</span></div>
+          <div class="spec-row"><span class="spec-k">LIVE OPS</span><span class="spec-v"><b>Live Events</b> &middot; Live-Service Ops &middot; User-Generated Content &middot; UI Design &middot; Community</span></div>
+          <div class="spec-row"><span class="spec-k">PRACTICE</span><span class="spec-v">Git &middot; Code Review &middot; Code Design &middot; Agile / Scrum &middot; Technical Writing &middot; <b>Team Leadership</b></span></div>
+          <div class="spec-row"><span class="spec-k">MUSIC</span><span class="spec-v"><b>Music Production</b> &middot; FL Studio &middot; Piano &middot; Chiptune &amp; Scoring</span></div>
+          <div class="spec-row"><span class="spec-k">VIDEO &amp; VOICE</span><span class="spec-v">Video Production &middot; Editing &amp; Post &middot; <b>Voiceover</b> &middot; Acting &middot; Character Animation</span></div>
+          <div class="spec-row"><span class="spec-k">AUDIENCE</span><span class="spec-v"><b>YouTube (350K+)</b> &middot; Online Content &middot; Discord Partner &middot; Public Speaking</span></div>
+        </div>
       </div>
     </section>
 
