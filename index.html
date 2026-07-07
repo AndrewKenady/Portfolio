@@ -1485,11 +1485,12 @@
   .window.mini .titlebar:active{ cursor:grabbing; }
   .window.mini .win-body{ transform-origin:top left; pointer-events:none; }
   .window.mini.min .win-body{ display:none; }
-  /* a soft fade at the clipped bottom so it reads as "there's more" */
-  .window.mini::after{
+  /* a dark fade at the bottom — only when the body is taller than the tile,
+     signalling "there's more below" */
+  .window.mini.clipped::after{
     content:"";
-    position:absolute; left:0; right:0; bottom:0; height:44px;
-    background:linear-gradient(180deg, transparent, var(--win));
+    position:absolute; left:0; right:0; bottom:0; height:46px;
+    background:linear-gradient(180deg, transparent, rgba(11,4,40,0.82));
     pointer-events:none;
   }
 
@@ -3045,8 +3046,11 @@
       const fullW = first.width;
       const k = MINI_W / fullW;                    // body shrinks by this
       const bodyW = body.offsetWidth;
-      const visBodyH = Math.min(MINI_BODY_H, Math.round(body.offsetHeight * k));
-      const endH = tb.offsetHeight + visBodyH;     // titlebar (full) + clipped body
+      const scaledBodyH = Math.round(body.offsetHeight * k);
+      const visBodyH = Math.min(MINI_BODY_H, scaledBodyH);
+      const endH = tb.offsetHeight + visBodyH;     // titlebar (full) + (maybe clipped) body
+      // only show the "more below" fade when the body is actually taller than the tile
+      win.classList.toggle('clipped', scaledBodyH > MINI_BODY_H + 1);
       win._fullW = fullW; win._bodyW = bodyW; win._k = k; win._endH = endH;
 
       const cx = miniCascade.x, cy = miniCascade.y;
@@ -3092,7 +3096,7 @@
       const ph = win._ph;
       if (prefersReducedMotion || !ph){
         if (ph){ ph.remove(); win._ph = null; }
-        win.classList.remove('mini');
+        win.classList.remove('mini', 'clipped');
         clearMiniInline(win);
         return;
       }
@@ -3114,7 +3118,7 @@
       win.addEventListener('transitionend', function done(e){
         if (e.propertyName !== 'width') return;
         win.removeEventListener('transitionend', done);
-        win.classList.remove('mini');
+        win.classList.remove('mini', 'clipped');
         clearMiniInline(win);
         ph.remove(); win._ph = null;
       });
