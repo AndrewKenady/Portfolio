@@ -1933,6 +1933,9 @@
 
 <script>
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // effect canvases render at capped DPI — it's all chunky pixel art anyway,
+  // and full retina on 4-5 fullscreen canvases is where the frame budget went
+  const fxDpr = () => Math.min(window.devicePixelRatio || 1, 1.5);
 
   // ===== the enter page — first input doubles as audio consent =====
   const splash = document.getElementById('splash');
@@ -2271,9 +2274,10 @@
     let raf = null;
 
     function size(){
-      tc.width = splash.clientWidth * devicePixelRatio;
-      tc.height = splash.clientHeight * devicePixelRatio;
-      tctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      const d = fxDpr();
+      tc.width = splash.clientWidth * d;
+      tc.height = splash.clientHeight * d;
+      tctx.setTransform(d, 0, 0, d, 0, 0);
     }
     size();
     addEventListener('resize', size);
@@ -2297,11 +2301,12 @@
       head.setAttribute('transform', tick ? 'translate(0 0.9)' : 'translate(0 0)');
       tail.setAttribute('transform', tick ? 'translate(0 -0.9)' : 'translate(0 0.5)');
 
-      // shed a segment every few px of travel (handles the wrap, too)
+      // shed a segment every 7px of travel, on a fixed grid so they always touch
       if (x < lastSpawnX) lastSpawnX = -Infinity;
-      if (x - lastSpawnX >= 7){
-        lastSpawnX = x;
-        segs.push({ x: x + 16, y: y + 12, born: now }); // spawns under the pop-tart, emerges from behind the butt
+      if (lastSpawnX === -Infinity) lastSpawnX = x - 7;
+      while (x - lastSpawnX >= 7){
+        lastSpawnX += 7;
+        segs.push({ x: lastSpawnX + 16, y: y + 12, born: now }); // spawns under the pop-tart, emerges from behind the butt
       }
 
       tctx.clearRect(0, 0, W, H);
@@ -2340,9 +2345,10 @@
     let sparks = [];
     let running = false;
     function size(){
-      sc.width = innerWidth * devicePixelRatio;
-      sc.height = innerHeight * devicePixelRatio;
-      sctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      const d = fxDpr();
+      sc.width = innerWidth * d;
+      sc.height = innerHeight * d;
+      sctx.setTransform(d, 0, 0, d, 0, 0);
     }
     size();
     addEventListener('resize', size);
@@ -2458,9 +2464,10 @@
     }
 
     function size(){
-      canvas2.width = innerWidth * devicePixelRatio;
-      canvas2.height = innerHeight * devicePixelRatio;
-      nctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      const d = fxDpr();
+      canvas2.width = innerWidth * d;
+      canvas2.height = innerHeight * d;
+      nctx.setTransform(d, 0, 0, d, 0, 0);
     }
     size();
     addEventListener('resize', size);
@@ -2509,16 +2516,31 @@
           c.y = c.baseY + Math.round(Math.sin(time * 5.4 + c.phase) * 1.4) * 7;
         }
         c.el.style.transform = 'translate(' + c.x + 'px,' + c.y + 'px)';
-        c.feet.setAttribute('transform', tick ? 'translate(1.2 0)' : 'translate(-1.2 0)');
-        c.head.setAttribute('transform', tick ? 'translate(0 0.9)' : 'translate(0 0)');
-        c.tail.setAttribute('transform', tick ? 'translate(0 -0.9)' : 'translate(0 0.5)');
-        // shed trail by distance traveled, whichever direction that is
-        c.trailAcc += Math.abs(c.x - c.prevX);
-        c.prevX = c.x;
-        if (c.trailAcc >= 7){
-          c.trailAcc = 0;
-          segs.push({ x: c.x + 13, y: c.y + 10, born: now }); // under the body — no gap at the butt
+        // the sprite only has two frames — don't touch the DOM between them
+        if (c.lastTick !== tick){
+          c.lastTick = tick;
+          c.feet.setAttribute('transform', tick ? 'translate(1.2 0)' : 'translate(-1.2 0)');
+          c.head.setAttribute('transform', tick ? 'translate(0 0.9)' : 'translate(0 0)');
+          c.tail.setAttribute('transform', tick ? 'translate(0 -0.9)' : 'translate(0 0.5)');
         }
+        // shed trail by distance traveled, interpolated along the path so the
+        // ribbon stays continuous even when frames run long. keeping the
+        // remainder (instead of zeroing it) is what makes segments touch.
+        const moved = c.x - c.prevX;
+        let dist = Math.abs(moved);
+        if (dist > 0){
+          const dir = moved > 0 ? 1 : -1;
+          let offset = 7 - c.trailAcc;
+          c.trailAcc += dist;
+          let guard = 24; // a hiccuping tab shouldn't paint a mile of rainbow at once
+          while (c.trailAcc >= 7 && guard-- > 0){
+            segs.push({ x: c.prevX + dir * offset + 13, y: c.y + 10, born: now }); // under the body — no gap at the butt
+            offset += 7;
+            c.trailAcc -= 7;
+          }
+          if (guard < 0) c.trailAcc = 0;
+        }
+        c.prevX = c.x;
       }
 
       nctx.clearRect(0, 0, innerWidth, innerHeight);
@@ -2557,9 +2579,10 @@
   let pieces = [];
   let confettiRunning = false;
   function sizeCanvas(){
-    canvas.width = innerWidth * devicePixelRatio;
-    canvas.height = innerHeight * devicePixelRatio;
-    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    const d = fxDpr();
+    canvas.width = innerWidth * d;
+    canvas.height = innerHeight * d;
+    ctx.setTransform(d, 0, 0, d, 0, 0);
   }
   sizeCanvas();
   addEventListener('resize', sizeCanvas);
@@ -3754,9 +3777,10 @@
     }
     function size(){
       if (!canvas) return;
-      canvas.width = innerWidth * devicePixelRatio;
-      canvas.height = innerHeight * devicePixelRatio;
-      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      const d = fxDpr();
+      canvas.width = innerWidth * d;
+      canvas.height = innerHeight * d;
+      ctx.setTransform(d, 0, 0, d, 0, 0);
     }
     function stopVisuals(){
       if (raf){ cancelAnimationFrame(raf); raf = null; }
