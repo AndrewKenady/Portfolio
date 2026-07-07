@@ -957,17 +957,23 @@
   }
   @keyframes blinker{ to{ visibility:hidden; } }
 
-  /* ============ THE KENNEDY TOOLBAR — it does nothing, but it's yours ============ */
+  /* ============ THE KENNEDY TOOLBAR — docked to the browser, like real chrome ============ */
   .ktb{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:720;
     display:flex;
     flex-wrap:wrap;
     align-items:center;
     gap:6px;
     background:var(--win-2);
     border:2px outset var(--bevel-hi);
-    border-top:none;
+    border-top:none; border-left:none; border-right:none;
+    box-shadow:0 2px 0 rgba(0,0,0,0.35);
     padding:5px 8px;
   }
+  /* anchor jumps clear the docked toolbar */
+  body.has-ktb .window, body.has-ktb .banner{ scroll-margin-top:44px; }
   .ktb-logo{
     font-family:'Courier New', Courier, monospace;
     font-weight:bold;
@@ -1004,8 +1010,8 @@
   @keyframes ktbFound{ 50%{ background:var(--gold); } }
   @media (max-width:640px){ .ktb-search{ margin-left:0; } }
 
-  /* ============ DKK STORE + CERTIFICATE.EXE — commerce, technically ============ */
-  .store-popup{ width:min(380px, 92vw); }
+  /* ============ DKK MEGA-STORE — genuine early-internet commerce ============ */
+  .store-popup{ width:min(430px, 94vw); }
   .store-popup input{
     display:block;
     width:100%;
@@ -1018,6 +1024,134 @@
     padding:6px 8px;
   }
   .store-lines{ font-family:'Courier New', Courier, monospace; font-size:12.5px; line-height:1.8; }
+  .store-hd{ text-align:center; padding:2px 0 4px; }
+  .store-logo{
+    font-family:'Times New Roman', Times, serif;
+    font-style:italic;
+    font-weight:bold;
+    font-size:25px;
+    background:var(--title-grad);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    filter:drop-shadow(1px 1px 0 rgba(30,10,60,0.35));
+  }
+  .store-tag{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:9px;
+    letter-spacing:0.14em;
+    color:var(--ink-soft);
+  }
+  .store-steps{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:7px;
+    flex-wrap:wrap;
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:10px;
+    color:var(--bevel-lo);
+    border:2px inset var(--bevel-hi);
+    background:#FBF9FF;
+    padding:4px 6px;
+    margin:8px 0 12px;
+  }
+  .store-steps .cur{ color:var(--magenta); }
+  .store-steps .done{ color:var(--violet); text-decoration:line-through; }
+  .store-steps b{ color:var(--bevel-lo); font-weight:normal; }
+  .store-prod{ display:flex; gap:14px; align-items:flex-start; }
+  .store-img{ width:80px; height:auto; flex-shrink:0; }
+  .store-name{ font-size:14px; }
+  .store-stars{ color:#E8A800; font-size:12px; }
+  .store-stars span{ color:var(--ink-soft); font-size:10.5px; }
+  .store-price{ margin:4px 0 2px; }
+  .store-price s{ color:var(--ink-soft); }
+  .store-price b{ color:var(--magenta); font-size:19px; }
+  .store-meta{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .store-qty{
+    font-family:Verdana, Geneva, sans-serif;
+    font-size:11px;
+    border:2px inset var(--bevel-hi);
+    background:#fff;
+    color:var(--ink);
+  }
+  .store-desc{ font-size:12px; margin-top:8px; }
+  .store-payhd{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:11px;
+    letter-spacing:0.08em;
+    margin-bottom:6px;
+  }
+  .store-paycards{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .store-trust{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    align-items:center;
+    justify-content:center;
+    margin-top:12px;
+    padding-top:10px;
+    border-top:1px dotted var(--bevel-lo);
+  }
+  .cc, .bbb{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    width:58px;
+    height:32px;
+    padding:0;
+    border:1px solid rgba(0,0,0,0.35);
+    border-radius:3px;
+    font-family:Verdana, Geneva, sans-serif;
+    font-size:6.5px;
+    font-weight:bold;
+    text-align:center;
+    line-height:1.25;
+    user-select:none;
+    flex-shrink:0;
+  }
+  .cc-vista{
+    background:linear-gradient(180deg, #1A1F71 0 66%, #F7B600 66%);
+    color:#fff;
+    font-style:italic;
+    font-size:9.5px;
+    justify-content:flex-start;
+    padding-top:5px;
+  }
+  .cc-mc{ background:#F6F1E7; color:var(--ink); position:relative; justify-content:flex-end; padding-bottom:2px; }
+  .cc-mc::before, .cc-mc::after{ content:""; position:absolute; top:3px; width:13px; height:13px; border-radius:50%; }
+  .cc-mc::before{ left:14px; background:#EB001B; }
+  .cc-mc::after{ right:14px; background:#F79E1B; opacity:0.9; }
+  .cc-amex{ background:#2E77BC; color:#fff; }
+  .cc-disc{ background:#F6F1E7; color:var(--ink); position:relative; overflow:hidden; }
+  .cc-disc::after{ content:""; position:absolute; right:-4px; bottom:-4px; width:14px; height:14px; border-radius:50%; background:#F68121; }
+  .bbb{ background:#00548B; color:#fff; }
+  .bbb b{ font-size:11px; letter-spacing:0.08em; }
+  .store-lock{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:9px;
+    color:var(--ink-soft);
+  }
+  button.cc{ cursor:pointer; }
+  button.cc:active{ transform:translateY(1px); }
+  .store-fine{
+    margin-top:8px;
+    font-size:8.5px;
+    color:var(--ink-soft);
+    text-align:center;
+    line-height:1.6;
+  }
   #certOverlay{
     position:fixed; inset:0;
     z-index:860;
@@ -1071,6 +1205,42 @@
   .cert-inner .c-sig{ margin-top:14px; font-style:italic; font-size:20px; }
   .cert-inner .c-sub{ font-size:9.5px; letter-spacing:0.12em; color:var(--ink-soft); margin-top:4px; }
   .cert-btns{ display:flex; justify-content:center; gap:10px; padding:2px 10px 12px; }
+
+  /* ============ MEMORY PURGE — the recycle bin, emotionally ============ */
+  .purge-popup{ width:min(360px, 92vw); }
+  .purge-anim{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    font-size:22px;
+    margin-bottom:10px;
+  }
+  .purge-fly{ display:inline-block; animation:purgeFly 1.1s ease-in infinite; }
+  @keyframes purgeFly{
+    0%{ transform:translate(-28px, 0) rotate(0deg); opacity:1; }
+    70%{ transform:translate(18px, -12px) rotate(25deg); opacity:1; }
+    100%{ transform:translate(30px, 6px) rotate(90deg); opacity:0; }
+  }
+  .purge-line{ font-size:12.5px; margin-bottom:8px; min-height:1.6em; }
+  .purge-bar{
+    height:16px;
+    border:2px inset var(--bevel-hi);
+    background:#fff;
+    overflow:hidden;
+  }
+  .purge-fill{
+    height:100%;
+    width:0%;
+    background:repeating-linear-gradient(90deg, #2B49C5 0 9px, transparent 9px 12px);
+    transition:width 0.3s steps(4);
+  }
+  .purge-sub{
+    margin-top:7px;
+    font-family:'Courier New', Courier, monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
 
   /* ============ retro scrollbar — chunky, beveled, correct ============ */
   ::-webkit-scrollbar{ width:16px; height:16px; }
@@ -1504,8 +1674,8 @@
             <tr>
               <td class="t-title"><a href="https://www.mobygames.com/game/113423/battlepillars-gold-edition/" target="_blank" rel="noopener">Battlepillars</a></td>
               <td class="t-year">2014</td>
-              <td class="t-role">Developer (of two)</td>
-              <td>Real-time strategy with heavily armed caterpillars, built by a two-person team. iOS, Android, and Steam.</td>
+              <td class="t-role">Gameplay Engineer</td>
+              <td>Real-time strategy with heavily armed caterpillars — one of two gameplay engineers. iOS, Android, and Steam.</td>
             </tr>
             <tr>
               <td class="t-title"><a href="https://www.mobygames.com/game/68665/draw-a-stickman-epic/" target="_blank" rel="noopener">Draw a Stickman: EPIC</a></td>
@@ -1785,7 +1955,12 @@
             const type = dv.getUint8(p.i++), mlen = varlen(dv, p);
             if (type === 0x51) tempos.push({ tick, uspq: (dv.getUint8(p.i)<<16) | (dv.getUint8(p.i+1)<<8) | dv.getUint8(p.i+2) });
             p.i += mlen;
-          } else if (status === 0xF0 || status === 0xF7){ p.i += varlen(dv, p); }
+          } else if (status === 0xF0 || status === 0xF7){
+            // evaluate varlen FIRST — `p.i += varlen(...)` reads the old p.i before
+            // varlen advances it past the length byte, skidding the parser off-axis
+            const slen = varlen(dv, p);
+            p.i += slen;
+          }
           else { p.i++; }
         }
         pos = end;
@@ -3313,18 +3488,61 @@
     return { show };
   })();
 
-  // ===== DKK STORE — a complete checkout experience for a free certificate =====
+  // ===== DKK MEGA-STORE — genuine early-internet commerce, one product strong =====
   const STORE = (function(){
     let win = null, certName = 'ANONYMOUS VISITOR', orders = 0;
+    const STEPS = ['SHOP', 'CART', 'SHIP', 'PAY', 'JOY'];
+    const TRUST =
+      '<span class="cc cc-vista" aria-hidden="true">VISTA</span>' +
+      '<span class="cc cc-mc" aria-hidden="true">MASTERCARP</span>' +
+      '<span class="cc cc-amex" aria-hidden="true">AMERICAN<br>EXPRESSION</span>' +
+      '<span class="cc cc-disc" aria-hidden="true">DISCOVERY</span>' +
+      '<span class="bbb" aria-hidden="true"><b>BBB</b>INVESTIGATED&trade;</span>' +
+      '<span class="store-lock">&#128274; 128&#8209;BIT VIBES</span>';
+    const DECLINES = {
+      'VISTA': 'DECLINED. VISTA IS NOT A REAL CARD.',
+      'MASTERCARP': 'DECLINED. MASTERCARP IS A FISH.',
+      'AMERICAN EXPRESSION': 'DECLINED. EXPRESSION INSUFFICIENT.',
+      'DISCOVERY': 'DECLINED. DISCOVERY DECLINED TO BE INVOLVED.'
+    };
+    const PRODUCT_IMG =
+      '<svg class="store-img" viewBox="0 0 80 100" aria-hidden="true">' +
+        '<rect x="1" y="1" width="78" height="98" fill="#FFFEF8" stroke="#1E1938" stroke-width="2"/>' +
+        '<rect x="7" y="7" width="66" height="86" fill="none" stroke="#8E86A8" stroke-width="1"/>' +
+        '<text x="40" y="24" text-anchor="middle" font-family="Times New Roman, serif" font-style="italic" font-size="9" fill="#1E1938">Certificate</text>' +
+        '<rect x="16" y="34" width="48" height="3" fill="#5C5478"/>' +
+        '<rect x="20" y="42" width="40" height="3" fill="#8E86A8"/>' +
+        '<rect x="16" y="50" width="48" height="3" fill="#8E86A8"/>' +
+        '<rect x="24" y="58" width="32" height="3" fill="#8E86A8"/>' +
+        '<rect x="14" y="76" width="24" height="3" fill="#5C5478"/>' +
+        '<rect x="52" y="82" width="3" height="11" fill="#FF6B4A"/>' +
+        '<rect x="58" y="82" width="3" height="11" fill="#FF6B4A"/>' +
+        '<circle cx="56" cy="77" r="9" fill="#FFD34D" stroke="#FF6B4A" stroke-width="1.5"/>' +
+      '</svg>';
+
+    function chrome(stepIdx, contentHTML){
+      const crumbs = STEPS.map((s, i) =>
+        '<span class="' + (i === stepIdx ? 'cur' : (i < stepIdx ? 'done' : '')) + '">' + (i + 1) + '&nbsp;' + s + '</span>'
+      ).join('<b>&rarr;</b>');
+      return '<div class="store-hd">' +
+          '<div class="store-logo">DKK Mega&#8209;Store&trade;</div>' +
+          '<div class="store-tag">EST. 1997 &bull; 1 PRODUCT STRONG &bull; OPEN 24/7/&infin;</div>' +
+        '</div>' +
+        '<div class="store-steps">' + crumbs + '</div>' +
+        contentHTML +
+        '<div class="store-trust">' + TRUST + '</div>' +
+        '<div class="store-fine">All sales final. All sales free. DKK Mega&#8209;Store is not legally a store. Encryption sold separately. BBB investigation ongoing &amp; appreciated.</div>';
+    }
+
     function close(){ if (win){ win.remove(); win = null; } }
     function popup(title, bodyHTML, btns){
       close();
       win = document.createElement('div');
       win.className = 'popup store-popup';
       win.style.zIndex = 890;
-      const w = Math.min(380, innerWidth * 0.92);
+      const w = Math.min(430, innerWidth * 0.94);
       win.style.left = Math.max(8, (innerWidth - w) / 2) + 'px';
-      win.style.top = Math.max(10, innerHeight * 0.22) + 'px';
+      win.style.top = Math.max(10, innerHeight * 0.12) + 'px';
       win.innerHTML =
         '<div class="titlebar"><span class="t-label">' + title + '</span>' +
         '<span class="t-btns"><i role="button" aria-label="Close" tabindex="0">&times;</i></span></div>' +
@@ -3344,49 +3562,86 @@
       });
       document.body.appendChild(win);
     }
+
     function stepProduct(){
-      popup('DKK STORE &mdash; 1 OF 1 PRODUCTS',
-        '<b>Commemorative Visitor Certificate</b><br>Certifies, in writing, that you visited this website. Printable. Frameable. Legally meaningless.<br><br>' +
-        '<span class="store-lines">PRICE ...... $0.00<br>IN STOCK ... &infin;<br>RATING ..... &starf;&starf;&starf;&starf;&starf; (1 review, mine)</span>',
+      popup('DKKSTORE&trade;.COM &mdash; Product 1 of 1',
+        chrome(0,
+          '<div class="store-prod">' +
+            PRODUCT_IMG +
+            '<div>' +
+              '<b class="store-name">Commemorative Visitor Certificate</b>' +
+              '<div class="store-stars">&starf;&starf;&starf;&starf;&starf; <span>(1 review, mine)</span></div>' +
+              '<div class="store-price"><s>$149.99</s> <b>$0.00</b> <span class="blink">SALE!</span></div>' +
+              '<div class="store-meta">IN STOCK: &infin; &bull; SHIPS: INSTANTLY<br>QTY: <select class="store-qty" aria-label="Quantity"><option>1</option><option>1</option><option>1</option></select> (all quantities are 1)</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="store-desc">Certifies, in writing, that you visited this website. Printable. Frameable. Legally meaningless. A genuine document from a genuine store.</div>'),
         [
           { l:'Add to Cart', fn:stepCart },
           { l:'Just Browsing', fn:() => { close(); notify('ITEM RETURNED TO SHELF. IT DID NOT MIND.'); } }
         ]);
     }
     function stepCart(){
-      popup('YOUR CART (1 ITEM)',
-        '<span class="store-lines">1 &times; VISITOR CERT ... $0.00<br>SUBTOTAL ......... $0.00<br>SHIPPING ......... $0.00<br>TAX .............. $0.00<br><b>TOTAL ............ $0.00</b></span>',
+      popup('DKKSTORE&trade;.COM &mdash; Your Cart',
+        chrome(1,
+          '<span class="store-lines">1 &times; VISITOR CERT .... $0.00<br>SUBTOTAL ............ $0.00<br>SHIPPING (INSTANT) .. $0.00<br>TAX (NONE) .......... $0.00<br><b>TOTAL ............... $0.00</b></span>'),
         [
-          { l:'Checkout', fn:stepShipping },
+          { l:'Proceed to Checkout', fn:stepShipping },
           { l:'Abandon Cart', fn:() => { close(); notify('CART ABANDONED. IT UNDERSTANDS.'); } }
         ]);
     }
     function stepShipping(){
-      popup('SHIPPING INFORMATION',
-        'Name to appear on the certificate:' +
-        '<input id="storeName" type="text" maxlength="24" placeholder="ANONYMOUS VISITOR">' +
-        '<span style="display:block;margin-top:6px;font-size:11px;color:var(--ink-soft);">No address needed. It ships directly to your screen.</span>',
-        [{ l:'Continue', fn:() => {
-            const v = document.getElementById('storeName').value.trim();
-            certName = (v || 'ANONYMOUS VISITOR').toUpperCase().slice(0, 24);
-            stepPayment();
-          } }]);
+      popup('DKKSTORE&trade;.COM &mdash; Secure Checkout (Probably)',
+        chrome(2,
+          'Name to appear on the certificate:' +
+          '<input id="storeName" type="text" maxlength="24" placeholder="ANONYMOUS VISITOR">' +
+          '<span style="display:block;margin-top:6px;font-size:11px;color:var(--ink-soft);">No address needed. It ships directly to your screen.</span>'),
+        [
+          { l:'Continue', fn:() => {
+              const v = document.getElementById('storeName').value.trim();
+              certName = (v || 'ANONYMOUS VISITOR').toUpperCase().slice(0, 24);
+              stepPayment();
+            } },
+          { l:'Back', fn:stepCart }
+        ]);
     }
     function stepPayment(){
-      popup('PAYMENT &mdash; SECURE (TRUST ME)',
-        '<span class="store-lines">METHOD ... EXPOSURE (pre-selected)<br>DUE ...... $0.00<br>STATUS ... <b id="storePay">CHARGING YOUR NOTHING&hellip;</b></span>',
-        [{ l:'Place Order', fn:stepConfirm }]);
-      setTimeout(() => {
-        const el = document.getElementById('storePay');
-        if (el) el.textContent = 'APPROVED';
-      }, 900);
+      popup('DKKSTORE&trade;.COM &mdash; Payment Portal',
+        chrome(3,
+          '<div class="store-payhd">SELECT PAYMENT METHOD:</div>' +
+          '<div class="store-paycards">' +
+            '<button type="button" class="cc cc-vista pay-cc" data-cc="VISTA">VISTA</button>' +
+            '<button type="button" class="cc cc-mc pay-cc" data-cc="MASTERCARP">MASTERCARP</button>' +
+            '<button type="button" class="cc cc-amex pay-cc" data-cc="AMERICAN EXPRESSION">AMERICAN<br>EXPRESSION</button>' +
+            '<button type="button" class="cc cc-disc pay-cc" data-cc="DISCOVERY">DISCOVERY</button>' +
+          '</div>' +
+          '<span class="store-lines">DUE ...... $0.00<br>METHOD ... EXPOSURE (default, undefeated)<br>STATUS ... <b class="store-paystate">AWAITING COURAGE</b></span>'),
+        [
+          { l:'Place Order ($0.00)', fn:stepConfirm },
+          { l:'Back', fn:stepShipping }
+        ]);
+      win.querySelectorAll('.pay-cc').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const st = win && win.querySelector('.store-paystate');
+          if (!st) return;
+          st.textContent = 'CHARGING $0.00 TO ' + btn.dataset.cc + '…';
+          setTimeout(() => {
+            const s2 = win && win.querySelector('.store-paystate');
+            if (s2) s2.textContent = DECLINES[btn.dataset.cc];
+          }, 800);
+        });
+      });
     }
     function stepConfirm(){
       orders++;
       const orderNo = 'DKK-' + String((window.VISITOR_N || 1337) * 10 + orders).padStart(7, '0');
-      popup('ORDER CONFIRMED',
-        'Order <b>#' + orderNo + '</b> has been placed.<br>Estimated delivery: <b>NOW.</b>',
-        [{ l:'Open Certificate', fn:() => { close(); CERT.show(certName, orderNo); } }]);
+      popup('DKKSTORE&trade;.COM &mdash; Receipt',
+        chrome(4,
+          '<span class="store-lines">ORDER .... #' + orderNo + '<br>ITEM ..... VISITOR CERT &times;1<br>PAID ..... $0.00 (EXPOSURE)<br>STATUS ... <b>DELIVERED. LOOK UP.</b></span>'),
+        [
+          { l:'Open Certificate', fn:() => { close(); CERT.show(certName, orderNo); } },
+          { l:'Done Shopping', fn:() => { close(); notify('THANK YOU FOR SHOPPING. YOUR ORDER IS WHEREVER YOU LEFT IT.'); } }
+        ]);
       burstConfetti();
     }
     return { open: stepProduct };
@@ -3407,6 +3662,12 @@
     let synIdx = 0;
     const WEATHER = ['STATIC', 'HEAVY STATIC', 'STATIC W/ A CHANCE OF SIGNAL', 'WALL-TO-WALL STATIC', 'STATIC'];
 
+    // the page scoots down exactly one toolbar-height; rewraps on resize
+    function pad(){
+      document.body.style.paddingTop = bar ? bar.offsetHeight + 'px' : '';
+    }
+    addEventListener('resize', () => { if (bar) pad(); });
+
     function build(){
       if (bar) return;
       bar = document.createElement('div');
@@ -3420,7 +3681,9 @@
         '<button type="button" data-k="store">&#128717; Store</button>' +
         '<button type="button" data-k="un">Uninstall</button>' +
         '<form class="ktb-search"><input type="text" maxlength="32" placeholder="Search the toolbar..." aria-label="Search the toolbar"><button type="submit">Go</button></form>';
-      document.querySelector('.navbar').insertAdjacentElement('afterend', bar);
+      document.body.appendChild(bar);
+      document.body.classList.add('has-ktb');
+      pad();
 
       bar.querySelector('[data-k="home"]').addEventListener('click', () => {
         document.getElementById('top').scrollIntoView({ behavior:'smooth' });
@@ -3438,6 +3701,8 @@
       un.addEventListener('click', () => {
         if (un.dataset.armed){
           bar.remove(); bar = null;
+          document.body.classList.remove('has-ktb');
+          pad();
           try { localStorage.removeItem(KEY); } catch(e){}
           notify('TOOLBAR UNINSTALLED. IT LEFT A NOTE: "NO HARD FEELINGS."');
         } else {
@@ -3489,7 +3754,7 @@
       { t: 'CONGRATULATIONS!', b: 'You are the 1,000,000th visitor. There is no prize. But you were counted, and that&rsquo;s something.', btns: [{ l: 'Claim Nothing' }] },
       { t: 'FREE RAM', b: 'Download more RAM? It&rsquo;s free.', btns: [{ l: 'Download', a: 'toast', arg: 'RAM DELIVERED. +0 MB.' }, { l: 'I Have Enough' }] },
       { t: 'RECRUITER ALERT', b: 'Hot job openings in your area are viewing this portfolio <b>right now</b>.', btns: [{ l: 'Show Them In', a: 'contact' }, { l: 'Let Them Wait' }] },
-      { t: 'LOW DISK SPACE', b: 'Your nostalgia drive is almost full. Delete childhood memories?', btns: [{ l: 'Never' }, { l: 'Also Never' }] },
+      { t: 'LOW DISK SPACE', b: 'Your nostalgia drive is almost full. Delete childhood memories?', btns: [{ l: 'Never' }, { l: "Toss 'Em", a: 'purge' }] },
       { t: 'SECURITY NOTICE', b: 'This site is protected by a firewall. Firewalls are sold separately in DEFEND.EXE.', btns: [{ l: 'Launch DEFEND.EXE', a: 'game' }, { l: 'Ignore Threat' }] },
       { t: 'TOOLBAR OFFER', b: 'Install the Kennedy Toolbar? It does nothing, but it&rsquo;s yours.', btns: [{ l: 'Install', a: 'toolbar' }, { l: 'Maybe Later' }] },
       { t: 'DKK STORE', b: 'New in the store: the <b>Commemorative Visitor Certificate</b>. Own a piece of this website. $0.00, free instant shipping.', btns: [{ l: 'View Product', a: 'store' }, { l: 'Window Shopping' }] },
@@ -3536,11 +3801,99 @@
       else if (a === 'omni') window.open('https://omni-cast.net/', '_blank', 'noopener');
       else if (a === 'toolbar') TOOLBAR.install();
       else if (a === 'store') STORE.open();
+      else if (a === 'purge') purge();
     }
     function dismiss(el){
       if (!el.parentNode) return;
       el.remove();
       visible--;
+    }
+
+    // ===== the memory purge — Empty Recycle Bin, but it's your childhood =====
+    function purge(){
+      const MEMORIES = [
+        'my first field trip',
+        'peewee baseball (the good season)',
+        'summers with Dad',
+        'learning to ride a bike',
+        'catching fireflies in a jar',
+        'Saturday morning cartoons',
+        'the blanket fort (load-bearing)',
+        "Grandma's kitchen (the smell)",
+        'beating Bowser for the first time',
+        'the class hamster incident'
+      ];
+      const ETAS = ['calculating...', '6 seconds', '2 seconds', '14 years', 'unknowable', '1 second'];
+      const el = document.createElement('div');
+      el.className = 'popup purge-popup';
+      el.style.zIndex = ++zTop;
+      const w = Math.min(360, innerWidth * 0.92);
+      el.style.left = Math.max(8, (innerWidth - w) / 2) + 'px';
+      el.style.top = Math.max(10, innerHeight * 0.28) + 'px';
+      el.innerHTML =
+        '<div class="titlebar"><span class="t-label">Emptying Recycle Bin&hellip;</span>' +
+        '<span class="t-btns"><i role="button" aria-label="Close" tabindex="0">&times;</i></span></div>' +
+        '<div class="popup-body">' +
+          '<div class="purge-anim" aria-hidden="true">&#128193; <span class="purge-fly">&#128196;</span> &#128465;&#65039;</div>' +
+          '<div class="purge-line">Deleting: <b class="p-item">&hellip;</b></div>' +
+          '<div class="purge-bar"><div class="purge-fill p-fill"></div></div>' +
+          '<div class="purge-sub"><span class="p-count">0</span> of ' + MEMORIES.length + ' memories &bull; time remaining: <span class="p-eta">calculating...</span></div>' +
+        '</div>' +
+        '<div class="popup-btns"><button type="button" class="p-cancel">Cancel</button></div>';
+      const itemEl = el.querySelector('.p-item');
+      const fillEl = el.querySelector('.p-fill');
+      const cntEl = el.querySelector('.p-count');
+      const etaEl = el.querySelector('.p-eta');
+      const cancelBtn = el.querySelector('.p-cancel');
+      let idx = 0, timer = null;
+
+      function stop(msg){
+        clearTimeout(timer);
+        el.remove();
+        if (msg) notify(msg);
+      }
+      function step(){
+        if (!el.parentNode) return;
+        if (idx >= MEMORIES.length){
+          el.querySelector('.t-label').textContent = 'Recycle Bin — Empty';
+          itemEl.textContent = '(nothing left)';
+          etaEl.textContent = 'none';
+          cancelBtn.textContent = 'OK';
+          notify('MEMORIES DELETED. DISK SPACE FREED: 0 KB. THEY LIVE IN THE HEART, WHICH IS NOT A DISK.');
+          timer = setTimeout(() => stop(), 4000);
+          return;
+        }
+        itemEl.textContent = '"' + MEMORIES[idx] + '"';
+        cntEl.textContent = idx + 1;
+        etaEl.textContent = ETAS[(Math.random() * ETAS.length) | 0];
+        fillEl.style.width = (((idx + 1) / MEMORIES.length) * 100) + '%';
+        idx++;
+        timer = setTimeout(step, 650 + Math.random() * 750);
+      }
+      cancelBtn.addEventListener('click', () => {
+        stop(idx >= MEMORIES.length ? '' : 'DELETION CANCELLED. THE MEMORIES REMAIN. THEY ALWAYS DO.');
+      });
+      el.querySelector('.t-btns i').addEventListener('click', () => {
+        stop(idx >= MEMORIES.length ? '' : 'DELETION CANCELLED. THE MEMORIES REMAIN. THEY ALWAYS DO.');
+      });
+      // rises when touched, drags by the titlebar — house rules
+      el.addEventListener('pointerdown', () => { el.style.zIndex = ++zTop; });
+      const bar = el.querySelector('.titlebar');
+      bar.addEventListener('pointerdown', e => {
+        if (e.target.closest('.t-btns')) return;
+        e.preventDefault();
+        const r = el.getBoundingClientRect();
+        const ox = e.clientX - r.left, oy = e.clientY - r.top;
+        function mv(ev){
+          el.style.left = Math.max(0, Math.min(innerWidth - r.width, ev.clientX - ox)) + 'px';
+          el.style.top = Math.max(0, Math.min(innerHeight - 40, ev.clientY - oy)) + 'px';
+        }
+        function up(){ removeEventListener('pointermove', mv); removeEventListener('pointerup', up); }
+        addEventListener('pointermove', mv);
+        addEventListener('pointerup', up);
+      });
+      document.body.appendChild(el);
+      timer = setTimeout(step, 500);
     }
 
     function spawn(){
