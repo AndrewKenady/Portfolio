@@ -272,6 +272,7 @@
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
+    min-width:0; /* allow the label to shrink + ellipsize in the flex titlebar */
   }
   .titlebar .t-btns{ display:flex; gap:4px; flex-shrink:0; }
   .titlebar .t-btns i{
@@ -1473,20 +1474,19 @@
      so it stays a true uniform miniature — no titlebar/body proportion shift */
   .window.mini{
     position:fixed;
-    transform-origin:top left;
     margin:0 !important;
     z-index:715;
-    overflow:hidden;              /* the max-height clamp masks the bottom */
+    overflow:hidden;              /* clips the scaled body to the tile */
     box-shadow:5px 5px 0 rgba(0,0,0,0.55);
   }
-  .window.mini .titlebar{ cursor:grab; }
+  .window.mini .titlebar{ cursor:grab; }        /* full-size: buttons stay clickable */
   .window.mini .titlebar:active{ cursor:grabbing; }
-  .window.mini .win-body{ pointer-events:none; } /* a preview, not a workspace */
+  .window.mini .win-body{ transform-origin:top left; pointer-events:none; }
   .window.mini.min .win-body{ display:none; }
   /* a soft fade at the clipped bottom so it reads as "there's more" */
   .window.mini::after{
     content:"";
-    position:absolute; left:0; right:0; bottom:0; height:150px;
+    position:absolute; left:0; right:0; bottom:0; height:44px;
     background:linear-gradient(180deg, transparent, var(--win));
     pointer-events:none;
   }
@@ -2979,22 +2979,27 @@
   let miniCascade = { x: 40, y: 96 };
   const MINI_EASE = 'cubic-bezier(0.22,0.75,0.3,1)';
   const MINI_MS = 340;
-  const MINI_W = 340; // target on-screen width of the mini tile
-  const MINI_H = 300; // max on-screen height — taller sections get masked
+  const MINI_W = 320;   // on-screen width of the mini tile
+  const MINI_BODY_H = 230; // on-screen height of the scaled body preview
 
   function clearMiniInline(win){
     win.style.position = win.style.left = win.style.top = win.style.right = win.style.bottom =
-      win.style.width = win.style.maxHeight = win.style.zIndex = win.style.margin =
-      win.style.transform = win.style.transition = '';
+      win.style.width = win.style.height = win.style.zIndex = win.style.margin =
+      win.style.transition = '';
+    const body = win.querySelector('.win-body');
+    if (body){ body.style.width = body.style.transform = body.style.transition = ''; }
   }
 
+  // titlebar height stays fixed; only the body scales, and the window's own
+  // width/height animate (clipping the body) — so the top bar never shrinks,
+  // the title just truncates, and the top edge stays anchored
   function toggleMini(win){
     const goingMini = !win.classList.contains('mini');
     const first = win.getBoundingClientRect();
+    const body = win.querySelector('.win-body');
+    const tb = win.querySelector('.titlebar');
 
     if (goingMini){
-      // a placeholder keeps the window's spot, then collapses smoothly — so the
-      // page below slides instead of snapping when the window leaves the flow
       const cs = getComputedStyle(win);
       const mt = cs.marginTop, mb = cs.marginBottom;
       const ph = document.createElement('div');
@@ -3003,53 +3008,55 @@
       ph.style.marginTop = mt;
       ph.style.marginBottom = mb;
       win.parentNode.insertBefore(ph, win);
-      win._ph = ph;
-      win._mt = mt; win._mb = mb;
-      win._fullH = win.offsetHeight;
+      win._ph = ph; win._mt = mt; win._mb = mb; win._fullH = win.offsetHeight;
+
+      const fullW = first.width;
+      const k = MINI_W / fullW;                    // body shrinks by this
+      const bodyW = body.offsetWidth;
+      const visBodyH = Math.min(MINI_BODY_H, Math.round(body.offsetHeight * k));
+      const endH = tb.offsetHeight + visBodyH;     // titlebar (full) + clipped body
+      win._fullW = fullW; win._bodyW = bodyW; win._k = k; win._endH = endH;
 
       const cx = miniCascade.x, cy = miniCascade.y;
-      const k = MINI_W / first.width; // uniform scale — a true miniature
-      const capH = Math.round(MINI_H / k); // pre-transform height that yields MINI_H on screen
-      win._k = k; win._fullW = first.width; win._capH = capH;
-
-      win.classList.remove('min');
-      win.classList.add('mini');
-      // lock the full width so the fixed window keeps its real layout, just scaled
-      win.style.width = first.width + 'px';
-      win.style.left = cx + 'px';
-      win.style.top = cy + 'px';
-      win.style.right = 'auto';
-      win.style.bottom = 'auto';
-      floatZ = floatZ >= 884 ? 841 : floatZ + 1;
-      win.style.zIndex = floatZ;
       miniCascade.x += 30; miniCascade.y += 30;
       if (miniCascade.y > innerHeight - 200){ miniCascade = { x: 40, y: 96 }; }
 
-      if (prefersReducedMotion){ win.style.transform = 'scale(' + k + ')'; win.style.maxHeight = capH + 'px'; ph.remove(); win._ph = null; return; }
+      win.classList.remove('min');
+      win.classList.add('mini');
+      body.style.width = bodyW + 'px';             // lock so it won't reflow
+      body.style.transformOrigin = 'top left';
+      win.style.right = 'auto'; win.style.bottom = 'auto';
+      floatZ = floatZ >= 884 ? 841 : floatZ + 1; win.style.zIndex = floatZ;
 
-      // window: one uniform transform from full-at-home to mini-at-tile, with the
-      // bottom masked by an animated max-height (top stays anchored, no jump)
-      win.style.transition = 'none';
-      win.style.transform = 'translate(' + (first.left - cx) + 'px,' + (first.top - cy) + 'px) scale(1)';
-      win.style.maxHeight = win._fullH + 'px';
+      // start frame: full window at its old spot
+      win.style.transition = body.style.transition = 'none';
+      win.style.left = first.left + 'px'; win.style.top = first.top + 'px';
+      win.style.width = fullW + 'px'; win.style.height = first.height + 'px';
+      body.style.transform = 'none';
+
+      if (prefersReducedMotion){
+        win.style.left = cx + 'px'; win.style.top = cy + 'px';
+        win.style.width = MINI_W + 'px'; win.style.height = endH + 'px';
+        body.style.transform = 'scale(' + k + ')';
+        ph.remove(); win._ph = null; return;
+      }
       void win.offsetWidth;
-      win.style.transition = 'transform ' + MINI_MS + 'ms ' + MINI_EASE + ', max-height ' + MINI_MS + 'ms ' + MINI_EASE;
-      win.style.transform = 'scale(' + k + ')'; // rest at the tile, scaled down
-      win.style.maxHeight = capH + 'px';
-      // space: collapse the placeholder in lockstep
+      const T = MINI_MS + 'ms ' + MINI_EASE;
+      win.style.transition = 'left ' + T + ', top ' + T + ', width ' + T + ', height ' + T;
+      body.style.transition = 'transform ' + T;
+      win.style.left = cx + 'px'; win.style.top = cy + 'px';
+      win.style.width = MINI_W + 'px'; win.style.height = endH + 'px';
+      body.style.transform = 'scale(' + k + ')';
       requestAnimationFrame(() => {
-        ph.style.transition = 'height ' + MINI_MS + 'ms ' + MINI_EASE + ', margin ' + MINI_MS + 'ms ' + MINI_EASE;
-        ph.style.height = '0px';
-        ph.style.marginTop = '0px';
-        ph.style.marginBottom = '0px';
+        ph.style.transition = 'height ' + T + ', margin ' + T;
+        ph.style.height = '0px'; ph.style.marginTop = '0px'; ph.style.marginBottom = '0px';
       });
       win.addEventListener('transitionend', function done(e){
-        if (e.propertyName !== 'transform') return;
-        win.style.transition = ''; // keep the resting scale() transform
+        if (e.propertyName !== 'width') return;
+        win.style.transition = body.style.transition = '';
         win.removeEventListener('transitionend', done);
       });
     } else {
-      // restore
       const ph = win._ph;
       if (prefersReducedMotion || !ph){
         if (ph){ ph.remove(); win._ph = null; }
@@ -3059,27 +3066,22 @@
       }
       const phRect = ph.getBoundingClientRect();
       const homeLeft = phRect.left, homeTop = phRect.top;
-      const curLeft = first.left, curTop = first.top; // visual tile position (may be dragged)
-      const k = win._k || (first.width / win._fullW);
-      const capH = win._capH || Math.round(MINI_H / k);
-      // space: reopen the placeholder, sliding the page back down
-      ph.style.transition = 'height ' + MINI_MS + 'ms ' + MINI_EASE + ', margin ' + MINI_MS + 'ms ' + MINI_EASE;
+      // reopen the space, sliding the page back down
+      const T = MINI_MS + 'ms ' + MINI_EASE;
+      ph.style.transition = 'height ' + T + ', margin ' + T;
       ph.style.height = win._fullH + 'px';
-      ph.style.marginTop = win._mt;
-      ph.style.marginBottom = win._mb;
-      // window: uniform transform from mini-at-tile back to full-at-home, unmasking
-      // the bottom as the max-height clamp lifts back to full
-      win.style.transition = 'none';
-      win.style.transform = 'scale(' + k + ')';
-      win.style.maxHeight = capH + 'px';
+      ph.style.marginTop = win._mt; ph.style.marginBottom = win._mb;
+      // window grows back to full at home; body un-scales
+      win.style.transition = body.style.transition = 'none';
       void win.offsetWidth;
-      win.style.transition = 'transform ' + MINI_MS + 'ms ' + MINI_EASE + ', max-height ' + MINI_MS + 'ms ' + MINI_EASE;
-      win.style.transform = 'translate(' + (homeLeft - curLeft) + 'px,' + (homeTop - curTop) + 'px) scale(1)';
-      win.style.maxHeight = win._fullH + 'px';
+      win.style.transition = 'left ' + T + ', top ' + T + ', width ' + T + ', height ' + T;
+      body.style.transition = 'transform ' + T;
+      win.style.left = homeLeft + 'px'; win.style.top = homeTop + 'px';
+      win.style.width = win._fullW + 'px'; win.style.height = win._fullH + 'px';
+      body.style.transform = 'none';
       win.addEventListener('transitionend', function done(e){
-        if (e.propertyName !== 'transform') return;
+        if (e.propertyName !== 'width') return;
         win.removeEventListener('transitionend', done);
-        // the transformed window now exactly covers the reopened slot — swap in
         win.classList.remove('mini');
         clearMiniInline(win);
         ph.remove(); win._ph = null;
