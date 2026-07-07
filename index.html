@@ -306,24 +306,12 @@
     padding:12px 15px;
   }
   .specs .spec-title{
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    gap:10px;
-    flex-wrap:wrap;
     color:var(--gold);
     letter-spacing:0.1em;
     padding-bottom:7px;
     margin-bottom:8px;
     border-bottom:1px dotted rgba(213,248,255,0.3);
   }
-  .specs .spec-legend{
-    color:rgba(205,230,242,0.6);
-    font-weight:normal;
-    font-size:10.5px;
-    letter-spacing:0.04em;
-  }
-  .specs .spec-legend b{ color:var(--cyan); font-weight:bold; }
   .spec-row{ display:flex; gap:12px; padding:3px 0; }
   .spec-row + .spec-row{ border-top:1px dotted rgba(213,248,255,0.12); }
   .spec-k{
@@ -332,8 +320,8 @@
     letter-spacing:0.04em;
     white-space:nowrap;
   }
-  .spec-v{ color:#CDE6F2; font-weight:normal; }
-  .spec-v b{ color:var(--cyan); font-weight:bold; }
+  .spec-v{ color:#D5F8FF; font-weight:normal; }
+  .spec-v b{ color:#D5F8FF; font-weight:bold; }
   @media (max-width:540px){
     .spec-row{ flex-direction:column; gap:1px; padding:6px 0; }
     .spec-k{ flex-basis:auto; }
@@ -1822,7 +1810,7 @@
         <p>Before that: co-created and shipped <b>C.A.R.L.</b> to PC and every major console, led development on <b>Draw a Stickman: EPIC 2</b>, and spent a decade making <b>Nintendrew</b> the internet's home for retro gaming deep dives. I also compose, edit, and do voiceover!</p>
         <p>Austin, TX. Two cats. One very complete N64 library. Make yourself at home — the guestbook is at the bottom.</p>
         <div class="specs" role="note" aria-label="Skills and specifications">
-          <div class="spec-title"><span>C:\&gt; SYSTEM SPECIFICATIONS</span><span class="spec-legend">// <b>cyan</b> = core specialties</span></div>
+          <div class="spec-title">C:\&gt; SYSTEM SPECIFICATIONS</div>
           <div class="spec-row"><span class="spec-k">LANGUAGES</span><span class="spec-v"><b>C#</b> &middot; <b>Python</b> &middot; TypeScript &middot; Lua &middot; Java &middot; SQL &middot; HTML/CSS</span></div>
           <div class="spec-row"><span class="spec-k">AI &amp; LLMs</span><span class="spec-v"><b>Agentic Systems</b> &middot; <b>RAG &amp; Semantic Retrieval</b> &middot; <b>LLM Tool-Use Orchestration</b> &middot; Prompt Engineering &middot; Embeddings &amp; Vector Search &middot; MCP &middot; LLM Eval &amp; Verification &middot; Anthropic &amp; OpenAI APIs &middot; Generative Image / Video / Audio</span></div>
           <div class="spec-row"><span class="spec-k">ENGINES</span><span class="spec-v"><b>Unity</b> &middot; <b>Unreal / UEFN</b> &middot; XNA &middot; MonoGame &middot; Xamarin</span></div>
