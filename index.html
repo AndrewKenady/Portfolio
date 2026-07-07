@@ -765,7 +765,9 @@
     background:var(--title-grad);
     padding:4px 8px;
     border-bottom:2px solid var(--bevel-lo);
+    cursor:move;
   }
+  @media (max-width:700px){ .wa-top{ cursor:default; } }
   .wa-led{
     width:7px; height:7px;
     border-radius:50%;
@@ -1465,6 +1467,35 @@
     25%{ transform:translateX(-5px); }
     75%{ transform:translateX(5px); }
   }
+
+  /* [□] collapses a section into a tiny draggable live preview */
+  .window.mini{
+    position:fixed;
+    width:max-content;
+    margin:0 !important;
+    z-index:715;
+    box-shadow:5px 5px 0 rgba(0,0,0,0.55);
+    animation:miniPop 0.18s cubic-bezier(0.2,0.9,0.3,1.4);
+  }
+  @keyframes miniPop{ from{ transform:scale(0.8); opacity:0.4; } to{ transform:scale(1); opacity:1; } }
+  .window.mini .titlebar{ cursor:grab; }
+  .window.mini .titlebar:active{ cursor:grabbing; }
+  .window.mini .win-body{
+    width:760px;           /* lay out at full width... */
+    zoom:0.34;             /* ...then shrink to a true ~258px miniature */
+    max-height:1100px;
+    overflow:hidden;
+    pointer-events:none;   /* it's a preview, not a workspace */
+    position:relative;
+  }
+  /* a soft fade so the clipped bottom doesn't look chopped */
+  .window.mini .win-body::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:60px;
+    background:linear-gradient(180deg, transparent, var(--win));
+    pointer-events:none;
+  }
+  .window.mini.min .win-body{ display:none; }
 
   /* netscape-style status bar — shows where links go */
   #statusBar{
@@ -2921,21 +2952,73 @@
     }
   })();
 
-  // ===== window controls — [_] works, [□] protests, [×] has consequences =====
+  // ===== drag anything by a handle — decks, dialogs, mini windows =====
+  let floatZ = 840;
+  function makeDraggable(el, handle, opts){
+    opts = opts || {};
+    handle.addEventListener('pointerdown', e => {
+      if (e.target.closest('.t-btns, button, a, input, select, textarea')) return;
+      if (opts.enabled && !opts.enabled()) return;
+      e.preventDefault();
+      const r = el.getBoundingClientRect();
+      const w = r.width, h = r.height;
+      el.style.position = 'fixed';
+      el.style.margin = '0';
+      el.style.right = 'auto';
+      el.style.bottom = 'auto';
+      el.style.left = r.left + 'px';
+      el.style.top = r.top + 'px';
+      if (opts.raise){ floatZ = floatZ >= 884 ? 841 : floatZ + 1; el.style.zIndex = floatZ; }
+      const ox = e.clientX - r.left, oy = e.clientY - r.top;
+      try { handle.setPointerCapture(e.pointerId); } catch(_){}
+      function mv(ev){
+        el.style.left = Math.max(4 - w * 0.6, Math.min(innerWidth - w * 0.4, ev.clientX - ox)) + 'px';
+        el.style.top = Math.max(0, Math.min(innerHeight - 24, ev.clientY - oy)) + 'px';
+      }
+      function up(){ handle.removeEventListener('pointermove', mv); handle.removeEventListener('pointerup', up); }
+      handle.addEventListener('pointermove', mv);
+      handle.addEventListener('pointerup', up);
+    });
+  }
+
+  // ===== window controls — [_] minimizes, [□] pops a tiny preview, [×] fights back =====
+  let miniCascade = { x: 40, y: 96 };
+  function toggleMini(win){
+    const mini = win.classList.toggle('mini');
+    if (mini){
+      win.classList.remove('min');
+      win.style.left = miniCascade.x + 'px';
+      win.style.top = miniCascade.y + 'px';
+      win.style.right = 'auto';
+      win.style.bottom = 'auto';
+      floatZ = floatZ >= 884 ? 841 : floatZ + 1;
+      win.style.zIndex = floatZ;
+      miniCascade.x += 30; miniCascade.y += 30;
+      if (miniCascade.y > innerHeight - 200){ miniCascade = { x: 40, y: 96 }; }
+    } else {
+      win.style.position = win.style.left = win.style.top = '';
+      win.style.right = win.style.bottom = win.style.zIndex = win.style.margin = '';
+    }
+  }
   document.querySelectorAll('.window .titlebar .t-btns').forEach(btns => {
     const win = btns.closest('.window');
     const [minB, maxB, closeB] = btns.querySelectorAll('i');
     if (minB) minB.addEventListener('click', () => win.classList.toggle('min'));
-    if (maxB) maxB.addEventListener('click', () => {
-      win.classList.remove('shake');
-      void win.offsetWidth; // restart the animation
-      win.classList.add('shake');
-    });
+    if (maxB) maxB.addEventListener('click', () => toggleMini(win));
     if (closeB) closeB.addEventListener('click', () => {
       notify('OH NO. THE SITE IS FIGHTING BACK.');
       DEFEND.open(false);
     });
+    // once mini, the whole window can be shoved around by its titlebar
+    makeDraggable(win, win.querySelector('.titlebar'), { enabled: () => win.classList.contains('mini'), raise: true });
   });
+
+  // the deck is a proper window — drag it by its top strip (desktop only)
+  (function(){
+    const deck = document.getElementById('winamp');
+    const grip = deck && deck.querySelector('.wa-top');
+    if (deck && grip) makeDraggable(deck, grip, { enabled: () => !matchMedia('(max-width:700px)').matches, raise: true });
+  })();
 
   // ===== status bar — where links go, announced honestly =====
   const statusBar = document.getElementById('statusBar');
@@ -3947,6 +4030,8 @@
         notify('CHECKOUT ABANDONED. YOUR CART WILL BE SAVED FOREVER.');
       });
       document.body.appendChild(win);
+      // the storefront drags by its titlebar, like every good window
+      makeDraggable(win, win.querySelector('.titlebar'));
     }
 
     function stepSoldOut(){
