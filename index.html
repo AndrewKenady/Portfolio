@@ -2151,7 +2151,7 @@
     const btnNext = document.getElementById('waNext');
     let order = [], pos = 0, playing = false, everStarted = false, skips = 0;
     const cache = new Map();
-    let marqStr = '';
+    let marqStr = '', crawl = false;
 
     function shuffle(){
       order = PLAYLIST.map((_, i) => i);
@@ -2162,15 +2162,21 @@
     }
     function cur(){ return PLAYLIST[order[pos]]; }
     function setLcd(){
-      marqStr = (pos + 1) + '/' + order.length + '  ' + cur().t + '  ★  ';
-      lcd.textContent = marqStr;
+      const base = (pos + 1) + '/' + order.length + '  ' + cur().t;
+      lcd.textContent = base;
+      // crawl only if the title overflows the LCD — short titles sit still,
+      // long ones parade. rotating a string that fits just looks broken.
+      crawl = lcd.offsetWidth > lcd.parentNode.clientWidth - 17;
+      marqStr = crawl ? base + '  ★  ' : base;
     }
-    // the LCD crawls, as is right and proper
+    // the LCD crawls (when it must), as is right and proper
     setInterval(() => {
-      if (!playing || !marqStr) return;
+      if (!playing || !crawl || !marqStr) return;
       marqStr = marqStr.slice(1) + marqStr[0];
       lcd.textContent = marqStr;
     }, 260);
+    // LCD width changes with the viewport — re-judge the crawl
+    addEventListener('resize', () => { if (everStarted) setLcd(); });
 
     function loadAndPlay(){
       const tr = cur();
@@ -2226,6 +2232,7 @@
       const shaded = box.classList.toggle('shade');
       btnShade.innerHTML = shaded ? '&#9652;' : '&#9662;';
       btnShade.setAttribute('aria-label', shaded ? 'Expand player' : 'Collapse player');
+      if (!shaded && everStarted) setLcd(); // the LCD was hidden — re-measure the crawl
     });
     return {
       start(){ shuffle(); pos = 0; loadAndPlay(); }
