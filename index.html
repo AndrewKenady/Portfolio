@@ -1476,12 +1476,20 @@
     transform-origin:top left;
     margin:0 !important;
     z-index:715;
+    overflow:hidden;              /* the max-height clamp masks the bottom */
     box-shadow:5px 5px 0 rgba(0,0,0,0.55);
   }
   .window.mini .titlebar{ cursor:grab; }
   .window.mini .titlebar:active{ cursor:grabbing; }
   .window.mini .win-body{ pointer-events:none; } /* a preview, not a workspace */
   .window.mini.min .win-body{ display:none; }
+  /* a soft fade at the clipped bottom so it reads as "there's more" */
+  .window.mini::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0; height:150px;
+    background:linear-gradient(180deg, transparent, var(--win));
+    pointer-events:none;
+  }
 
   /* netscape-style status bar — shows where links go */
   #statusBar{
@@ -2972,11 +2980,12 @@
   const MINI_EASE = 'cubic-bezier(0.22,0.75,0.3,1)';
   const MINI_MS = 340;
   const MINI_W = 340; // target on-screen width of the mini tile
+  const MINI_H = 300; // max on-screen height — taller sections get masked
 
   function clearMiniInline(win){
     win.style.position = win.style.left = win.style.top = win.style.right = win.style.bottom =
-      win.style.width = win.style.zIndex = win.style.margin = win.style.transform =
-      win.style.transition = '';
+      win.style.width = win.style.maxHeight = win.style.zIndex = win.style.margin =
+      win.style.transform = win.style.transition = '';
   }
 
   function toggleMini(win){
@@ -3000,7 +3009,8 @@
 
       const cx = miniCascade.x, cy = miniCascade.y;
       const k = MINI_W / first.width; // uniform scale — a true miniature
-      win._k = k; win._fullW = first.width;
+      const capH = Math.round(MINI_H / k); // pre-transform height that yields MINI_H on screen
+      win._k = k; win._fullW = first.width; win._capH = capH;
 
       win.classList.remove('min');
       win.classList.add('mini');
@@ -3015,14 +3025,17 @@
       miniCascade.x += 30; miniCascade.y += 30;
       if (miniCascade.y > innerHeight - 200){ miniCascade = { x: 40, y: 96 }; }
 
-      if (prefersReducedMotion){ win.style.transform = 'scale(' + k + ')'; ph.remove(); win._ph = null; return; }
+      if (prefersReducedMotion){ win.style.transform = 'scale(' + k + ')'; win.style.maxHeight = capH + 'px'; ph.remove(); win._ph = null; return; }
 
-      // window: one uniform transform from full-at-home to mini-at-tile
+      // window: one uniform transform from full-at-home to mini-at-tile, with the
+      // bottom masked by an animated max-height (top stays anchored, no jump)
       win.style.transition = 'none';
       win.style.transform = 'translate(' + (first.left - cx) + 'px,' + (first.top - cy) + 'px) scale(1)';
+      win.style.maxHeight = win._fullH + 'px';
       void win.offsetWidth;
-      win.style.transition = 'transform ' + MINI_MS + 'ms ' + MINI_EASE;
+      win.style.transition = 'transform ' + MINI_MS + 'ms ' + MINI_EASE + ', max-height ' + MINI_MS + 'ms ' + MINI_EASE;
       win.style.transform = 'scale(' + k + ')'; // rest at the tile, scaled down
+      win.style.maxHeight = capH + 'px';
       // space: collapse the placeholder in lockstep
       requestAnimationFrame(() => {
         ph.style.transition = 'height ' + MINI_MS + 'ms ' + MINI_EASE + ', margin ' + MINI_MS + 'ms ' + MINI_EASE;
@@ -3048,17 +3061,21 @@
       const homeLeft = phRect.left, homeTop = phRect.top;
       const curLeft = first.left, curTop = first.top; // visual tile position (may be dragged)
       const k = win._k || (first.width / win._fullW);
+      const capH = win._capH || Math.round(MINI_H / k);
       // space: reopen the placeholder, sliding the page back down
       ph.style.transition = 'height ' + MINI_MS + 'ms ' + MINI_EASE + ', margin ' + MINI_MS + 'ms ' + MINI_EASE;
       ph.style.height = win._fullH + 'px';
       ph.style.marginTop = win._mt;
       ph.style.marginBottom = win._mb;
-      // window: uniform transform from mini-at-tile back to full-at-home
+      // window: uniform transform from mini-at-tile back to full-at-home, unmasking
+      // the bottom as the max-height clamp lifts back to full
       win.style.transition = 'none';
       win.style.transform = 'scale(' + k + ')';
+      win.style.maxHeight = capH + 'px';
       void win.offsetWidth;
-      win.style.transition = 'transform ' + MINI_MS + 'ms ' + MINI_EASE;
+      win.style.transition = 'transform ' + MINI_MS + 'ms ' + MINI_EASE + ', max-height ' + MINI_MS + 'ms ' + MINI_EASE;
       win.style.transform = 'translate(' + (homeLeft - curLeft) + 'px,' + (homeTop - curTop) + 'px) scale(1)';
+      win.style.maxHeight = win._fullH + 'px';
       win.addEventListener('transitionend', function done(e){
         if (e.propertyName !== 'transform') return;
         win.removeEventListener('transitionend', done);
