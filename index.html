@@ -1088,6 +1088,11 @@
   .store-price s{ color:var(--ink-soft); }
   .store-price b{ color:var(--magenta); font-size:19px; }
   .store-soldout{ color:#E03C31; font-size:16px; letter-spacing:0.06em; }
+  /* sold out: the product reads as clearly disabled */
+  .store-prod.soldout{ opacity:0.6; }
+  .store-prod.soldout .store-name{ text-decoration:line-through; color:var(--ink-soft); }
+  .store-prod.soldout .store-img{ filter:grayscale(0.9); opacity:0.7; }
+  .store-prod.soldout .store-stars{ filter:grayscale(1); opacity:0.7; }
   .store-meta{
     font-family:'Courier New', Courier, monospace;
     font-weight:bold;
@@ -4164,12 +4169,12 @@
       const saved = savedCert();
       popup('DKKSTORE&trade;.COM &mdash; Product 1 of 1',
         chrome(0,
-          '<div class="store-prod">' +
+          '<div class="store-prod soldout">' +
             PRODUCT_IMG +
             '<div>' +
               '<b class="store-name">Commemorative Visitor Certificate</b>' +
               '<div class="store-stars">&starf;&starf;&starf;&starf;&starf; <span>(1 review, mine &mdash; yours pending)</span></div>' +
-              '<div class="store-price"><b class="store-soldout">OUT OF STOCK</b></div>' +
+              '<div class="store-price"><s>$0.00</s> <b class="store-soldout">OUT OF STOCK</b></div>' +
               '<div class="store-meta">IN STOCK: 0 (WAS &infin;. YOU BOUGHT ALL OF IT.)<br>RESTOCK: NO</div>' +
             '</div>' +
           '</div>' +
