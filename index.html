@@ -284,7 +284,7 @@
   }
   .titlebar .t-btns i:active{ border-style:inset; }
   .win-body{ padding:22px 24px 26px; }
-  .win-body > p{ margin-bottom:1em; max-width:70ch; }
+  .win-body > p{ margin-bottom:1em; }
   .win-body b{ color:var(--ink); }
 
   h2.win-h{
@@ -1113,7 +1113,7 @@
       <span class="wa-led" id="waLed"></span>
       <span class="wa-name">DKK-AMP</span>
       <span class="wa-eq" id="waEq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-      <button class="wa-shade" id="waShade" type="button" aria-label="Collapse player">&#9652;</button>
+      <button class="wa-shade" id="waShade" type="button" aria-label="Collapse player">&#9662;</button>
     </div>
     <div class="wa-lcd"><span id="waTrack">&mdash;</span></div>
     <div class="wa-ctrl">
@@ -1750,7 +1750,7 @@
     const btnShade = document.getElementById('waShade');
     btnShade.addEventListener('click', () => {
       const shaded = box.classList.toggle('shade');
-      btnShade.innerHTML = shaded ? '&#9662;' : '&#9652;';
+      btnShade.innerHTML = shaded ? '&#9652;' : '&#9662;';
       btnShade.setAttribute('aria-label', shaded ? 'Expand player' : 'Collapse player');
     });
     return {
