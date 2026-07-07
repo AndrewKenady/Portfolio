@@ -770,14 +770,18 @@
   .winamp.paused .wa-led{ animation:none; background:#8F85B8; box-shadow:none; }
   @keyframes waLed{ 50%{ opacity:0.4; } }
   .wa-name{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
     font-family:'Courier New', Courier, monospace;
     font-weight:bold;
     font-size:10.5px;
-    letter-spacing:0.28em;
     color:#fff;
     text-shadow:1px 1px 0 rgba(30,10,60,0.8);
     flex:1;
+    padding:0 2px;
   }
+  .wa-name i{ font-style:normal; }
   .wa-eq{ display:flex; align-items:flex-end; gap:2px; height:11px; }
   .wa-eq i{
     display:block;
@@ -1243,7 +1247,7 @@
       box-shadow:0 0 0 1px rgba(0,229,255,0.35), 0 0 18px rgba(0,229,255,0.35);
       text-shadow:0 0 10px rgba(255,211,77,0.6);
     }
-    .myspace-cta:hover img{ transform:rotate(-3deg) scale(1.06); }
+    .myspace-cta:hover img{ transform:scale(1.06); }
     /* list links invert like 90s selected text */
     .linklist a:hover, .webring a:hover, .f-legal a:hover, .table-note a:hover{
       background:var(--magenta); color:#fff !important; text-decoration:none;
@@ -1346,7 +1350,7 @@
   <div class="winamp" id="winamp" style="display:none;" aria-label="Music player">
     <div class="wa-top">
       <span class="wa-led" id="waLed"></span>
-      <span class="wa-name">DKK-AMP</span>
+      <span class="wa-name" aria-label="DKK-AMP"><i>D</i><i>K</i><i>K</i><i>-</i><i>A</i><i>M</i><i>P</i></span>
       <span class="wa-eq" id="waEq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
       <button class="wa-shade" id="waShade" type="button" aria-label="Collapse player">&#9662;</button>
     </div>
