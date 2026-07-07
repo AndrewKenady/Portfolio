@@ -390,12 +390,13 @@
   /* a tiny "watch" link on the resume entry, opens the player in a modal */
   .rez-watch{
     display:inline-block;
-    margin-top:6px;
+    margin-left:12px;
     font-family:'Courier New', Courier, monospace;
     font-weight:bold;
     font-size:12px;
     color:var(--violet);
     text-decoration:none;
+    vertical-align:baseline;
   }
   .rez-watch:hover{ color:var(--magenta); }
   .rez-watch .yt-dot{ color:#E62117; }
@@ -2032,7 +2033,7 @@
           <div>
             <p>Since 2016 I've hosted <b><a href="https://www.youtube.com/c/Nintendrew" target="_blank" rel="noopener">Nintendrew</a></b>, a YouTube channel dedicated to video game history and preservation — obscure prototypes, ambitious homebrew, console mods, and the hardware everyone else forgot.</p>
             <p>Practically, that's a decade of <b>scripting, shooting, editing, scoring, and publishing</b> broadcast-quality video on a schedule, plus the audience instincts that come from a comment section 350,000 strong. Frequent collaborations with Scott the Woz, Nathaniel Bandy, SMG4, and SimpleFlips.</p>
-            <p>For a studio, that means a developer who can also <b>speak publicly, demo convincingly, and represent the product</b> — conventions included. I'm a recurring guest at Retropalooza, and the channel is <a href="https://www.imdb.com/name/nm10395432/" target="_blank" rel="noopener">listed on IMDb</a>.</p>
+            <p>For a studio, that means a developer who can also <b>speak publicly, demo convincingly, and represent the product</b> — conventions included. I'm a recurring guest at Retropalooza, OMG!Con, and Really Rad Weekend, and the channel is <a href="https://www.imdb.com/name/nm10395432/" target="_blank" rel="noopener">listed on IMDb</a>.</p>
           </div>
           <div>
             <div class="statbox" role="table" aria-label="Channel statistics">
@@ -2071,10 +2072,9 @@
         <div class="rez-row">
           <div class="rez-when">2016 — NOW</div>
           <div class="rez-what">
-            <b>Nintendrew</b>
+            <b>Nintendrew</b> <a href="#" class="rez-watch" data-yt="OaJMtdAcfjc"><span class="yt-dot">&#9654;</span> Watch a sample</a>
             <div class="rz-role">Content Creator</div>
             <p>Writing, filming, scoring, and editing for a 350,000+ subscriber YouTube channel — reviews, retrospectives, DIY builds, and retro collecting, produced solo since 2016.</p>
-            <a href="#" class="rez-watch" data-yt="OaJMtdAcfjc"><span class="yt-dot">&#9654;</span> Watch a sample</a>
           </div>
         </div>
         <div class="rez-row">
@@ -2561,7 +2561,10 @@
     });
     return {
       start(){ shuffle(); pos = 0; loadAndPlay(); },
-      playSecret
+      playSecret,
+      get isPlaying(){ return playing; },
+      pause(){ if (everStarted && playing) toggle(); },
+      resume(){ if (everStarted && !playing) toggle(); }
     };
   })();
 
@@ -5004,7 +5007,11 @@
     const modal = document.getElementById('ytModal');
     const frame = document.getElementById('ytFrame');
     if (!modal || !frame) return;
+    let resumeMusic = false;
     function open(id){
+      // duck the site music while the video plays; remember to bring it back
+      resumeMusic = PLAYER.isPlaying;
+      if (resumeMusic) PLAYER.pause();
       const f = document.createElement('iframe');
       f.src = 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?autoplay=1&rel=0';
       f.title = 'Nintendrew video';
@@ -5014,7 +5021,11 @@
       frame.appendChild(f);
       modal.classList.add('on');
     }
-    function close(){ modal.classList.remove('on'); frame.innerHTML = ''; }
+    function close(){
+      modal.classList.remove('on');
+      frame.innerHTML = '';
+      if (resumeMusic){ PLAYER.resume(); resumeMusic = false; }
+    }
     document.querySelectorAll('[data-yt]').forEach(a => {
       a.addEventListener('click', e => { e.preventDefault(); open(a.dataset.yt); });
     });
