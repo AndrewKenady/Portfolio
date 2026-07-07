@@ -1468,31 +1468,19 @@
     75%{ transform:translateX(5px); }
   }
 
-  /* [□] collapses a section into a tiny draggable live preview */
+  /* [□] collapses a section into a tiny draggable live preview.
+     the WHOLE window is scaled by one transform (JS sets the scale + width),
+     so it stays a true uniform miniature — no titlebar/body proportion shift */
   .window.mini{
     position:fixed;
-    width:max-content;
+    transform-origin:top left;
     margin:0 !important;
     z-index:715;
     box-shadow:5px 5px 0 rgba(0,0,0,0.55);
   }
   .window.mini .titlebar{ cursor:grab; }
   .window.mini .titlebar:active{ cursor:grabbing; }
-  .window.mini .win-body{
-    width:760px;           /* lay out at full width... */
-    zoom:0.34;             /* ...then shrink to a true ~258px miniature */
-    max-height:1100px;
-    overflow:hidden;
-    pointer-events:none;   /* it's a preview, not a workspace */
-    position:relative;
-  }
-  /* a soft fade so the clipped bottom doesn't look chopped */
-  .window.mini .win-body::after{
-    content:"";
-    position:absolute; left:0; right:0; bottom:0; height:60px;
-    background:linear-gradient(180deg, transparent, var(--win));
-    pointer-events:none;
-  }
+  .window.mini .win-body{ pointer-events:none; } /* a preview, not a workspace */
   .window.mini.min .win-body{ display:none; }
 
   /* netscape-style status bar — shows where links go */
@@ -2981,42 +2969,105 @@
 
   // ===== window controls — [_] minimizes, [□] pops a tiny preview, [×] fights back =====
   let miniCascade = { x: 40, y: 96 };
+  const MINI_EASE = 'cubic-bezier(0.22,0.75,0.3,1)';
+  const MINI_MS = 340;
+  const MINI_W = 340; // target on-screen width of the mini tile
+
+  function clearMiniInline(win){
+    win.style.position = win.style.left = win.style.top = win.style.right = win.style.bottom =
+      win.style.width = win.style.zIndex = win.style.margin = win.style.transform =
+      win.style.transition = '';
+  }
+
   function toggleMini(win){
-    // FLIP: measure where it is now, flip the state, then tween the transform
-    // from the old geometry back to identity so it visibly scales + glides
-    const first = win.getBoundingClientRect();
     const goingMini = !win.classList.contains('mini');
-    win.classList.toggle('mini');
+    const first = win.getBoundingClientRect();
+
     if (goingMini){
+      // a placeholder keeps the window's spot, then collapses smoothly — so the
+      // page below slides instead of snapping when the window leaves the flow
+      const cs = getComputedStyle(win);
+      const mt = cs.marginTop, mb = cs.marginBottom;
+      const ph = document.createElement('div');
+      ph.className = 'mini-ph';
+      ph.style.height = win.offsetHeight + 'px';
+      ph.style.marginTop = mt;
+      ph.style.marginBottom = mb;
+      win.parentNode.insertBefore(ph, win);
+      win._ph = ph;
+      win._mt = mt; win._mb = mb;
+      win._fullH = win.offsetHeight;
+
+      const cx = miniCascade.x, cy = miniCascade.y;
+      const k = MINI_W / first.width; // uniform scale — a true miniature
+      win._k = k; win._fullW = first.width;
+
       win.classList.remove('min');
-      win.style.left = miniCascade.x + 'px';
-      win.style.top = miniCascade.y + 'px';
+      win.classList.add('mini');
+      // lock the full width so the fixed window keeps its real layout, just scaled
+      win.style.width = first.width + 'px';
+      win.style.left = cx + 'px';
+      win.style.top = cy + 'px';
       win.style.right = 'auto';
       win.style.bottom = 'auto';
       floatZ = floatZ >= 884 ? 841 : floatZ + 1;
       win.style.zIndex = floatZ;
       miniCascade.x += 30; miniCascade.y += 30;
       if (miniCascade.y > innerHeight - 200){ miniCascade = { x: 40, y: 96 }; }
+
+      if (prefersReducedMotion){ win.style.transform = 'scale(' + k + ')'; ph.remove(); win._ph = null; return; }
+
+      // window: one uniform transform from full-at-home to mini-at-tile
+      win.style.transition = 'none';
+      win.style.transform = 'translate(' + (first.left - cx) + 'px,' + (first.top - cy) + 'px) scale(1)';
+      void win.offsetWidth;
+      win.style.transition = 'transform ' + MINI_MS + 'ms ' + MINI_EASE;
+      win.style.transform = 'scale(' + k + ')'; // rest at the tile, scaled down
+      // space: collapse the placeholder in lockstep
+      requestAnimationFrame(() => {
+        ph.style.transition = 'height ' + MINI_MS + 'ms ' + MINI_EASE + ', margin ' + MINI_MS + 'ms ' + MINI_EASE;
+        ph.style.height = '0px';
+        ph.style.marginTop = '0px';
+        ph.style.marginBottom = '0px';
+      });
+      win.addEventListener('transitionend', function done(e){
+        if (e.propertyName !== 'transform') return;
+        win.style.transition = ''; // keep the resting scale() transform
+        win.removeEventListener('transitionend', done);
+      });
     } else {
-      win.style.position = win.style.left = win.style.top = '';
-      win.style.right = win.style.bottom = win.style.zIndex = win.style.margin = '';
+      // restore
+      const ph = win._ph;
+      if (prefersReducedMotion || !ph){
+        if (ph){ ph.remove(); win._ph = null; }
+        win.classList.remove('mini');
+        clearMiniInline(win);
+        return;
+      }
+      const phRect = ph.getBoundingClientRect();
+      const homeLeft = phRect.left, homeTop = phRect.top;
+      const curLeft = first.left, curTop = first.top; // visual tile position (may be dragged)
+      const k = win._k || (first.width / win._fullW);
+      // space: reopen the placeholder, sliding the page back down
+      ph.style.transition = 'height ' + MINI_MS + 'ms ' + MINI_EASE + ', margin ' + MINI_MS + 'ms ' + MINI_EASE;
+      ph.style.height = win._fullH + 'px';
+      ph.style.marginTop = win._mt;
+      ph.style.marginBottom = win._mb;
+      // window: uniform transform from mini-at-tile back to full-at-home
+      win.style.transition = 'none';
+      win.style.transform = 'scale(' + k + ')';
+      void win.offsetWidth;
+      win.style.transition = 'transform ' + MINI_MS + 'ms ' + MINI_EASE;
+      win.style.transform = 'translate(' + (homeLeft - curLeft) + 'px,' + (homeTop - curTop) + 'px) scale(1)';
+      win.addEventListener('transitionend', function done(e){
+        if (e.propertyName !== 'transform') return;
+        win.removeEventListener('transitionend', done);
+        // the transformed window now exactly covers the reopened slot — swap in
+        win.classList.remove('mini');
+        clearMiniInline(win);
+        ph.remove(); win._ph = null;
+      });
     }
-    if (prefersReducedMotion) return;
-    const last = win.getBoundingClientRect();
-    if (!first.width || !last.width) return;
-    const dx = first.left - last.left;
-    const dy = first.top - last.top;
-    const s = first.width / last.width; // uniform scale — no aspect distortion
-    win.style.transformOrigin = 'top left';
-    win.style.transition = 'none';
-    win.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')';
-    void win.offsetWidth; // commit the start frame before transitioning
-    win.style.transition = 'transform 0.34s cubic-bezier(0.22,0.75,0.3,1)';
-    win.style.transform = 'none';
-    win.addEventListener('transitionend', function done(){
-      win.style.transition = win.style.transform = win.style.transformOrigin = '';
-      win.removeEventListener('transitionend', done);
-    }, { once: true });
   }
   document.querySelectorAll('.window .titlebar .t-btns').forEach(btns => {
     const win = btns.closest('.window');
