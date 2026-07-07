@@ -1224,19 +1224,21 @@
     position:fixed; inset:0;
     z-index:640;
     pointer-events:none;
-    opacity:0.5;
+    opacity:0.75;
     mix-blend-mode:screen;
     background:
-      radial-gradient(60% 38% at 20% -5%, rgba(60,255,110,0.5), transparent 70%),
-      radial-gradient(55% 34% at 55% -8%, rgba(0,229,255,0.45), transparent 70%),
-      radial-gradient(50% 30% at 85% -4%, rgba(122,43,217,0.5), transparent 70%);
+      radial-gradient(55% 70% at 15% -12%, rgba(60,255,110,0.6), transparent 72%),
+      radial-gradient(48% 85% at 50% -18%, rgba(0,229,255,0.55), transparent 76%),
+      radial-gradient(55% 75% at 85% -10%, rgba(122,43,217,0.65), transparent 72%),
+      radial-gradient(70% 50% at 35% 112%, rgba(255,60,172,0.28), transparent 70%);
     background-size:200% 100%;
-    filter:blur(6px);
+    filter:blur(10px);
+    transform-origin:top;
     animation:auroraDrift 9s ease-in-out infinite alternate;
   }
   @keyframes auroraDrift{
-    from{ background-position:0% 0, 0% 0, 0% 0; transform:translateX(-2%) scaleY(1); }
-    to{ background-position:100% 0, 60% 0, 30% 0; transform:translateX(2%) scaleY(1.15); }
+    from{ background-position:0% 0, 0% 0, 0% 0, 0% 0; transform:translateX(-2%) scaleY(1); }
+    to{ background-position:100% 0, 60% 0, 30% 0, 80% 0; transform:translateX(2%) scaleY(1.18); }
   }
 
   /* ============ MEMORY PURGE — the recycle bin, emotionally ============ */
@@ -3718,14 +3720,17 @@
 
   // ===== WEATHER.SYS — full-screen forecasts, 1990s edition =====
   const WEATHER = (function(){
-    const MODES = ['MISSING', 'SNOW', 'RAIN', 'STATIC', 'AURORA'];
+    const MODES = ['MISSING', 'SNOW', 'RAIN', 'STATIC', 'AURORA', 'MIDI'];
     const TOASTS = {
       'MISSING': 'WEATHER RETURNED TO STORAGE.',
       'SNOW': 'WEATHER: SNOW. NO ACCUMULATION. IT IS INSIDE THE COMPUTER.',
       'RAIN': 'WEATHER: RAIN. YOUR FILES MAY GET DAMP.',
       'STATIC': 'WEATHER: STATIC. A CLASSIC.',
-      'AURORA': 'WEATHER: AURORA. RARE AT THIS LATITUDE (YOUR DESK).'
+      'AURORA': 'WEATHER: AURORA. RARE AT THIS LATITUDE (YOUR DESK).',
+      'MIDI': 'WEATHER: MIDI. 100% CHANCE OF ♪. AUDIO NOT INCLUDED.'
     };
+    const NOTE_GLYPHS = ['♪', '♫', '♬', '♩'];
+    const NOTE_COLORS = ['#FF3CAC', '#00E5FF', '#FFD34D', '#B29CE8'];
     let mode = 'MISSING';
     let canvas = null, ctx = null, raf = null, parts = [];
     let noiseC = null, lastNoise = 0, auroraEl = null, last = 0, t = 0;
@@ -3764,6 +3769,14 @@
           x: Math.random() * (innerWidth + 60), y: Math.random() * innerHeight,
           l: 8 + Math.random() * 14, v: 260 + Math.random() * 240
         });
+      } else if (mode === 'MIDI'){
+        for (let i = 0; i < 45; i++) parts.push({
+          x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+          s: 12 + Math.random() * 10, v: 18 + Math.random() * 34,
+          ph: Math.random() * Math.PI * 2,
+          g: NOTE_GLYPHS[(Math.random() * NOTE_GLYPHS.length) | 0],
+          c: NOTE_COLORS[(Math.random() * NOTE_COLORS.length) | 0]
+        });
       }
     }
     function frame(now){
@@ -3793,6 +3806,21 @@
           ctx.lineTo(p.x + p.l * 0.12, p.y - p.l);
         }
         ctx.stroke();
+      } else if (mode === 'MIDI'){
+        // the site's native precipitation — notes fall gently, swaying like snow
+        ctx.textBaseline = 'top';
+        for (const p of parts){
+          p.y += p.v * dt;
+          p.x += Math.sin(t * 1.1 + p.ph) * 26 * dt;
+          if (p.y > innerHeight + 24){ p.y = -24; p.x = Math.random() * innerWidth; }
+          if (p.x > innerWidth + 24) p.x = -24;
+          if (p.x < -24) p.x = innerWidth + 24;
+          ctx.font = 'bold ' + p.s + 'px Courier New, monospace';
+          ctx.fillStyle = p.c;
+          ctx.globalAlpha = 0.75;
+          ctx.fillText(p.g, p.x, p.y);
+        }
+        ctx.globalAlpha = 1;
       } else if (mode === 'STATIC'){
         // crunchy 12fps noise, rendered tiny and scaled up like a bad antenna
         if (!noiseC || now - lastNoise > 80){
@@ -3859,7 +3887,8 @@
       'SNOW': '&#10052;&#65039;',
       'RAIN': '&#127783;&#65039;',
       'STATIC': '&#128250;',
-      'AURORA': '&#127756;'
+      'AURORA': '&#127756;',
+      'MIDI': '&#127925;'
     };
 
     // the page scoots down exactly one toolbar-height; rewraps on resize
@@ -3998,7 +4027,10 @@
         { l: 'My Wife Left Me', a: 'dlg', arg: 'wife' } ] },
       nothing: { t: 'VISITOR SURVEY', b: 'The popup stares at you.<br><br>It knows. It has always known. But it respects you too much to press.<br><br>&ldquo;Okay,&rdquo; it says, not believing you.', btns: [
         { l: 'Thanks', a: 'dlg', arg: 'end' },
-        { l: 'Wait. Actually…', a: 'dlg', arg: 'wife' } ] },
+        { l: 'Wait. Actually…', a: 'dlg', arg: 'actually' } ] },
+      actually: { t: 'VISITOR SURVEY', b: 'The popup waits. Popups are patient. It&rsquo;s kind of their whole thing.<br><br>You take a breath and tell it everything. The wife. Gone. The house is quiet now.<br><br>&ldquo;That&rsquo;s heavy,&rdquo; it says softly. &ldquo;I&rsquo;m just a survey. But I&rsquo;m here, and I have buttons.&rdquo;', btns: [
+        { l: 'She Took The Dog', a: 'dlg', arg: 'dog' },
+        { l: "I'll Be Fine", a: 'dlg', arg: 'fine' } ] },
       wife: { t: 'VISITOR SURVEY — TRIAGE MODE', b: 'The popup is quiet for a long moment. A respectful silence, rendered at 60 frames per second.<br><br>&ldquo;That&rsquo;s heavy,&rdquo; it finally says. &ldquo;I&rsquo;m just a survey. But I&rsquo;m here, and I have buttons.&rdquo;', btns: [
         { l: 'She Took The Dog', a: 'dlg', arg: 'dog' },
         { l: "I'll Be Fine", a: 'dlg', arg: 'fine' } ] },
