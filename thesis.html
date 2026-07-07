@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Interruption Economics Thesis — Drew K. Kennedy</title>
+<meta name="description" content="How I architected, built, and operate a company-wide internal AI platform solo — and the thesis behind it: every answered question is an expert interruption that didn't happen.">
+<meta name="theme-color" content="#0B0428">
+<meta property="og:title" content="Interruption Economics — Drew K. Kennedy">
+<meta property="og:description" content="Solo-architected a company-wide agentic AI platform. The thesis: every answered question is an expert interruption that didn't happen — and the value compounds with every discipline it spans.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://drewkkennedy.com/thesis.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0428'/%3E%3Crect x='1' y='2' width='14' height='3' fill='%23FF3CAC'/%3E%3Crect x='1' y='5' width='14' height='9' fill='%23F0EDF5'/%3E%3Crect x='3' y='7' width='6' height='1.5' fill='%231E1938'/%3E%3Crect x='3' y='10' width='9' height='1.5' fill='%231E1938'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --night:#0B0428; --win:#F0EDF5; --win-2:#E4DFEF; --ink:#1E1938; --ink-soft:#5C5478;
+    --bevel-hi:#FFFFFF; --bevel-lo:#8E86A8; --magenta:#FF3CAC; --cyan:#00E5FF;
+    --violet:#7A2BD9; --gold:#FFD34D;
+    --title-grad:linear-gradient(90deg, #FF3CAC 0%, #784BA0 50%, #2B86C5 100%);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background-color:var(--night);
+    background-image:
+      radial-gradient(1px 1px at 12px 18px, #fff, transparent),
+      radial-gradient(1px 1px at 68px 44px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1.5px 1.5px at 120px 90px, var(--cyan), transparent),
+      radial-gradient(1px 1px at 160px 24px, rgba(255,255,255,0.65), transparent),
+      radial-gradient(1px 1px at 40px 120px, rgba(255,60,172,0.8), transparent),
+      radial-gradient(1px 1px at 190px 150px, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1.5px 1.5px at 90px 170px, rgba(255,255,255,0.9), transparent);
+    background-size:220px 190px;
+    color:var(--ink);
+    font-family:Verdana, Geneva, sans-serif;
+    font-size:14px;
+    line-height:1.7;
+    padding:26px 14px 60px;
+  }
+  .page{ max-width:820px; margin:0 auto; }
+  a{ color:#2B49C5; }
+  a:hover{ color:var(--magenta); }
+  .backbar{ margin-bottom:16px; }
+  .backbtn{
+    display:inline-block;
+    font-family:Verdana, Geneva, sans-serif; font-weight:bold; font-size:12.5px;
+    color:var(--ink) !important; text-decoration:none;
+    background:var(--win); border:2px outset var(--bevel-hi); padding:7px 16px;
+  }
+  .backbtn:active{ border-style:inset; }
+  .backbtn:hover{ background:#FBF9FF; }
+  .window{ border:2px outset var(--bevel-hi); background:var(--win); box-shadow:4px 4px 0 rgba(0,0,0,0.45); }
+  .titlebar{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--title-grad); padding:5px 6px 5px 12px; border-bottom:2px solid var(--bevel-lo);
+  }
+  .titlebar .t-label{
+    font-family:'Courier New', Courier, monospace; font-weight:bold; font-size:13.5px;
+    letter-spacing:0.06em; color:#fff; text-shadow:1px 1px 0 rgba(30,10,60,0.8);
+  }
+  .titlebar .t-btns{ display:flex; gap:4px; }
+  .titlebar .t-btns i{
+    display:flex; align-items:center; justify-content:center; width:20px; height:18px;
+    background:var(--win); border:2px outset var(--bevel-hi); font-style:normal;
+    font-family:Verdana, sans-serif; font-weight:bold; font-size:10px; color:var(--ink);
+  }
+  .win-body{ padding:24px 26px 28px; }
+  h1{
+    font-family:'Times New Roman', Times, serif; font-style:italic; font-weight:bold;
+    font-size:clamp(26px, 5vw, 38px); line-height:1.1; margin-bottom:6px;
+  }
+  .sub{
+    font-family:'Courier New', Courier, monospace; font-weight:bold; font-size:11px;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--magenta); margin-bottom:16px;
+  }
+  .hr90{ border:none; height:3px; margin:0 0 20px; background:repeating-linear-gradient(90deg, var(--magenta) 0 14px, var(--cyan) 14px 28px); }
+  h2{
+    font-family:'Times New Roman', Times, serif; font-style:italic; font-size:24px;
+    color:var(--ink); margin:26px 0 10px;
+  }
+  p{ margin-bottom:13px; }
+  .lead{ font-size:15px; }
+  b{ color:var(--ink); }
+  .pull{
+    border-left:4px solid var(--magenta);
+    background:#FBF9FF;
+    padding:14px 18px; margin:18px 0;
+    font-family:'Times New Roman', Times, serif; font-style:italic; font-size:19px; line-height:1.4;
+    color:var(--ink);
+  }
+  .term{
+    border:2px inset var(--bevel-hi); background:#08031C; color:#D5F8FF;
+    font-family:'Courier New', Courier, monospace; font-size:12.5px; line-height:1.8;
+    padding:13px 15px; margin:16px 0;
+  }
+  .term .k{ color:var(--gold); }
+  .term .spec-row{ display:flex; gap:12px; padding:2px 0; }
+  .term .spec-row + .spec-row{ border-top:1px dotted rgba(213,248,255,0.12); }
+  .term .spec-k{ flex:0 0 132px; color:var(--gold); white-space:nowrap; }
+  @media (max-width:560px){ .term .spec-row{ flex-direction:column; gap:0; } .term .spec-k{ flex-basis:auto; } }
+  ul{ margin:0 0 14px 22px; }
+  li{ margin-bottom:7px; }
+  .stat-strip{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:12px; margin:8px 0 20px;
+  }
+  .stat{ border:2px outset var(--bevel-hi); background:#FBF9FF; padding:12px 10px; text-align:center; }
+  .stat b{ display:block; font-family:'Courier New', Courier, monospace; font-size:22px; color:var(--violet); }
+  .stat span{ font-size:11px; color:var(--ink-soft); letter-spacing:0.04em; }
+  .note{ font-size:12px; color:var(--ink-soft); margin-top:8px; }
+  .cta{ margin-top:24px; text-align:center; }
+  .cta a{
+    display:inline-block; font-family:'Courier New', Courier, monospace; font-weight:bold; font-size:14px;
+    color:var(--cyan) !important; background:#08031C; border:2px inset var(--bevel-hi);
+    padding:12px 24px; text-decoration:none;
+  }
+  .cta a:hover{ color:var(--gold) !important; }
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="backbar"><a class="backbtn" href="/">&#9204; Back to drewkkennedy.com</a></div>
+    <main class="window">
+      <div class="titlebar">
+        <span class="t-label">THESIS.TXT &mdash; The Interruption Economy</span>
+        <span class="t-btns" aria-hidden="true"><i>_</i><i>&#9633;</i><i onclick="location.href='/'" style="cursor:pointer">&times;</i></span>
+      </div>
+      <div class="win-body">
+        <h1>Interruption Economics</h1>
+        <div class="sub">Building a company's operating memory &bull; Architect &amp; Owner</div>
+        <hr class="hr90">
+
+        <p class="lead">I architected, built, and operate my company's internal AI platform &mdash; <b>solo, end-to-end</b>. It began as one thesis, and every part of the system is an argument for it.</p>
+
+        <div class="pull">Every answered question is an expert interruption that didn't happen &mdash; and the value compounds with every discipline it spans.</div>
+
+        <p>In any growing company, the real bottleneck isn't a lack of data &mdash; it's that the answers live in people's heads, and getting them means interrupting an expert. The data lead pings the engineer. The community manager pings the data lead. Every interruption is a context-switch tax paid twice: once by the asker who waits, once by the expert who stops. The tax scales with headcount, and it never shows up on a balance sheet.</p>
+
+        <p>The platform's job is to make that tax optional. Ask it in plain language; it plans, queries live production systems, reads the results, checks its own work, and answers with citations &mdash; or tells you honestly when it can't. The interruption doesn't happen. And because one system serves <b>every</b> discipline at once, each new domain it learns raises the value of every other &mdash; the return compounds instead of adding up.</p>
+
+        <div class="stat-strip">
+          <div class="stat"><b>1</b><span>engineer, end-to-end</span></div>
+          <div class="stat"><b>20+</b><span>live data sources</span></div>
+          <div class="stat"><b>~95</b><span>agent tools</span></div>
+          <div class="stat"><b>230+</b><span>automated tests</span></div>
+        </div>
+
+        <h2>How it works</h2>
+        <p>It's an agentic system, not a retrieval template &mdash; it reasons about what evidence it needs, gathers it from live systems, and synthesizes an answer that it then verifies before sending.</p>
+        <div class="term" role="note" aria-label="Architecture">
+          <div class="spec-row"><span class="spec-k">ROUTE</span><span>Tiered models &mdash; a cheap model for quick lookups, the strongest for executive synthesis. Spend scales with difficulty.</span></div>
+          <div class="spec-row"><span class="spec-k">RETRIEVE</span><span>Semantic-first search across 20+ live sources, so meaning matches even when keywords don't.</span></div>
+          <div class="spec-row"><span class="spec-k">CONSULT</span><span>Context-isolated specialist sub-agents per domain; each sees only its own tools; an orchestrator synthesizes.</span></div>
+          <div class="spec-row"><span class="spec-k">VERIFY</span><span>A verifier checks every claim against the gathered sources, calibrates confidence, and shows only what's cited.</span></div>
+          <div class="spec-row"><span class="spec-k">GUARDRAILS</span><span>Every write is human-approved. Auth fails closed. Cost is governed. Nothing customer-facing ships without review.</span></div>
+        </div>
+
+        <h2>Built like a product, run like a platform</h2>
+        <p>The safety and cost guarantees are <b>enforced in code and pinned by tests</b> &mdash; not merely requested in a prompt. A tripwire fails the build if a customer-facing capability is ever added without review; a model change without its migration fails the build, so production can't silently break. It's exposed as a standard tool-server so other assistants can consult it, and it runs on the same rigor I'd give any shipped product: a full test suite including a safety-focused "trust-spine," continuous integration, and honest failure when a source is down or coverage is thin.</p>
+
+        <h2>Why it's the work I'm proudest of</h2>
+        <p>Not because of the model &mdash; models are a commodity &mdash; but because it's a <b>platform</b> designed, built, safety-modeled, cost-governed, and rolled out across an organization by one person, and because it serves the whole company rather than one team: leadership, data, ops, engineering, trust &amp; safety, community, and product. The next frontier is longitudinal memory, proactive "what changed / what's at risk" digests for leadership, and a multi-tenant version &mdash; a company's operating memory as a product.</p>
+
+        <p class="note">This describes the platform's architecture and thesis at a general level; specifics, internal names, and data are omitted deliberately. Happy to go deeper in conversation.</p>
+
+        <div class="cta"><a href="mailto:hello@drewkkennedy.com?subject=Let's%20talk%20about%20the%20AI%20platform">&#9993; Talk to me about this &rarr;</a></div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
