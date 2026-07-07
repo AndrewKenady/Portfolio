@@ -312,62 +312,8 @@
     background:repeating-linear-gradient(90deg, var(--magenta) 0 14px, var(--cyan) 14px 28px);
   }
 
-  /* ============ TABLES — border=1 cellpadding=6, in spirit ============ */
-  table.classic{
-    width:100%;
-    border-collapse:collapse;
-    font-size:13.5px;
-    background:#FBF9FF;
-  }
-  table.classic th{
-    background:var(--ink);
-    color:#fff;
-    font-family:'Courier New', Courier, monospace;
-    font-size:12.5px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    padding:8px 10px;
-    text-align:left;
-    border:1px solid var(--bevel-lo);
-  }
-  table.classic td{
-    border:1px solid var(--bevel-lo);
-    padding:10px;
-    vertical-align:top;
-  }
-  table.classic tr:nth-child(even) td{ background:var(--win-2); }
-  table.classic .t-title{ font-weight:bold; white-space:nowrap; }
-  /* portrait: the table becomes a stack of cards */
-  @media (max-width:640px){
-    table.classic thead{ display:none; }
-    table.classic, table.classic tbody, table.classic tr, table.classic td{ display:block; width:100%; }
-    table.classic tr{
-      border:2px outset var(--bevel-hi);
-      margin-bottom:14px;
-      background:#FBF9FF;
-    }
-    table.classic tr:nth-child(even) td{ background:transparent; }
-    table.classic tr:nth-child(even){ background:var(--win-2); }
-    table.classic td{ border:none; padding:2px 14px; }
-    table.classic td.t-title{
-      padding-top:12px;
-      font-size:15px;
-      white-space:normal;
-    }
-    table.classic td.t-year, table.classic td.t-role{
-      display:inline-block;
-      width:auto;
-      white-space:normal;
-      padding-top:2px; padding-bottom:2px;
-    }
-    table.classic td.t-year::after{ content:" ·"; color:var(--bevel-lo); }
-    table.classic td:last-child{ padding-top:6px; padding-bottom:14px; font-size:13px; }
-  }
-  table.classic .t-title a{ text-decoration:none; }
-  table.classic .t-title a:hover{ text-decoration:underline; }
-  table.classic .t-year{ font-family:'Courier New', Courier, monospace; font-weight:bold; white-space:nowrap; }
-  table.classic .t-role{ color:var(--ink-soft); font-size:12.5px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
-  .table-note{ margin-top:12px; font-size:12.5px; color:var(--ink-soft); }
+  /* ============ WORK.EXE note line ============ */
+  .table-note{ margin-top:16px; font-size:12.5px; color:var(--ink-soft); }
 
   /* two-column layout inside windows (channel) */
   .cols{ display:grid; grid-template-columns:3fr 2fr; gap:26px; align-items:start; }
@@ -1277,47 +1223,114 @@
     color:var(--ink-soft);
   }
 
-  /* ============ SCREENSHOTS — thumbnails in WORK.EXE, viewer on click ============ */
-  .shots{ display:flex; flex-wrap:wrap; gap:8px; margin-top:11px; }
-  .shot{
-    padding:0;
-    border:2px outset var(--bevel-hi);
-    background:#000;
-    line-height:0;
-    cursor:pointer;
-    flex:0 0 auto;
+  /* ============ WORK.EXE — a card grid, screenshots front and center ============ */
+  .work-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+    gap:18px;
+    margin-top:4px;
   }
-  .shot img{ height:66px; width:auto; display:block; }
-  .shot:active{ border-style:inset; }
-  /* the two non-photo cards — same footprint, different story */
-  .shot.card{
-    height:70px; width:118px;
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    gap:3px;
-    line-height:1.3;
+  .work-card{
+    display:flex;
+    flex-direction:column;
+    border:2px outset var(--bevel-hi);
+    background:#FBF9FF;
+    box-shadow:3px 3px 0 rgba(0,0,0,0.3);
+  }
+  /* the screenshot frame — one fixed aspect for every card, so the grid aligns */
+  .wc-shot{
+    position:relative;
+    display:block;
+    width:100%;
+    aspect-ratio:16 / 9;
+    margin:0; padding:0;
+    border:none;
+    border-bottom:2px solid var(--bevel-lo);
+    background:#08031C;
+    overflow:hidden;
+  }
+  button.wc-shot{ cursor:pointer; }
+  a.wc-shot{ cursor:pointer; text-decoration:none; }
+  .wc-shot img{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  /* little corner glyphs over a photo */
+  .wc-zoom, .wc-count{
+    position:absolute;
+    background:rgba(11,4,40,0.82);
+    color:#fff;
     font-family:'Courier New', Courier, monospace;
     font-weight:bold;
-    font-size:10px;
-    letter-spacing:0.08em;
+    font-size:11px;
+    padding:2px 7px;
+    border:1px solid rgba(255,255,255,0.35);
+    opacity:0;
+    transition:opacity 0.15s ease;
+  }
+  .wc-zoom{ top:7px; right:7px; }
+  .wc-count{ bottom:7px; right:7px; opacity:1; }
+  /* the non-photo tiles — same frame, different content */
+  .wc-redacted, .wc-play, .wc-none{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
     text-align:center;
-    cursor:default;
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    letter-spacing:0.1em;
   }
-  .shot.redacted{
-    background:
-      repeating-linear-gradient(45deg, #14101F 0 8px, #1B1530 8px 16px);
+  .wc-redacted{
+    background:repeating-linear-gradient(45deg, #14101F 0 13px, #1B1530 13px 26px);
     color:var(--ink-soft);
-    border-style:inset;
+    font-size:11px;
   }
-  .shot.redacted b{ color:#E03C31; font-size:11px; letter-spacing:0.16em; }
-  .shot.play{
+  .wc-redacted b{ color:#E03C31; font-size:16px; letter-spacing:0.16em; }
+  .wc-play{
     background:linear-gradient(180deg, #241F33 0%, #14101F 100%);
     color:var(--cyan);
-    cursor:pointer;
+    font-size:13px;
+  }
+  .wc-play .pl-arrow{ font-size:34px; color:var(--gold); line-height:1; }
+  .wc-none{
+    background:repeating-linear-gradient(90deg, #E4DFEF 0 12px, #EDEAF5 12px 24px);
+    color:var(--ink-soft);
+    font-size:12px;
+  }
+  .wc-none .pl-arrow{ font-size:26px; line-height:1; }
+  .wc-body{ padding:13px 15px 15px; display:flex; flex-direction:column; }
+  .wc-title{
+    font-family:'Times New Roman', Times, serif;
+    font-style:italic;
+    font-size:20px;
+    line-height:1.15;
+    color:var(--ink);
+  }
+  .wc-title a{ text-decoration:none; color:var(--ink); }
+  .wc-title a:hover{ color:var(--magenta); }
+  .wc-meta{
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:11px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--violet);
+    margin:5px 0 8px;
+  }
+  .wc-notes{ font-size:12.5px; color:var(--ink-soft); line-height:1.6; }
+  .wc-link{
+    display:inline-block;
+    margin-top:9px;
+    font-family:'Courier New', Courier, monospace;
+    font-weight:bold;
+    font-size:12px;
+    color:var(--violet);
     text-decoration:none;
   }
-  .shot.play .pl-arrow{ font-size:16px; color:var(--gold); }
-  .shot.play:hover{ color:#fff; }
+  .wc-link:hover{ color:var(--magenta); }
 
   #shotOverlay{
     position:fixed; inset:0;
@@ -1339,6 +1352,7 @@
     flex-direction:column;
   }
   .shot-win .win-inner{ padding:8px; overflow:auto; }
+  .shot-stage{ position:relative; display:flex; align-items:center; justify-content:center; }
   .shot-win img{
     display:block;
     max-width:100%;
@@ -1348,6 +1362,24 @@
     border:2px inset var(--bevel-hi);
     image-rendering:auto;
   }
+  .shot-nav{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:38px; height:54px;
+    background:var(--win);
+    border:2px outset var(--bevel-hi);
+    color:var(--ink);
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    display:none;
+  }
+  .shot-nav:active{ border-style:inset; }
+  .shot-nav:hover{ background:#FBF9FF; color:var(--magenta); }
+  .shot-nav.prev{ left:6px; }
+  .shot-nav.next{ right:6px; }
+  .shot-win.multi .shot-nav{ display:block; }
   .shot-cap{
     font-family:'Courier New', Courier, monospace;
     font-size:12px;
@@ -1509,13 +1541,6 @@
     .statbox .sb-row:hover{ background:rgba(0,229,255,0.09); }
     .statbox .sb-row:hover b{ text-shadow:0 0 9px rgba(0,229,255,0.9); }
 
-    /* work table: rows highlight like a selected file */
-    table.classic tbody td{ transition:background 0.1s ease, box-shadow 0.1s ease; }
-    table.classic tbody tr:hover td{ background:#E6FAFF; }
-    table.classic tbody tr:hover td:first-child{ box-shadow:inset 3px 0 0 var(--magenta); }
-    table.classic tbody tr:hover .t-title a{ color:var(--magenta); }
-    table.classic tbody tr:hover .blink{ animation:none; visibility:visible; }
-
     /* resume rows step forward when called on */
     .rez-row{ transition:background 0.12s ease, box-shadow 0.12s ease, padding 0.12s ease; }
     .rez-row:hover{ background:rgba(122,43,217,0.07); box-shadow:inset 3px 0 0 var(--magenta); padding-left:12px; }
@@ -1525,10 +1550,14 @@
     .extra:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 rgba(0,0,0,0.4); background:#FFFFFF; }
     .extra:hover b{ color:var(--violet); }
 
-    /* screenshots lift and glow when courted */
-    .shot{ transition:transform 0.1s ease, box-shadow 0.14s ease, filter 0.14s ease; }
-    .shot:not(.redacted):hover{ transform:translate(-1px,-2px); box-shadow:3px 4px 0 rgba(0,0,0,0.4); filter:brightness(1.08) saturate(1.1); }
-    .shot.play:hover{ box-shadow:3px 4px 0 rgba(0,0,0,0.4), 0 0 14px rgba(0,229,255,0.4); }
+    /* work cards lift off the desk; their screenshot pushes in slightly */
+    .work-card{ transition:transform 0.12s ease, box-shadow 0.16s ease; }
+    .work-card:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 rgba(0,0,0,0.4), 8px 8px 0 rgba(255,60,172,0.2); }
+    .wc-shot img{ transition:transform 0.28s ease, filter 0.2s ease; }
+    .work-card:hover .wc-shot img{ transform:scale(1.06); filter:brightness(1.08) saturate(1.1); }
+    .work-card:hover .wc-zoom{ opacity:1; }
+    .wc-play, .wc-none, .wc-redacted{ transition:filter 0.16s ease; }
+    .work-card:hover .wc-play{ filter:brightness(1.2); }
 
     /* contact: the email plate lights up, MySpace does a little dance */
     .email-big:hover{
@@ -1706,7 +1735,11 @@
         <span class="t-btns"><i id="shotClose" role="button" aria-label="Close viewer" tabindex="0">&times;</i></span>
       </div>
       <div class="win-inner">
-        <img id="shotImg" src="" alt="">
+        <div class="shot-stage">
+          <button type="button" class="shot-nav prev" id="shotPrev" aria-label="Previous screenshot">&#10094;</button>
+          <img id="shotImg" src="" alt="">
+          <button type="button" class="shot-nav next" id="shotNext" aria-label="Next screenshot">&#10095;</button>
+        </div>
         <div class="shot-cap" id="shotCap"></div>
       </div>
     </div>
@@ -1768,86 +1801,101 @@
       <div class="win-body">
         <h2 class="win-h">Selected work.</h2>
         <hr class="hr90">
-        <table class="classic">
-          <thead>
-            <tr><th>Title</th><th>Year</th><th>Role</th><th>Notes</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="t-title"><a href="https://highrise.game/" target="_blank" rel="noopener">Highrise — Event Worlds</a><span class="blink">NEW!</span></td>
-              <td class="t-year">2025&ndash;now</td>
-              <td class="t-role">Sr. Software Eng. II</td>
-              <td>I lead engineering on the live event gameplay shipped to thousands of players weekly — design, systems, live ops — and built HR Stream, the platform that lets live video hosts run interactive events like Bingo and Trivia. (Pocket Worlds)
-                <div class="shots">
-                  <button type="button" class="shot" data-full="misc/shots/highrise-1.jpg" data-cap="Highrise: Avatar &amp; Social World — Pocket Worlds"><img src="misc/shots/highrise-1.jpg" alt="Highrise game marketing screenshot" loading="lazy"></button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="t-title">Internal AI Platform</td>
-              <td class="t-year">2025&ndash;now</td>
-              <td class="t-role">Architect &amp; Owner</td>
-              <td>Designed, built, and operate Pocket Worlds' company-wide AI analyst solo — consolidating a fleet of single-purpose bots into one agentic platform spanning 20+ live data sources. Cited, verified answers from production systems; every action human-approved. Serves every discipline: leadership, data, ops, engineering, trust &amp; safety, community.
-                <div class="shots"><span class="shot card redacted"><b>&#9632; CONFIDENTIAL</b><span>screenshot redacted</span></span></div>
-              </td>
-            </tr>
-            <tr>
-              <td class="t-title"><a href="https://omni-cast.net/" target="_blank" rel="noopener">OmniCast</a></td>
-              <td class="t-year">2026</td>
-              <td class="t-role">Solo Developer</td>
-              <td>A surreal web game about surviving an avalanche of popups — mini-games, scam chats, a stock ticker, and a virtual pet, all living inside the windows attacking you. The (much politer) popup engine haunting this very site is its licensed descendant.
-                <div class="shots"><a class="shot card play" href="https://omni-cast.net/" target="_blank" rel="noopener"><span class="pl-arrow">&#9654;</span><span>PLAY IN BROWSER</span></a></div>
-              </td>
-            </tr>
-            <tr>
-              <td class="t-title"><a href="https://www.carlgame.com/" target="_blank" rel="noopener">C.A.R.L.</a></td>
-              <td class="t-year">2022</td>
-              <td class="t-role">Co-Creator / Dev</td>
-              <td>Retro-style platformer built with Matt Bitner, in the lineage of Cave Story and Jazz Jackrabbit. Steam, Switch, PlayStation, Xbox.
-                <div class="shots">
-                  <button type="button" class="shot" data-full="misc/shots/carl-1.jpg" data-cap="C.A.R.L. (2022) — Steam / Switch / PlayStation / Xbox"><img src="misc/shots/carl-1.jpg" alt="C.A.R.L. gameplay screenshot" loading="lazy"></button>
-                  <button type="button" class="shot" data-full="misc/shots/carl-2.jpg" data-cap="C.A.R.L. (2022) — Steam / Switch / PlayStation / Xbox"><img src="misc/shots/carl-2.jpg" alt="C.A.R.L. gameplay screenshot" loading="lazy"></button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="t-title"><a href="https://www.mobygames.com/game/98806/draw-a-stickman-epic-2/" target="_blank" rel="noopener">Draw a Stickman: EPIC 2</a></td>
-              <td class="t-year">2015</td>
-              <td class="t-role">Lead Developer</td>
-              <td>Led development of the draw-your-own-hero sequel. C#/Unity, shipped across desktop and mobile, later ported to Switch.
-                <div class="shots">
-                  <button type="button" class="shot" data-full="misc/shots/stickman2-1.jpg" data-cap="Draw a Stickman: EPIC 2 (2015) — Hitcents"><img src="misc/shots/stickman2-1.jpg" alt="Draw a Stickman: EPIC 2 gameplay screenshot" loading="lazy"></button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="t-title"><a href="https://www.mobygames.com/game/113423/battlepillars-gold-edition/" target="_blank" rel="noopener">Battlepillars</a></td>
-              <td class="t-year">2014</td>
-              <td class="t-role">Gameplay Engineer</td>
-              <td>Real-time strategy with heavily armed caterpillars — one of two gameplay engineers. iOS, Android, and Steam.
-                <div class="shots">
-                  <button type="button" class="shot" data-full="misc/shots/battlepillars-1.jpg" data-cap="Battlepillars Gold Edition (2014) — Hitcents"><img src="misc/shots/battlepillars-1.jpg" alt="Battlepillars gameplay screenshot" loading="lazy"></button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="t-title"><a href="https://www.mobygames.com/game/68665/draw-a-stickman-epic/" target="_blank" rel="noopener">Draw a Stickman: EPIC</a></td>
-              <td class="t-year">2012</td>
-              <td class="t-role">Developer</td>
-              <td>Core gameplay engineering on the original. Tens of millions of downloads across six platforms.
-                <div class="shots">
-                  <button type="button" class="shot" data-full="misc/shots/stickman1-1.jpg" data-cap="Draw a Stickman: EPIC (2012) — Hitcents"><img src="misc/shots/stickman1-1.jpg" alt="Draw a Stickman: EPIC gameplay screenshot" loading="lazy"></button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="t-title">Prototypes &amp; Tools</td>
-              <td class="t-year">ongoing</td>
-              <td class="t-role">Everything</td>
-              <td>Playable experiences built in Unreal (UEFN), a browser voxel sandbox with procedural textures and synthesized audio, AI-assisted music tooling, homebrew experiments. Ask me about these.</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="work-grid">
+
+          <article class="work-card">
+            <button type="button" class="wc-shot" data-full="misc/shots/highrise-1.jpg" data-cap="Highrise: Avatar &amp; Social World — Pocket Worlds">
+              <img src="misc/shots/highrise-1.jpg" alt="Highrise game marketing screenshot" loading="lazy">
+              <span class="wc-zoom" aria-hidden="true">&#128269;</span>
+            </button>
+            <div class="wc-body">
+              <h3 class="wc-title"><a href="https://highrise.game/" target="_blank" rel="noopener">Highrise — Event Worlds</a><span class="blink">NEW!</span></h3>
+              <div class="wc-meta">2025&ndash;now &middot; Sr. Software Eng. II</div>
+              <p class="wc-notes">I lead engineering on the live event gameplay shipped to thousands of players weekly — design, systems, live ops — and built HR Stream, the platform that lets live video hosts run interactive events like Bingo and Trivia. (Pocket Worlds)</p>
+            </div>
+          </article>
+
+          <article class="work-card">
+            <div class="wc-shot wc-redacted"><b>&#9632; CONFIDENTIAL</b><span>screenshot redacted</span></div>
+            <div class="wc-body">
+              <h3 class="wc-title">Internal AI Platform</h3>
+              <div class="wc-meta">2025&ndash;now &middot; Architect &amp; Owner</div>
+              <p class="wc-notes">Designed, built, and operate Pocket Worlds' company-wide AI analyst solo — consolidating a fleet of single-purpose bots into one agentic platform spanning 20+ live data sources. Cited, verified answers from production systems; every action human-approved. Serves every discipline: leadership, data, ops, engineering, trust &amp; safety, community.</p>
+            </div>
+          </article>
+
+          <article class="work-card">
+            <button type="button" class="wc-shot" data-full="misc/shots/omnicast-1.jpg" data-cap="OmniCast (2026) — a surreal web game about surviving popups">
+              <img src="misc/shots/omnicast-1.jpg" alt="OmniCast gameplay screenshot" loading="lazy">
+              <span class="wc-zoom" aria-hidden="true">&#128269;</span>
+            </button>
+            <div class="wc-body">
+              <h3 class="wc-title"><a href="https://omni-cast.net/" target="_blank" rel="noopener">OmniCast</a></h3>
+              <div class="wc-meta">2026 &middot; Solo Developer</div>
+              <p class="wc-notes">A surreal web game about surviving an avalanche of popups — mini-games, scam chats, a stock ticker, and a virtual pet, all living inside the windows attacking you. The (much politer) popup engine haunting this very site is its licensed descendant.</p>
+              <a class="wc-link" href="https://omni-cast.net/" target="_blank" rel="noopener">&#9654; Play in browser</a>
+            </div>
+          </article>
+
+          <article class="work-card">
+            <button type="button" class="wc-shot" data-full="misc/shots/carl-1.jpg" data-extra="misc/shots/carl-2.jpg" data-cap="C.A.R.L. (2022) — Steam / Switch / PlayStation / Xbox">
+              <img src="misc/shots/carl-1.jpg" alt="C.A.R.L. gameplay screenshot" loading="lazy">
+              <span class="wc-count" aria-hidden="true">&#128247; 2</span>
+              <span class="wc-zoom" aria-hidden="true">&#128269;</span>
+            </button>
+            <div class="wc-body">
+              <h3 class="wc-title"><a href="https://www.carlgame.com/" target="_blank" rel="noopener">C.A.R.L.</a></h3>
+              <div class="wc-meta">2022 &middot; Co-Creator / Dev</div>
+              <p class="wc-notes">Retro-style platformer built with Matt Bitner, in the lineage of Cave Story and Jazz Jackrabbit. Steam, Switch, PlayStation, Xbox.</p>
+            </div>
+          </article>
+
+          <article class="work-card">
+            <button type="button" class="wc-shot" data-full="misc/shots/stickman2-1.jpg" data-cap="Draw a Stickman: EPIC 2 (2015) — Hitcents">
+              <img src="misc/shots/stickman2-1.jpg" alt="Draw a Stickman: EPIC 2 gameplay screenshot" loading="lazy">
+              <span class="wc-zoom" aria-hidden="true">&#128269;</span>
+            </button>
+            <div class="wc-body">
+              <h3 class="wc-title"><a href="https://www.mobygames.com/game/98806/draw-a-stickman-epic-2/" target="_blank" rel="noopener">Draw a Stickman: EPIC 2</a></h3>
+              <div class="wc-meta">2015 &middot; Lead Developer</div>
+              <p class="wc-notes">Led development of the draw-your-own-hero sequel. C#/Unity, shipped across desktop and mobile, later ported to Switch.</p>
+            </div>
+          </article>
+
+          <article class="work-card">
+            <button type="button" class="wc-shot" data-full="misc/shots/battlepillars-1.jpg" data-cap="Battlepillars Gold Edition (2014) — Hitcents">
+              <img src="misc/shots/battlepillars-1.jpg" alt="Battlepillars gameplay screenshot" loading="lazy">
+              <span class="wc-zoom" aria-hidden="true">&#128269;</span>
+            </button>
+            <div class="wc-body">
+              <h3 class="wc-title"><a href="https://www.mobygames.com/game/113423/battlepillars-gold-edition/" target="_blank" rel="noopener">Battlepillars</a></h3>
+              <div class="wc-meta">2014 &middot; Gameplay Engineer</div>
+              <p class="wc-notes">Real-time strategy with heavily armed caterpillars — one of two gameplay engineers. iOS, Android, and Steam.</p>
+            </div>
+          </article>
+
+          <article class="work-card">
+            <button type="button" class="wc-shot" data-full="misc/shots/stickman1-1.jpg" data-cap="Draw a Stickman: EPIC (2012) — Hitcents">
+              <img src="misc/shots/stickman1-1.jpg" alt="Draw a Stickman: EPIC gameplay screenshot" loading="lazy">
+              <span class="wc-zoom" aria-hidden="true">&#128269;</span>
+            </button>
+            <div class="wc-body">
+              <h3 class="wc-title"><a href="https://www.mobygames.com/game/68665/draw-a-stickman-epic/" target="_blank" rel="noopener">Draw a Stickman: EPIC</a></h3>
+              <div class="wc-meta">2012 &middot; Developer</div>
+              <p class="wc-notes">Core gameplay engineering on the original. Tens of millions of downloads across six platforms.</p>
+            </div>
+          </article>
+
+          <article class="work-card">
+            <div class="wc-shot wc-none"><span class="pl-arrow">&#128736;</span><span>VARIOUS / NO PREVIEW</span></div>
+            <div class="wc-body">
+              <h3 class="wc-title">Prototypes &amp; Tools</h3>
+              <div class="wc-meta">ongoing &middot; Everything</div>
+              <p class="wc-notes">Playable experiences built in Unreal (UEFN), a browser voxel sandbox with procedural textures and synthesized audio, AI-assisted music tooling, homebrew experiments. Ask me about these.</p>
+            </div>
+          </article>
+
+        </div>
         <p class="table-note">Earlier credits published under Andrew Kenady — full list on <a href="https://www.mobygames.com/person/653849/andrew-kenady/" target="_blank" rel="noopener">MobyGames</a>.</p>
       </div>
     </section>
@@ -3669,27 +3717,48 @@
     return { open, close, get running(){ return running; } };
   })();
 
-  // ===== IMAGEVIEW.EXE — the screenshot lightbox =====
+  // ===== IMAGEVIEW.EXE — the screenshot lightbox, with gallery nav =====
   (function(){
     const overlay = document.getElementById('shotOverlay');
+    const win = overlay && overlay.querySelector('.shot-win');
     const img = document.getElementById('shotImg');
     const cap = document.getElementById('shotCap');
     const title = document.getElementById('shotTitle');
     if (!overlay) return;
-    function open(src, caption){
+    let shots = [], idx = 0, caption = '';
+
+    function paint(){
+      const src = shots[idx];
       img.src = src;
       img.alt = caption || 'Screenshot';
-      cap.textContent = caption || '';
+      cap.textContent = (caption || '') + (shots.length > 1 ? '   (' + (idx + 1) + '/' + shots.length + ')' : '');
       title.textContent = 'IMAGEVIEW.EXE — ' + (src.split('/').pop() || '');
+      win.classList.toggle('multi', shots.length > 1);
+    }
+    function open(list, cptn){
+      shots = list; idx = 0; caption = cptn || '';
+      paint();
       overlay.classList.add('on');
     }
     function close(){ overlay.classList.remove('on'); img.src = ''; }
-    document.querySelectorAll('.shot[data-full]').forEach(b => {
-      b.addEventListener('click', () => open(b.dataset.full, b.dataset.cap));
+    function step(d){ if (shots.length > 1){ idx = (idx + d + shots.length) % shots.length; paint(); } }
+
+    document.querySelectorAll('.wc-shot[data-full]').forEach(b => {
+      b.addEventListener('click', () => {
+        const list = [b.dataset.full].concat(b.dataset.extra ? b.dataset.extra.split('|') : []);
+        open(list, b.dataset.cap);
+      });
     });
     document.getElementById('shotClose').addEventListener('click', close);
+    document.getElementById('shotPrev').addEventListener('click', e => { e.stopPropagation(); step(-1); });
+    document.getElementById('shotNext').addEventListener('click', e => { e.stopPropagation(); step(1); });
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
-    addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('on')) close(); });
+    addEventListener('keydown', e => {
+      if (!overlay.classList.contains('on')) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') step(-1);
+      else if (e.key === 'ArrowRight') step(1);
+    });
   })();
 
   // ===== CERTIFICATE.EXE — a real document, suitable for framing =====
