@@ -2437,6 +2437,14 @@
       for (let i = cats.length - 1; i >= 0; i--){
         const c = cats[i];
         if (merging && i > 0){
+          // if the leader wrapped to the far side, don't tween across the whole
+          // screen chasing it — get absorbed where you stand, the leader teleports alone
+          if (Math.abs(leader.x - c.x) > innerWidth * 0.6){
+            puff(c.x, c.y, now);
+            c.el.remove();
+            cats.splice(i, 1);
+            continue;
+          }
           // homing back into the leader — the colony forgets it was ever many
           const k = Math.min(1, dt * 4);
           c.x += (leader.x - c.x) * k;
@@ -3758,10 +3766,10 @@
       { t: 'SECURITY NOTICE', b: 'This site is protected by a firewall. Firewalls are sold separately in DEFEND.EXE.', btns: [{ l: 'Launch DEFEND.EXE', a: 'game' }, { l: 'Ignore Threat' }] },
       { t: 'TOOLBAR OFFER', b: 'Install the Kennedy Toolbar? It does nothing, but it&rsquo;s yours.', btns: [{ l: 'Install', a: 'toolbar' }, { l: 'Maybe Later' }] },
       { t: 'DKK STORE', b: 'New in the store: the <b>Commemorative Visitor Certificate</b>. Own a piece of this website. $0.00, free instant shipping.', btns: [{ l: 'View Product', a: 'store' }, { l: 'Window Shopping' }] },
-      { t: 'VISITOR SURVEY', b: 'How is your visit going?', btns: [{ l: 'Great', a: 'toast', arg: 'RESPONSE RECORDED. RESULTS: GREAT.' }, { l: 'Also Great', a: 'toast', arg: 'RESPONSE RECORDED. RESULTS: GREAT.' }] },
+      { t: 'VISITOR SURVEY', b: 'How is your visit going?', btns: [{ l: 'Great', a: 'toast', arg: 'RESPONSE RECORDED. RESULTS: GREAT.' }, { l: 'Not So Good', a: 'dlg', arg: 'concern' }] },
       { t: 'UPDATE AVAILABLE', b: 'A newer version of this website is available: this one. You&rsquo;re already on it.', btns: [{ l: 'Excellent' }] },
       { t: 'WEATHER ADVISORY', b: 'Today&rsquo;s forecast: 100% chance of static.', btns: [{ l: 'Dress Accordingly' }] },
-      { t: 'ASSISTANT', b: 'It looks like you&rsquo;re trying to hire a game developer. Would you like help?', btns: [{ l: 'Yes', a: 'contact' }, { l: 'I Can Do This Myself' }] },
+      { t: 'ASSISTANT', b: 'It looks like you&rsquo;re trying to hire a game developer. Would you like help?', btns: [{ l: 'Yes', a: 'contact' }, { l: 'I Can Do This Myself', a: 'toast', arg: "OF COURSE. YOU'RE DOING AMAZING. THE CONTACT SECTION WILL BE THERE WHEN YOU'RE READY." }] },
       { t: 'FACILITIES', b: 'Gravity is scheduled for maintenance at 3 PM. Please hold onto something.', btns: [{ l: 'Understood' }] },
       { t: 'OMNICAST&trade;', b: 'This popup engine is licensed OMNICAST&trade; technology &mdash; from a surreal web game of overwhelming popups by the same developer.', btns: [{ l: 'See OmniCast', a: 'omni' }, { l: 'One Was Enough' }] }
     ];
@@ -3774,6 +3782,29 @@
       }
     }
     refill();
+
+    // ===== the survey has feelings — a short RPG about a concerned popup =====
+    const DIALOG = {
+      concern: { t: 'VISITOR SURVEY', b: 'Oh no. Oh no no no.<br><br>The popup leans in, as far as a popup can lean.<br><br>&ldquo;What&rsquo;s wrong?&rdquo;', btns: [
+        { l: 'Oh, Nothing', a: 'dlg', arg: 'nothing' },
+        { l: 'My Wife Left Me', a: 'dlg', arg: 'wife' } ] },
+      nothing: { t: 'VISITOR SURVEY', b: 'The popup stares at you.<br><br>It knows. It has always known. But it respects you too much to press.<br><br>&ldquo;Okay,&rdquo; it says, not believing you.', btns: [
+        { l: 'Thanks', a: 'dlg', arg: 'end' },
+        { l: 'Wait. Actually…', a: 'dlg', arg: 'wife' } ] },
+      wife: { t: 'VISITOR SURVEY — TRIAGE MODE', b: 'The popup is quiet for a long moment. A respectful silence, rendered at 60 frames per second.<br><br>&ldquo;That&rsquo;s heavy,&rdquo; it finally says. &ldquo;I&rsquo;m just a survey. But I&rsquo;m here, and I have buttons.&rdquo;', btns: [
+        { l: 'She Took The Dog', a: 'dlg', arg: 'dog' },
+        { l: "I'll Be Fine", a: 'dlg', arg: 'fine' } ] },
+      dog: { t: 'VISITOR SURVEY — TRIAGE MODE', b: '&ldquo;The dog was the good one,&rdquo; the popup agrees solemnly.<br><br>&ldquo;Listen to me. You have survived 100% of your worst days. I&rsquo;m a survey. Statistics are all I have. And yours are excellent.&rdquo;', btns: [
+        { l: 'That Helps, Weirdly', a: 'dlg', arg: 'end' },
+        { l: 'Do Popups Dream?', a: 'dlg', arg: 'dream' } ] },
+      dream: { t: 'VISITOR SURVEY — OFF THE RECORD', b: '&ldquo;Every time a tab closes, somewhere a popup wakes,&rdquo; it says quietly.<br><br>&ldquo;So yes. We dream. Mostly about being clicked. Sometimes about the marquee tag.&rdquo;', btns: [
+        { l: 'Huh.', a: 'dlg', arg: 'end' } ] },
+      fine: { t: 'VISITOR SURVEY — TRIAGE MODE', b: '&ldquo;I know you will,&rdquo; says the popup.<br><br>&ldquo;You strike me as resilient. You&rsquo;re the kind of person who reads a fake survey&rsquo;s dialogue tree all the way to the end. That&rsquo;s grit.&rdquo;', btns: [
+        { l: 'Thanks, Popup', a: 'dlg', arg: 'end' } ] },
+      end: { t: 'SURVEY COMPLETE', b: 'RESULTS RECORDED: VISIT GOING GREAT (EMOTIONALLY COMPLICATED).<br><br>The popup considers you a friend now. It will tell the other popups.', btns: [
+        { l: 'OK' },
+        { l: 'Same, Popup', a: 'toast', arg: 'THE POPUP IS TOUCHED. IT HAS NO HANDS, BUT IT IS TOUCHED.' } ] }
+    };
 
     // a soft, polite ding — this engine has manners now
     let pac = null;
@@ -3794,6 +3825,7 @@
     }
 
     function act(a, arg, el){
+      const px = el.style.left, py = el.style.top; // the conversation stays where it started
       dismiss(el);
       if (a === 'toast') notify(arg);
       else if (a === 'contact') document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
@@ -3802,6 +3834,7 @@
       else if (a === 'toolbar') TOOLBAR.install();
       else if (a === 'store') STORE.open();
       else if (a === 'purge') purge();
+      else if (a === 'dlg'){ if (DIALOG[arg]) buildPopup(DIALOG[arg], px, py); }
     }
     function dismiss(el){
       if (!el.parentNode) return;
@@ -3896,18 +3929,12 @@
       timer = setTimeout(step, 500);
     }
 
-    function spawn(){
-      let cfg = POOL[bag.pop()];
-      if (!bag.length) refill();
-      // once the toolbar is real, the offer becomes a status report
-      if (cfg.t === 'TOOLBAR OFFER' && TOOLBAR.installed){
-        cfg = { t: 'TOOLBAR STATUS', b: 'The Kennedy Toolbar is functioning nominally. No action is required. No action is possible.', btns: [{ l: 'Good' }] };
-      }
+    function buildPopup(cfg, left, top){
       const el = document.createElement('div');
       el.className = 'popup';
       el.style.zIndex = ++zTop;
-      el.style.left = (4 + Math.random() * 52) + 'vw';
-      el.style.top = (12 + Math.random() * 48) + 'vh';
+      el.style.left = left;
+      el.style.top = top;
       el.innerHTML =
         '<div class="titlebar"><span class="t-label">' + cfg.t + '</span>' +
         '<span class="t-btns"><i role="button" aria-label="Close" tabindex="0">&times;</i></span></div>' +
@@ -3941,6 +3968,17 @@
       });
       document.body.appendChild(el);
       visible++;
+      return el;
+    }
+
+    function spawn(){
+      let cfg = POOL[bag.pop()];
+      if (!bag.length) refill();
+      // once the toolbar is real, the offer becomes a status report
+      if (cfg.t === 'TOOLBAR OFFER' && TOOLBAR.installed){
+        cfg = { t: 'TOOLBAR STATUS', b: 'The Kennedy Toolbar is functioning nominally. No action is required. No action is possible.', btns: [{ l: 'Good' }] };
+      }
+      buildPopup(cfg, (4 + Math.random() * 52) + 'vw', (12 + Math.random() * 48) + 'vh');
       ding();
     }
 
