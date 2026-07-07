@@ -98,6 +98,7 @@
     width:100%; height:100%;
     z-index:910;
     pointer-events:none;
+    display:none; /* only composited while confetti is actually flying */
   }
 
   .toast{
@@ -889,6 +890,7 @@
     width:100%; height:100%;
     z-index:600;
     pointer-events:none;
+    display:none; /* only composited while sparkles are on screen */
   }
 
   /* the site cat — free-range, and clickable: it divides under observation */
@@ -2538,6 +2540,9 @@
     PLAYER.start(); // the click is the user gesture the audio needs
     splash.classList.add('hidden');
     document.body.style.overflow = '';
+    // once faded, drop the splash entirely — it's a full-screen gradient layer
+    // plus the splash trail canvas, both pure overhead after entering
+    setTimeout(() => { splash.style.display = 'none'; }, 1000);
   }
   splash.addEventListener('click', enterSite);
 
@@ -2634,7 +2639,7 @@
     let sparks = [];
     let running = false;
     function size(){
-      const d = fxDpr();
+      const d = 1; // tiny star sprites — 1x keeps the trail cheap on hi-DPI screens
       sc.width = innerWidth * d;
       sc.height = innerHeight * d;
       sctx.setTransform(d, 0, 0, d, 0, 0);
@@ -2655,7 +2660,7 @@
         c: colors[(Math.random() * colors.length) | 0],
         life: 46
       });
-      if (!running){ running = true; requestAnimationFrame(step); }
+      if (!running){ running = true; sc.style.display = 'block'; requestAnimationFrame(step); }
     });
     function drawStar(x, y, r, c, a){
       sctx.save();
@@ -2668,15 +2673,27 @@
       sctx.stroke();
       sctx.restore();
     }
+    let sparkDirty = null;
     function step(){
-      sctx.clearRect(0, 0, innerWidth, innerHeight);
       sparks = sparks.filter(s => s.life > 0);
+      // dirty-rect: only clear the sparks' bounding box, not the whole viewport
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, maxR = 0;
+      for (const s of sparks){
+        if (s.x < minX) minX = s.x; if (s.x > maxX) maxX = s.x;
+        if (s.y < minY) minY = s.y; if (s.y > maxY) maxY = s.y;
+        if (s.r > maxR) maxR = s.r;
+      }
+      const pad = maxR + 3;
+      const cur = sparks.length ? { x: minX - pad, y: minY - pad, w: (maxX - minX) + pad * 2, h: (maxY - minY) + pad * 2 } : null;
+      if (sparkDirty) sctx.clearRect(sparkDirty.x, sparkDirty.y, sparkDirty.w, sparkDirty.h);
+      if (cur) sctx.clearRect(cur.x, cur.y, cur.w, cur.h);
+      sparkDirty = cur;
       for (const s of sparks){
         s.y += s.vy; s.life--;
         drawStar(s.x, s.y, s.r * (s.life / 46), s.c, s.life / 46);
       }
       if (sparks.length){ requestAnimationFrame(step); }
-      else { running = false; sctx.clearRect(0, 0, innerWidth, innerHeight); }
+      else { running = false; sparkDirty = null; sc.style.display = 'none'; }
     }
   })();
 
@@ -2694,6 +2711,7 @@
     const STRIPE_H = 3.9, FADE_MS = 2200, SPEED = 95;
     const MAX_CATS = 8, MERGE_AFTER = 2000;
     let segs = [], raf = null, last = 0, time = 0;
+    let prevDirty = null; // last frame's trail bounds, for dirty-rect clearing
     let lastTouch = -Infinity;
     let cats = [];
     let saidDivided = false, saidMax = false;
@@ -2753,7 +2771,7 @@
     }
 
     function size(){
-      const d = fxDpr();
+      const d = 1; // chunky pixel-art trail — 1x is plenty and much cheaper to composite
       canvas2.width = innerWidth * d;
       canvas2.height = innerHeight * d;
       nctx.setTransform(d, 0, 0, d, 0, 0);
@@ -2764,6 +2782,9 @@
     cats.push(makeCat(-160, pickAltitude()));
 
     function frame(now){
+      // this is a background flourish — ~40fps is smooth enough and halves the
+      // per-second canvas redraw/compositing cost of an always-on full-screen layer
+      if (last && now - last < 24){ raf = requestAnimationFrame(frame); return; }
       if (!last) last = now;
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
@@ -2832,8 +2853,19 @@
         c.prevX = c.x;
       }
 
-      nctx.clearRect(0, 0, innerWidth, innerHeight);
       segs = segs.filter(s => now - s.born < FADE_MS);
+      // dirty-rect: clear only where the trail was + is, not the whole viewport
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (const s of segs){
+        if (s.x < minX) minX = s.x; if (s.x > maxX) maxX = s.x;
+        if (s.y < minY) minY = s.y; if (s.y > maxY) maxY = s.y;
+      }
+      const cur = segs.length
+        ? { x: minX - 1, y: minY - 1, w: (maxX - minX) + 11, h: (maxY - minY) + 6 * STRIPE_H + 3 }
+        : null;
+      if (prevDirty) nctx.clearRect(prevDirty.x, prevDirty.y, prevDirty.w, prevDirty.h);
+      if (cur) nctx.clearRect(cur.x, cur.y, cur.w, cur.h);
+      prevDirty = cur;
       for (const s of segs){
         const a = 1 - (now - s.born) / FADE_MS;
         nctx.globalAlpha = a * 0.8;
@@ -2891,7 +2923,7 @@
         life: 240
       });
     }
-    if (!confettiRunning){ confettiRunning = true; requestAnimationFrame(stepConfetti); }
+    if (!confettiRunning){ confettiRunning = true; canvas.style.display = 'block'; requestAnimationFrame(stepConfetti); }
   }
   function stepConfetti(){
     ctx.clearRect(0, 0, innerWidth, innerHeight);
@@ -2907,7 +2939,7 @@
       ctx.restore();
     }
     if (pieces.length){ requestAnimationFrame(stepConfetti); }
-    else { confettiRunning = false; ctx.clearRect(0, 0, innerWidth, innerHeight); }
+    else { confettiRunning = false; ctx.clearRect(0, 0, innerWidth, innerHeight); canvas.style.display = 'none'; }
   }
 
   // the Konami code — summons DEFEND.EXE (with a bonus life, as tradition demands)
