@@ -3116,7 +3116,9 @@
         return;
       }
       const phRect = ph.getBoundingClientRect();
-      const homeLeft = phRect.left, homeTop = phRect.top;
+      // the placeholder's top margin is currently collapsed to 0; the restored
+      // window will sit that margin lower, so target its true resting top
+      const homeLeft = phRect.left, homeTop = phRect.top + parseFloat(win._mt || 0);
       // reopen the space, sliding the page back down
       const T = MINI_MS + 'ms ' + MINI_EASE;
       ph.style.transition = 'height ' + T + ', margin ' + T;
