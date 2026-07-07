@@ -698,11 +698,13 @@
   @keyframes enterBlink{ 0%, 54%{ opacity:1; } 55%, 100%{ opacity:0; } }
   .splash:hover .sp-enter{ transform:scale(1.06); animation:none; opacity:1; }
   .sp-divider.btm{ margin-top:46px; }
-  /* the award sticker — an honor this site bestowed upon itself */
+  /* the award sticker — an honor this site bestowed upon itself.
+     anchored to center and offset down-right, so it hangs off the main info
+     instead of drifting to the viewport corner on big screens */
   .sp-award{
     position:absolute;
-    right:clamp(10px, 7vw, 110px);
-    bottom:clamp(84px, 15vh, 150px);
+    left:calc(50% + clamp(90px, 22vw, 230px));
+    top:calc(50% + clamp(100px, 16vh, 180px));
     width:clamp(84px, 11vw, 120px);
     animation:awardWobble 4.6s ease-in-out infinite;
     filter:drop-shadow(0 4px 10px rgba(0,0,0,0.55));
@@ -1008,6 +1010,10 @@
   }
   .ktb .found{ animation:ktbFound 0.5s steps(2) 3; }
   @keyframes ktbFound{ 50%{ background:var(--gold); } }
+  /* the certificate link — earned, gilded, right-aligned just left of search */
+  .ktb [data-k="cert"]{ background:#FFF3C9; margin-left:auto; }
+  .ktb [data-k="cert"]:hover{ background:#FFF9E2; }
+  .ktb [data-k="cert"] ~ .ktb-search{ margin-left:0; }
   @media (max-width:640px){ .ktb-search{ margin-left:0; } }
 
   /* ============ DKK MEGA-STORE — genuine early-internet commerce ============ */
@@ -1069,6 +1075,7 @@
   .store-price{ margin:4px 0 2px; }
   .store-price s{ color:var(--ink-soft); }
   .store-price b{ color:var(--magenta); font-size:19px; }
+  .store-soldout{ color:#E03C31; font-size:16px; letter-spacing:0.06em; }
   .store-meta{
     font-family:'Courier New', Courier, monospace;
     font-weight:bold;
@@ -3499,6 +3506,11 @@
   // ===== DKK MEGA-STORE — genuine early-internet commerce, one product strong =====
   const STORE = (function(){
     let win = null, certName = 'ANONYMOUS VISITOR', orders = 0;
+    let purchased = false;
+    try { purchased = !!localStorage.getItem('dkk_cert'); } catch(e){}
+    function savedCert(){
+      try { return JSON.parse(localStorage.getItem('dkk_cert') || 'null'); } catch(e){ return null; }
+    }
     const STEPS = ['SHOP', 'CART', 'SHIP', 'PAY', 'JOY'];
     const TRUST =
       '<span class="cc cc-vista" aria-hidden="true">VISTA</span>' +
@@ -3571,7 +3583,27 @@
       document.body.appendChild(win);
     }
 
+    function stepSoldOut(){
+      const saved = savedCert();
+      popup('DKKSTORE&trade;.COM &mdash; Product 1 of 1',
+        chrome(0,
+          '<div class="store-prod">' +
+            PRODUCT_IMG +
+            '<div>' +
+              '<b class="store-name">Commemorative Visitor Certificate</b>' +
+              '<div class="store-stars">&starf;&starf;&starf;&starf;&starf; <span>(1 review, mine &mdash; yours pending)</span></div>' +
+              '<div class="store-price"><b class="store-soldout">OUT OF STOCK</b></div>' +
+              '<div class="store-meta">IN STOCK: 0 (WAS &infin;. YOU BOUGHT ALL OF IT.)<br>RESTOCK: NO</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="store-desc">You own this. The shelf is empty. The store remains open out of principle.</div>'),
+        [
+          { l:'View My Certificate', fn:() => { close(); if (saved) CERT.show(saved.n, saved.o); } },
+          { l:'Request Restock', fn:() => { close(); notify('RESTOCK REQUEST RECEIVED. THE FACTORY (ME) WILL THINK ABOUT IT.'); } }
+        ]);
+    }
     function stepProduct(){
+      if (purchased) return stepSoldOut();
       popup('DKKSTORE&trade;.COM &mdash; Product 1 of 1',
         chrome(0,
           '<div class="store-prod">' +
@@ -3643,6 +3675,9 @@
     function stepConfirm(){
       orders++;
       const orderNo = 'DKK-' + String((window.VISITOR_N || 1337) * 10 + orders).padStart(7, '0');
+      purchased = true; // the last of the infinite stock, gone
+      try { localStorage.setItem('dkk_cert', JSON.stringify({ n: certName, o: orderNo })); } catch(e){}
+      TOOLBAR.certLink();
       popup('DKKSTORE&trade;.COM &mdash; Receipt',
         chrome(4,
           '<span class="store-lines">ORDER .... #' + orderNo + '<br>ITEM ..... VISITOR CERT &times;1<br>PAID ..... $0.00 (EXPOSURE)<br>STATUS ... <b>DELIVERED. LOOK UP.</b></span>'),
@@ -3723,6 +3758,7 @@
           }, 6000);
         }
       });
+      certLink(); // returning owners get their certificate button back
       const form = bar.querySelector('.ktb-search');
       form.addEventListener('submit', e => {
         e.preventDefault();
@@ -3738,6 +3774,20 @@
       });
     }
 
+    // the proudest button: proof of purchase, docked at the far right
+    function certLink(){
+      if (!bar || bar.querySelector('[data-k="cert"]')) return;
+      let saved = null;
+      try { saved = JSON.parse(localStorage.getItem('dkk_cert') || 'null'); } catch(e){}
+      if (!saved) return;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.k = 'cert';
+      b.innerHTML = '&#128220; My Certificate';
+      b.addEventListener('click', () => CERT.show(saved.n, saved.o));
+      bar.insertBefore(b, bar.querySelector('.ktb-search'));
+    }
+
     function install(){
       if (bar){ notify('THE KENNEDY TOOLBAR IS ALREADY INSTALLED. IT SAW YOU CHECKING.'); return; }
       build();
@@ -3747,7 +3797,7 @@
     }
     // returning visitors get their toolbar back, silently, like it never left
     try { if (localStorage.getItem(KEY)) build(); } catch(e){}
-    return { install, get installed(){ return !!bar; } };
+    return { install, certLink, get installed(){ return !!bar; } };
   })();
 
   // ===== the popup engine — OMNICAST™ technology, road-legal edition =====
