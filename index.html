@@ -571,7 +571,8 @@
     margin-bottom:18px;
   }
   .badges svg{
-    width:88px; height:31px;
+    /* 88x31 in spirit, 1.5x in practice — honor the format, respect the reader */
+    width:132px; height:46.5px;
     image-rendering:pixelated;
     border:1px solid rgba(255,255,255,0.25);
   }
@@ -1034,6 +1035,116 @@
     color:var(--ink-soft);
     text-align:center;
     padding:2px 4px 4px;
+  }
+
+  /* ============ HOVER PASS — the whole page notices your cursor ============ */
+  .navbtn{ position:relative; overflow:hidden; }
+  /* the glossy sweep — every good button deserves a glare */
+  .navbtn::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.65) 50%, transparent 60%);
+    transform:translateX(-101%);
+    pointer-events:none;
+  }
+  @keyframes navSheen{ to{ transform:translateX(101%); } }
+  .banner .sun{ transition:opacity 0.35s ease; }
+  /* inline-block so the name's hover zone is the name, not the whole row;
+     the springy bezier gives the grow-and-tilt a little bounce */
+  .banner h1, .sp-title{
+    display:inline-block;
+    transition:filter 0.3s ease, transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  /* the floor scrolls toward you, one grid cell per loop — seamless */
+  @keyframes gridScroll{ to{ background-position:0 0, 0 26px, 0 0; } }
+
+  @media (hover:hover) and (pointer:fine){
+    .navbtn, .gb-btn, .popup-btns button, .wa-ctrl button, .wa-shade,
+    .titlebar, .titlebar .t-btns i, .email-big, .extra, .badges svg,
+    .myspace-cta img, .dancing-baby img, .window, .webring, .specs, .newsbar{
+      transition:transform 0.1s ease, box-shadow 0.14s ease, background 0.1s ease,
+                 color 0.1s ease, filter 0.16s ease, border-color 0.14s ease;
+    }
+
+    /* bevel buttons rise to meet the pointer, press down on click */
+    .navbtn:hover, .gb-btn:hover{
+      transform:translate(-1px,-1px);
+      box-shadow:3px 3px 0 rgba(0,0,0,0.35);
+    }
+    .navbtn:hover{ color:var(--magenta) !important; }
+    .navbtn:hover::after{ animation:navSheen 0.5s ease; }
+    .navbtn:active, .gb-btn:active{ transform:translate(1px,1px); box-shadow:none; }
+    .popup-btns button:hover{ transform:translate(-1px,-1px); box-shadow:2px 2px 0 rgba(0,0,0,0.3); }
+    .popup-btns button:active{ transform:translate(1px,1px); box-shadow:none; }
+
+    /* hovered window = focused window; titlebar wakes up, shadow warms */
+    .window:hover{ box-shadow:4px 4px 0 rgba(0,0,0,0.45), 7px 7px 0 rgba(255,60,172,0.22); }
+    .window:hover > .titlebar{ filter:saturate(1.35) brightness(1.06); }
+    .titlebar .t-btns i:hover{ background:#FBF9FF; color:var(--violet); }
+    /* the X glows menacing — it knows what it does */
+    .titlebar .t-btns i:last-child:hover{ background:var(--magenta); color:#fff; }
+
+    /* banner: the sun comes out and the grid starts driving */
+    .banner:hover .sun{ opacity:1; }
+    .banner:hover .grid-floor{ animation:gridScroll 1.6s linear infinite; }
+    .banner:hover h1{ filter:drop-shadow(2px 3px 0 rgba(30,10,60,0.85)) drop-shadow(0 0 28px rgba(0,229,255,0.6)); }
+    /* the name itself: grows, tilts, and goes full neon */
+    .banner h1:hover, .sp-title:hover{
+      transform:scale(1.07) rotate(-2.5deg);
+      filter:drop-shadow(2px 3px 0 rgba(30,10,60,0.85))
+             drop-shadow(0 0 24px rgba(0,229,255,0.9))
+             drop-shadow(0 0 48px rgba(255,60,172,0.55));
+    }
+
+    /* terminals glow like warm phosphor */
+    .newsbar:hover{ box-shadow:inset 0 0 16px rgba(0,229,255,0.22); }
+    .specs:hover{ box-shadow:inset 0 0 18px rgba(0,229,255,0.2); }
+    .statbox .sb-row{ transition:background 0.1s ease; }
+    .statbox .sb-row:hover{ background:rgba(0,229,255,0.09); }
+    .statbox .sb-row:hover b{ text-shadow:0 0 9px rgba(0,229,255,0.9); }
+
+    /* work table: rows highlight like a selected file */
+    table.classic tbody td{ transition:background 0.1s ease, box-shadow 0.1s ease; }
+    table.classic tbody tr:hover td{ background:#E6FAFF; }
+    table.classic tbody tr:hover td:first-child{ box-shadow:inset 3px 0 0 var(--magenta); }
+    table.classic tbody tr:hover .t-title a{ color:var(--magenta); }
+    table.classic tbody tr:hover .blink{ animation:none; visibility:visible; }
+
+    /* resume rows step forward when called on */
+    .rez-row{ transition:background 0.12s ease, box-shadow 0.12s ease, padding 0.12s ease; }
+    .rez-row:hover{ background:rgba(122,43,217,0.07); box-shadow:inset 3px 0 0 var(--magenta); padding-left:12px; }
+    .rez-row:hover .rez-when{ color:var(--magenta); }
+
+    /* extras cards pop off the desk */
+    .extra:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 rgba(0,0,0,0.4); background:#FFFFFF; }
+    .extra:hover b{ color:var(--violet); }
+
+    /* contact: the email plate lights up, MySpace does a little dance */
+    .email-big:hover{
+      transform:translate(-1px,-1px);
+      box-shadow:0 0 0 1px rgba(0,229,255,0.35), 0 0 18px rgba(0,229,255,0.35);
+      text-shadow:0 0 10px rgba(255,211,77,0.6);
+    }
+    .myspace-cta:hover img{ transform:rotate(-3deg) scale(1.06); }
+    /* list links invert like 90s selected text */
+    .linklist a:hover, .webring a:hover, .f-legal a:hover, .table-note a:hover{
+      background:var(--magenta); color:#fff !important; text-decoration:none;
+    }
+    .gb-entry{ transition:background 0.1s ease; }
+    .gb-entry:hover{ background:rgba(122,43,217,0.06); }
+
+    /* the deck */
+    .wa-ctrl button:hover, .wa-shade:hover{ background:#FBF9FF; color:var(--magenta); }
+
+    /* footer trinkets earn their keep */
+    .badges svg:hover{ transform:scale(1.12) rotate(-2deg); filter:drop-shadow(0 0 9px rgba(0,229,255,0.55)); border-color:rgba(0,229,255,0.8); }
+    .counter .digits i{ transition:color 0.15s ease, text-shadow 0.15s ease; }
+    .counter:hover .digits i{ color:#7CFF9E; text-shadow:0 0 9px rgba(60,255,110,0.9); }
+    .dancing-baby:hover img{ transform:scale(1.18); filter:drop-shadow(0 0 12px rgba(255,60,172,0.55)); }
+    .webring:hover{ box-shadow:0 0 0 1px rgba(0,229,255,0.35), 0 0 16px rgba(0,229,255,0.25); }
+
+    /* the award sticker basks in its own honor */
+    .sp-award:hover{ filter:drop-shadow(0 4px 10px rgba(0,0,0,0.55)) drop-shadow(0 0 14px rgba(255,211,77,0.85)); }
   }
 
   @media print{
