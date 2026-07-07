@@ -3135,7 +3135,17 @@
     const win = btns.closest('.window');
     const [minB, maxB, closeB] = btns.querySelectorAll('i');
     if (minB) minB.addEventListener('click', () => win.classList.toggle('min'));
-    if (maxB) maxB.addEventListener('click', () => toggleMini(win));
+    if (maxB) maxB.addEventListener('click', () => {
+      // mini preview needs a precise pointer to drag/restore — on touch/narrow
+      // screens fall back to the harmless shake instead
+      if (matchMedia('(max-width:760px)').matches || matchMedia('(pointer:coarse)').matches){
+        win.classList.remove('shake');
+        void win.offsetWidth; // restart the animation
+        win.classList.add('shake');
+      } else {
+        toggleMini(win);
+      }
+    });
     if (closeB) closeB.addEventListener('click', () => {
       notify('OH NO. THE SITE IS FIGHTING BACK.');
       DEFEND.open(false);
