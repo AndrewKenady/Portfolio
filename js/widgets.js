@@ -382,6 +382,7 @@
     }
     function set(next){
       mode = next;
+      try { localStorage.setItem('dkk_weather', next); } catch(e){}
       stopVisuals();
       if (prefersReducedMotion || mode === 'MISSING') return;
       if (mode === 'AURORA'){
@@ -402,7 +403,10 @@
       notify(TOASTS[next]);
       return next;
     }
-    return { cycle, get mode(){ return mode; } };
+    function reset(){ set('MISSING'); try { localStorage.removeItem('dkk_weather'); } catch(e){} }
+    // resume the last chosen forecast on load
+    try { const saved = localStorage.getItem('dkk_weather'); if (saved && MODES.indexOf(saved) > 0) set(saved); } catch(e){}
+    return { cycle, reset, get mode(){ return mode; } };
   })();
 
   // ===== THE KENNEDY TOOLBAR — it does nothing, but it's yours =====
@@ -485,6 +489,7 @@
           bar.remove(); bar = null;
           document.body.classList.remove('has-ktb');
           pad();
+          WEATHER.reset(); // clear the forecast — the toolbar owned the weather
           try { localStorage.removeItem(KEY); } catch(e){}
           notify('TOOLBAR UNINSTALLED. IT LEFT A NOTE: "NO HARD FEELINGS."');
         } else {
