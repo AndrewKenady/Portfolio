@@ -952,7 +952,7 @@
 
     function fmtDate(t){
       if (!t) return 'July 2026';
-      return new Date(t).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      return new Date(t).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
     }
     function render(){
       list.innerHTML = '';
