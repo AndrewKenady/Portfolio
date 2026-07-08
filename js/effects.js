@@ -224,9 +224,14 @@
     }
 
     function size(){
-      const d = 1; // chunky pixel-art trail — 1x is plenty and much cheaper to composite
-      canvas2.width = innerWidth * d;
-      canvas2.height = innerHeight * d;
+      // the trail is chunky pixel-art, so we render the full-screen canvas at a
+      // fraction of CSS resolution and let the GPU upscale it (image-rendering:
+      // pixelated keeps it crisp). This is the big lever on Retina: it's an
+      // always-on full-screen layer whose texture re-uploads every frame, and
+      // 0.67x cuts that upload cost by ~55% with no visible change to the bands.
+      const d = 0.67;
+      canvas2.width = Math.ceil(innerWidth * d);
+      canvas2.height = Math.ceil(innerHeight * d);
       nctx.setTransform(d, 0, 0, d, 0, 0);
     }
     size();

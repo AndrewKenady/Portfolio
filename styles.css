@@ -1033,6 +1033,7 @@
     width:100%; height:100%;
     z-index:589;
     pointer-events:none;
+    image-rendering:pixelated; /* trail canvas is rendered sub-resolution; keep the upscale crisp */
   }
 
   /* ============ the popup engine — OMNICAST™ technology, road-legal edition ============ */
