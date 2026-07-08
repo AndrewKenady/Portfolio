@@ -318,9 +318,6 @@
     }
     function frame(now){
       raf = requestAnimationFrame(frame);
-      // ~30fps is plenty for ambient weather and halves the per-second redraw cost
-      // of an always-on full-screen layer (STATIC already self-limits to ~12fps inside)
-      if (last && now - last < 32) return;
       const dt = last ? Math.min((now - last) / 1000, 0.05) : 0.016;
       last = now; t += dt;
       ctx.clearRect(0, 0, innerWidth, innerHeight);
