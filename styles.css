@@ -177,9 +177,10 @@
   .pf-scene{ display:none; position:absolute; inset:0; z-index:0; overflow:hidden; }
   .banner.platformer .pf-scene{ display:block; }
   .pf-layer{ position:absolute; will-change:transform; }
-  .pf-clouds{ left:0; width:100%; top:14px; height:72px; } /* farthest layer — static, no parallax drift */
+  .pf-clouds{ left:-300px; width:calc(100% + 600px); top:14px; height:72px; animation:pfClouds 90s linear infinite; } /* farthest layer — a slow rightward breeze */
   .pf-hills{ left:-360px; width:calc(100% + 720px); bottom:58px; height:104px; animation:pfHills 34s linear infinite; }
   .pf-ground{ left:-320px; width:calc(100% + 640px); bottom:0; height:150px; animation:pfGround 16s linear infinite; }
+  @keyframes pfClouds{ to{ transform:translateX(300px); } } /* +300 = one cloud pattern width, so it loops seamlessly */
   @keyframes pfHills{ to{ transform:translateX(-360px); } }
   @keyframes pfGround{ to{ transform:translateX(-320px); } }
   /* coins flip edge-on like real game coins (each spins around its own center) */
