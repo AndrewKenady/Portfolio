@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>How This Site Was Built — Drew K. Kennedy</title>
-<meta name="description" content="A colophon: this portfolio is a handful of hand-written files with zero dependencies — a from-scratch MIDI synthesizer, canvas effects, and a full arcade game, all in vanilla HTML/CSS/JS.">
+<meta name="description" content="A colophon: this portfolio is a handful of small files with zero dependencies — a from-scratch MIDI synthesizer, canvas effects, and a full arcade game, all vanilla HTML/CSS/JS, built with AI agents in the loop and directed by hand.">
 <meta name="theme-color" content="#0B0428">
 <meta property="og:title" content="How This Site Was Built — Drew K. Kennedy">
 <meta property="og:description" content="Zero dependencies. A hand-written MIDI parser + WebAudio synth, canvas particle systems, and a full arcade game — all vanilla, no build step.">
@@ -80,6 +80,10 @@
   .egg{ font-size:12.5px; color:var(--ink-soft); }
   .egg b{ color:var(--ink); }
   .note{ font-size:12px; color:var(--ink-soft); margin-top:16px; }
+  .pull{
+    border-left:4px solid var(--magenta); background:#FBF9FF; padding:14px 18px; margin:18px 0;
+    font-family:'Times New Roman', Times, serif; font-style:italic; font-size:19px; line-height:1.4; color:var(--ink);
+  }
 </style>
 </head>
 <body>
@@ -95,9 +99,9 @@
         <div class="sub">A colophon &bull; because the site is the work sample</div>
         <hr class="hr90">
 
-        <p class="lead">This whole thing is <b>a handful of hand-written files with zero dependencies</b> &mdash; one HTML page, one stylesheet, a few plain scripts. No framework, no build step, no libraries, nothing loaded from a CDN. Everything you've clicked, heard, or played is vanilla HTML, CSS, and JavaScript. Here's what's actually under the hood.</p>
+        <p class="lead">This whole thing is <b>a handful of small files with zero dependencies</b> &mdash; one HTML page, one stylesheet, a few plain scripts. No framework, no build step, no libraries, nothing loaded from a CDN. Everything you've clicked, heard, or played is vanilla HTML, CSS, and JavaScript. Here's what's actually under the hood.</p>
 
-        <div class="term"><b>$ stack</b> &mdash; HTML5 &bull; CSS3 &bull; vanilla JavaScript &bull; Canvas 2D &bull; Web Audio API<br><b>$ dependencies</b> &mdash; 0<br><b>$ build step</b> &mdash; none. what ships is what I wrote.</div>
+        <div class="term"><b>$ stack</b> &mdash; HTML5 &bull; CSS3 &bull; vanilla JavaScript &bull; Canvas 2D &bull; Web Audio API<br><b>$ dependencies</b> &mdash; 0<br><b>$ build step</b> &mdash; none. what ships is exactly what's in the repo.</div>
 
         <div class="feat">
           <h3>&#9835; A MIDI synthesizer, from scratch</h3>
@@ -118,8 +122,8 @@
         </div>
 
         <div class="feat">
-          <h3>&#128421; A Windows-9x UI kit, by hand</h3>
-          <p>Every beveled window, title bar, inset terminal, chunky scrollbar, and pressed-button state is hand-authored CSS &mdash; outset/inset borders, drop shadows, the works. The window controls are live: minimize collapses, maximize protests, and closing one has consequences. There's also a draggable popup engine, a Netscape-style status bar, a real visitor counter, and a Firebase-backed guestbook.</p>
+          <h3>&#128421; A Windows-9x UI kit</h3>
+          <p>Every beveled window, title bar, inset terminal, chunky scrollbar, and pressed-button state is bespoke CSS &mdash; outset/inset borders, drop shadows, the works. The window controls are live: minimize collapses, maximize protests, and closing one has consequences. There's also a draggable popup engine, a Netscape-style status bar, a real visitor counter, and a Firebase-backed guestbook.</p>
           <div class="tags"><span class="tag">CSS systems</span><span class="tag">DOM</span><span class="tag">Firebase</span></div>
         </div>
 
@@ -128,6 +132,15 @@
           <p>All of it respects <b>prefers-reduced-motion</b> (animations and effects stand down), has a print stylesheet, uses semantic landmarks and focus styles, gates hover-only effects behind the right media queries, and pauses animation work when the tab is hidden. Personality doesn't have to cost accessibility.</p>
           <div class="tags"><span class="tag">A11y</span><span class="tag">Reduced-motion</span><span class="tag">Print CSS</span></div>
         </div>
+
+        <h2>How this was actually built</h2>
+        <p>Full transparency: I built this with <b>AI coding agents</b> in the loop. I didn't hand-type every character &mdash; and I don't think that's the flex it used to be. The honest version of the process is the part I actually find interesting.</p>
+
+        <div class="pull">Execution got cheap. Judgment got expensive.</div>
+
+        <p>For most of my career the ceiling on what I could build was whatever I could personally execute: to ship in a language I had to know it cold, and my own hands were the constraint. That constraint is mostly gone. What replaced &ldquo;how fast can I type&rdquo; is <b>&ldquo;how well can I direct&rdquo;</b> &mdash; and those are very different limits.</p>
+
+        <p>So the work that shipped this wasn't typing. It was deciding what to build, breaking it into clean pieces, holding the architecture in my head while the parts got written, and &mdash; the part that matters most &mdash; catching the output when it was confidently, plausibly <em>wrong</em>. Agents fail in specific, predictable ways, and the leverage you get from one scales with your ability to tell correct from merely plausible. That judgment is the one input the tool can't supply, and it's the thing years of building this stuff by hand actually bought me. Every line here was read, steered, and shipped on purpose.</p>
 
         <h2>Things worth finding</h2>
         <p class="egg">A few rewards for the curious: the <b>Konami code</b> does something. So does clicking the <b>&times;</b> on a window you like. The <b>weather</b> menu on the toolbar is real. The <b>DKK Store</b> sells exactly one thing, for free, and it prints. And the <b>console</b> has a note for whoever opens it.</p>
