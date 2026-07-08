@@ -15,7 +15,7 @@
 /* the three intro lines, now as bitmap type that fits the DMG LCD */
 .banner.gameboy h1{
   font-family:'DKKPixelName','Trebuchet MS',sans-serif;
-  font-style:normal;                    /* classic GB type is upright; hover still tilts it */
+  font-style:italic;                    /* synthetic slant on the pixel face, per request */
   font-size:clamp(34px, 6.8vw, 66px);   /* Pixelify is wide, so sized to fit the name on one line */
   letter-spacing:0.01em;
   line-height:1.12;
