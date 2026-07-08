@@ -212,7 +212,7 @@
     color:#0f380f; -webkit-text-fill-color:#0f380f;
     filter:none; text-shadow:none;
     overflow:hidden;                 /* clip shine sweep */
-    padding:0 0.14em 0.36em;         /* room for the italic y descender under overflow:hidden */
+    padding:0 0.14em 0.2em;          /* room for italic y descender */
   }
   /* shine sweep after logo lands */
   .banner.gameboy h1::after{
@@ -293,6 +293,10 @@
     color:transparent;
     filter:drop-shadow(2px 3px 0 rgba(30,10,60,0.85)) drop-shadow(0 0 18px rgba(0,229,255,0.35));
   }
+  /* background-clip:text won't paint the italic y descender that dips below the
+     box; extend the paint area down and cancel it with margin so layout is
+     unchanged. gameboy uses a solid fill and is exempt. */
+  .banner:not(.gameboy) h1{ padding-bottom:0.16em; margin-bottom:-0.16em; }
   .banner .tagline{
     position:relative;
     z-index:2;
