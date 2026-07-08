@@ -15,9 +15,14 @@
 /* the three intro lines, now as bitmap type that fits the DMG LCD */
 .banner.gameboy h1{
   font-family:'DKKPixelSerif','Times New Roman',serif;
-  font-size:clamp(30px, 6.2vw, 56px);
+  font-size:clamp(42px, 8.5vw, 80px); /* Jacquard renders small per-em, so it's sized up vs other themes */
   letter-spacing:0.02em;
   line-height:1.12;
+}
+/* keep the on-hover grow/tilt (from the base rule) but swap the cyan/magenta
+   neon for an in-theme green glow so it doesn't clash with the DMG LCD */
+.banner.gameboy h1:hover{
+  filter:drop-shadow(0 0 12px rgba(15,56,15,0.55)) drop-shadow(0 3px 4px rgba(15,56,15,0.4));
 }
 .banner.gameboy .tagline{
   font-family:'DKKPixelMono','Courier New',monospace;

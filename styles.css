@@ -211,7 +211,7 @@
   .banner.gameboy h1{
     background:none; -webkit-background-clip:border-box; background-clip:border-box;
     color:#0f380f; -webkit-text-fill-color:#0f380f;
-    filter:none; text-shadow:2px 2px 0 #306230;
+    filter:none; text-shadow:none;   /* flat dark-on-LCD reads cleanest for the dense pixel type */
     overflow:hidden;                 /* clips the shine sweep to the text box */
     padding:0 0.14em 0.2em;          /* ...but leave room for the italic 'y' descender */
   }
@@ -223,7 +223,7 @@
   }
   @keyframes gbBoot{ 0%{ transform:translateY(-230%); } 62%{ transform:translateY(0); } 100%{ transform:translateY(0); } }
   @keyframes gbShine{ to{ transform:translateX(240%); } }
-  .banner.gameboy .tagline{ color:#0f380f; text-shadow:1px 1px 0 rgba(48,98,48,0.55); }
+  .banner.gameboy .tagline{ color:#0f380f; text-shadow:none; }
   @keyframes gbFadeIn{ from{ opacity:0; } to{ opacity:1; } }
   .banner.gameboy .net-badge{ filter:drop-shadow(2px 2px 0 rgba(15,56,15,0.5)); }
   .banner.gameboy .net-badge path{ fill:#306230; stroke:#9bbc0f; }
@@ -238,10 +238,12 @@
   @keyframes gbBlink{ 0%,100%{ opacity:1; } 50%{ opacity:0; } }
   /* The DMG boot is a one-shot that must play AFTER the splash clears, not on
      page load behind it. Gate it on body.entered and delay ~0.8s past the 0.9s
-     splash fade. 'both' keeps the logo clipped above during the delay and at
-     rest after it lands; the dependent delays are shifted by the same 0.8s to
-     preserve the original OG boot choreography. */
-  body.entered .banner.gameboy h1{ animation:gbBoot 2s linear 0.8s both; }
+     splash fade. 'backwards' fill keeps the logo clipped above during the delay;
+     we deliberately DON'T hold it forwards, so after it lands the transform is
+     freed for the :hover grow/tilt (a forwards fill would override hover). It
+     ends at translateY(0) = the base position, so there's no snap. The dependent
+     delays are shifted by the same 0.8s to preserve the OG boot choreography. */
+  body.entered .banner.gameboy h1{ animation:gbBoot 2s linear 0.8s backwards; }
   body.entered .banner.gameboy h1::after{ animation:gbShine 0.85s ease-in 2.3s 1; }
   body.entered .banner.gameboy .tagline{ animation:gbFadeIn 0.5s ease 2.05s both; }
   body.entered .banner.gameboy .gb-start{ animation:gbBlink 1.05s steps(2) infinite 2.3s; }
