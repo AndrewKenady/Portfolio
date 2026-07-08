@@ -235,9 +235,9 @@
     cats.push(makeCat(-160, pickAltitude()));
 
     function frame(now){
-      // this is a background flourish — ~40fps is smooth enough and halves the
+      // this is a background flourish — ~30fps is smooth enough and cuts the
       // per-second canvas redraw/compositing cost of an always-on full-screen layer
-      if (last && now - last < 24){ raf = requestAnimationFrame(frame); return; }
+      if (last && now - last < 32){ raf = requestAnimationFrame(frame); return; }
       if (!last) last = now;
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;

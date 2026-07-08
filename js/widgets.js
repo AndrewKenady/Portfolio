@@ -317,8 +317,11 @@
       }
     }
     function frame(now){
-      if (!last) last = now;
-      const dt = Math.min((now - last) / 1000, 0.05);
+      raf = requestAnimationFrame(frame);
+      // ~30fps is plenty for ambient weather and halves the per-second redraw cost
+      // of an always-on full-screen layer (STATIC already self-limits to ~12fps inside)
+      if (last && now - last < 32) return;
+      const dt = last ? Math.min((now - last) / 1000, 0.05) : 0.016;
       last = now; t += dt;
       ctx.clearRect(0, 0, innerWidth, innerHeight);
       if (mode === 'SNOW'){
@@ -378,7 +381,6 @@
         ctx.drawImage(noiseC, 0, 0, innerWidth, innerHeight);
         ctx.restore();
       }
-      raf = requestAnimationFrame(frame);
     }
     function set(next){
       mode = next;
@@ -406,6 +408,11 @@
     function reset(){ set('MISSING'); try { localStorage.removeItem('dkk_weather'); } catch(e){} }
     // resume the last chosen forecast on load
     try { const saved = localStorage.getItem('dkk_weather'); if (saved && MODES.indexOf(saved) > 0) set(saved); } catch(e){}
+    // spare the CPU when the tab is hidden — a background forecast helps no one
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden){ if (raf){ cancelAnimationFrame(raf); raf = null; } }
+      else if (!raf && !prefersReducedMotion && mode !== 'MISSING' && mode !== 'AURORA'){ last = 0; raf = requestAnimationFrame(frame); }
+    });
     return { cycle, reset, get mode(){ return mode; } };
   })();
 
