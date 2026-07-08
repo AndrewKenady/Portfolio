@@ -5298,7 +5298,7 @@
     const g = cv.getContext('2d');
     const GREEN = '#3CFF6E', PINK = '#FF3CAC', CYAN = '#00E5FF';
     let W = 0, H = 0, inv = [], bullets = [], sparks = [];
-    let marchX = 0, marchDir = 1, marchY = 0, revCount = 0, px = 0, pcool = 0.6, target = null;
+    let marchX = 0, marchDir = 1, marchY = 0, revCount = 0, px = 0, pcool = 0.6, target = null, moveT = 0, restT = 0.4, sdir = 1;
     function pickTarget(){
       const alive = inv.filter(v => v.alive);
       if (!alive.length){ target = null; return; }
@@ -5356,18 +5356,27 @@
       if (!running) return;
       if (last && now - last < 33){ raf = requestAnimationFrame(frame); return; } // 30fps
       const dt = Math.min((now - (last || now)) / 1000, 0.06); last = now;
-      // hunt: glide at a constant speed under a random nearby invader, fire, repeat
-      if (!target || !target.alive) pickTarget();
-      const tx = target ? target.bx + marchX : px;
-      const d = tx - px;
-      if (Math.abs(d) > 2) px += Math.sign(d) * Math.min(Math.abs(d), 90 * dt);
-      else px = tx;
-      px = Math.max(30, Math.min(W - 30, px));
+      // ship: constant-speed bursts toward a random nearby invader, then holds
+      // still and fires — only ever fully stopped or at max speed
+      const SPEED = 95;
+      if (moveT > 0){
+        moveT -= dt;
+        px += sdir * SPEED * dt;
+        if (px < 30){ px = 30; moveT = 0; } else if (px > W - 30){ px = W - 30; moveT = 0; }
+        if (moveT <= 0) restT = 0.3 + Math.random() * 0.7; // arrived → hold & shoot
+      } else {
+        restT -= dt;
+        if (restT <= 0){
+          pickTarget();
+          const tx = target ? target.bx + marchX : Math.random() * W;
+          sdir = tx < px ? -1 : 1;
+          moveT = 0.25 + Math.random() * 0.7; // bounded move time, constant speed
+        }
+      }
       pcool -= dt;
-      if (target && Math.abs(px - tx) < 6 && pcool <= 0 && bullets.length < 4){
+      if (moveT <= 0 && pcool <= 0 && bullets.length < 4){ // fire only while still
         bullets.push({ x: px, y: H - 32 });
-        pcool = 0.35 + Math.random() * 0.4;
-        pickTarget(); // line up on someone new
+        pcool = 0.35 + Math.random() * 0.45;
       }
       marchX += marchDir * 26 * dt;
       if (marchX > 26 || marchX < -26){
