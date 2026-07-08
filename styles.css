@@ -638,7 +638,7 @@
   .myspace-cta img{ width:180px; height:auto; image-rendering:auto; mix-blend-mode:multiply; }
   .myspace-cta:hover img{ filter:drop-shadow(0 0 10px rgba(0,229,255,0.7)); }
 
-  .dancing-baby{ margin-bottom:20px; }
+  .dancing-baby{ width:fit-content; margin:0 auto 20px; } /* shrink to the image so the click area isn't full-width */
   .dancing-baby img{ width:110px; height:auto; mix-blend-mode:screen; }
 
   /* guestbook */

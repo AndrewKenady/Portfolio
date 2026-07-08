@@ -1,8 +1,12 @@
+  // no window/popup dragging on touch or narrow screens (it fights scrolling)
+  const dragDisabled = () => matchMedia('(pointer:coarse)').matches || matchMedia('(max-width:760px)').matches;
+
   // drag any element by a handle (decks, dialogs, mini windows)
   let floatZ = 840;
   function makeDraggable(el, handle, opts){
     opts = opts || {};
     handle.addEventListener('pointerdown', e => {
+      if (dragDisabled()) return;
       if (e.target.closest('.t-btns, button, a, input, select, textarea')) return;
       if (opts.enabled && !opts.enabled()) return;
       e.preventDefault();

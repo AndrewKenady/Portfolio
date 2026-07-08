@@ -809,6 +809,7 @@
       el.addEventListener('pointerdown', () => { el.style.zIndex = ++zTop; });
       const bar = el.querySelector('.titlebar');
       bar.addEventListener('pointerdown', e => {
+        if (dragDisabled()) return;
         if (e.target.closest('.t-btns')) return;
         e.preventDefault();
         const r = el.getBoundingClientRect();
@@ -825,12 +826,32 @@
       timer = setTimeout(step, 500);
     }
 
+    // position a popup fully on-screen: scattered on desktop, centred with a
+    // slight offset on mobile; reuse a prior spot (px) for dialog continuity.
+    // offsetWidth/Height are used so the popIn scale doesn't skew the clamp.
+    function place(el, left, top){
+      const w = el.offsetWidth, h = el.offsetHeight;
+      const mobile = matchMedia('(max-width:700px)').matches;
+      let x, y;
+      if (left != null && top != null){
+        x = parseFloat(left); y = parseFloat(top);
+      } else if (mobile){
+        x = (innerWidth - w) / 2 + (Math.random() - 0.5) * Math.min(48, innerWidth * 0.06);
+        y = (innerHeight - h) / 2 + (Math.random() - 0.5) * Math.min(90, innerHeight * 0.10);
+      } else {
+        x = (0.05 + Math.random() * 0.5) * innerWidth;
+        y = (0.12 + Math.random() * 0.4) * innerHeight;
+      }
+      x = Math.max(8, Math.min(innerWidth - w - 8, x));
+      y = Math.max(8, Math.min(innerHeight - h - 8, y));
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+    }
+
     function buildPopup(cfg, left, top){
       const el = document.createElement('div');
       el.className = 'popup';
       el.style.zIndex = ++zTop;
-      el.style.left = left;
-      el.style.top = top;
       el.setAttribute('role', 'dialog');
       el.setAttribute('aria-label', cfg.t);
       el.innerHTML =
@@ -852,6 +873,7 @@
       // drag by titlebar
       const bar = el.querySelector('.titlebar');
       bar.addEventListener('pointerdown', e => {
+        if (dragDisabled()) return;
         if (e.target.closest('.t-btns')) return;
         e.preventDefault();
         const r = el.getBoundingClientRect();
@@ -865,6 +887,7 @@
         addEventListener('pointerup', up);
       });
       document.body.appendChild(el);
+      place(el, left, top);
       visible++;
       // focus first button for keyboard users
       const firstBtn = el.querySelector('.popup-btns button');
@@ -879,7 +902,7 @@
       if (cfg.t === 'TOOLBAR OFFER' && TOOLBAR.installed){
         cfg = { t: 'TOOLBAR STATUS', b: 'The Kennedy Toolbar is functioning nominally. No action is required. No action is possible.', btns: [{ l: 'Good' }] };
       }
-      buildPopup(cfg, (4 + Math.random() * 52) + 'vw', (12 + Math.random() * 48) + 'vh');
+      buildPopup(cfg);
       ding();
     }
 
