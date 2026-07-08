@@ -175,12 +175,12 @@
     </div>
   </main>
 <script>
-  // the title panics quietly, as is tradition
+  // scroll the title bar text
   let t = '404 — ROOM NOT FOUND ★ 404 — ROOM NOT FOUND ★ ';
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches){
     setInterval(() => { t = t.slice(1) + t[0]; document.title = t; }, 400);
   }
-  // show what they were looking for, honestly
+  // show the requested path
   const p = decodeURIComponent(location.pathname.replace(/^\//, '')) || 'this page';
   document.getElementById('whereTo').textContent = p.slice(0, 40);
 </script>

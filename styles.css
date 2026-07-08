@@ -44,7 +44,7 @@
   }
   .skip:focus{ left:12px; top:12px; }
 
-  /* ============ STARFIELD (tiled, like a proper background GIF) ============ */
+  /* starfield */
   .stars{
     position:fixed; inset:0;
     z-index:0;
@@ -62,7 +62,7 @@
   }
   @keyframes twinkle{ from{ opacity:0.75; } to{ opacity:1; } }
 
-  /* CRT easter-egg overlay */
+  /* crt overlay */
   .crt-overlay{
     position:fixed; inset:0;
     z-index:900;
@@ -75,16 +75,16 @@
   #confettiCanvas{
     position:fixed; inset:0;
     width:100%; height:100%;
-    z-index:1100; /* celebration sits above all chrome, incl. the toolbar and the screensaver */
+    z-index:1100; /* above all chrome */
     pointer-events:none;
-    display:none; /* only composited while confetti is actually flying */
+    display:none; /* shown while active */
   }
 
   .toast{
     position:fixed;
     bottom:26px; left:50%;
     transform:translate(-50%, 20px);
-    z-index:1200; /* transient feedback always on top, even over the screensaver */
+    z-index:1200; /* always on top */
     background:var(--ink);
     color:#fff;
     border:2px outset var(--bevel-hi);
@@ -100,7 +100,7 @@
   }
   .toast.on{ opacity:1; transform:translate(-50%, 0); }
 
-  /* ============ PAGE COLUMN — the classic centered homepage ============ */
+  /* page column */
   .page{
     position:relative;
     z-index:1;
@@ -109,22 +109,21 @@
     padding:26px 14px 60px;
   }
 
-  /* ============ HEADER BANNER — vaporwave sunset ============ */
+  /* header banner */
   .banner{
     border:2px outset var(--bevel-hi);
     background:#0B0428;
     position:relative;
     overflow:hidden;
     text-align:center;
-    padding:62px 20px 58px; /* content dropped a hair — was a touch top-heavy */
+    padding:62px 20px 58px;
   }
-  /* ---- SUNSET theme: the original vaporwave (shown 50/50 on load) ---- */
+  /* sunset theme */
   .banner.sunset{
     background:linear-gradient(180deg, #1B0C4A 0%, #4A1663 34%, #B0286E 62%, #FF6B4A 88%, #FFD34D 100%);
   }
   .banner .sun, .banner .grid-floor{ display:none; }
   .banner.sunset .sun, .banner.sunset .grid-floor{ display:block; }
-  /* the floor drives toward you and wavers like heat; the sun breathes + sways */
   .banner.sunset .grid-floor{ animation:gridScroll 2s linear infinite, gridHeat 7s ease-in-out infinite; }
   @keyframes gridHeat{
     0%,100%{ transform:perspective(220px) rotateX(58deg) skewX(-1.2deg); }
@@ -147,11 +146,11 @@
     transform:perspective(220px) rotateX(58deg);
     transform-origin:bottom;
   }
-  /* ---- ARCADE theme: neon carpet, always slowly drifting ---- */
+  /* arcade theme */
   .banner-carpet{
     display:none;
     position:absolute;
-    top:-160px; left:-240px;                 /* one tile of slack all round... */
+    top:-160px; left:-240px;
     width:calc(100% + 480px);
     height:calc(100% + 320px);
     z-index:0;
@@ -159,10 +158,10 @@
   }
   .banner.arcade .banner-carpet{
     display:block;
-    animation:carpetDrift 22s linear infinite; /* ...so the drift never exposes an edge */
+    animation:carpetDrift 22s linear infinite;
     will-change:transform;
   }
-  /* a calm dark pocket so the chrome title stays legible over the busy carpet */
+  /* dark pocket to keep the title legible */
   .banner.arcade::before{
     content:"";
     position:absolute; inset:0;
@@ -170,25 +169,25 @@
     pointer-events:none;
     background:radial-gradient(ellipse 62% 78% at 50% 46%, rgba(11,4,40,0.94) 0%, rgba(11,4,40,0.78) 42%, rgba(11,4,40,0) 80%);
   }
-  /* ---- PLATFORMER theme: a bright 8-bit side-scroller with parallax ---- */
+  /* platformer theme */
   .banner.platformer{
     background:linear-gradient(180deg, #1E5A9E 0%, #4E97D8 46%, #8FCBF0 76%, #CFEEFF 100%);
   }
   .pf-scene{ display:none; position:absolute; inset:0; z-index:0; overflow:hidden; }
   .banner.platformer .pf-scene{ display:block; }
   .pf-layer{ position:absolute; will-change:transform; }
-  .pf-clouds{ left:-300px; width:calc(100% + 600px); top:14px; height:72px; animation:pfClouds 90s linear infinite; } /* farthest layer — a slow rightward breeze */
+  .pf-clouds{ left:-300px; width:calc(100% + 600px); top:14px; height:72px; animation:pfClouds 90s linear infinite; }
   .pf-hills{ left:-360px; width:calc(100% + 720px); bottom:58px; height:104px; animation:pfHills 34s linear infinite; }
   .pf-ground{ left:-320px; width:calc(100% + 640px); bottom:0; height:150px; animation:pfGround 16s linear infinite; }
-  @keyframes pfClouds{ to{ transform:translateX(300px); } } /* +300 = one cloud pattern width, so it loops seamlessly */
+  @keyframes pfClouds{ to{ transform:translateX(300px); } } /* one pattern width, loops seamlessly */
   @keyframes pfHills{ to{ transform:translateX(-360px); } }
   @keyframes pfGround{ to{ transform:translateX(-320px); } }
-  /* coins flip edge-on like real game coins (each spins around its own center) */
+  /* coins spin around their own center */
   .pf-coin{ transform-box:fill-box; transform-origin:center; animation:coinSpin 0.85s ease-in-out infinite; }
   .pf-coin:nth-of-type(2n){ animation-delay:-0.3s; }
   .pf-coin:nth-of-type(3n){ animation-delay:-0.55s; }
   @keyframes coinSpin{ 0%,100%{ transform:scaleX(1); } 50%{ transform:scaleX(0.14); } }
-  /* dim the whole scene so the chrome title has contrast (darkest at center) */
+  /* dim scene for title contrast */
   .banner.platformer::before{
     content:"";
     position:absolute; inset:0;
@@ -196,10 +195,10 @@
     pointer-events:none;
     background:radial-gradient(ellipse 78% 92% at 50% 50%, rgba(6,14,32,0.26) 0%, rgba(6,14,32,0.17) 58%, rgba(6,14,32,0.14) 100%);
   }
-  /* stronger dark outline so the chrome title reads over the bright sky */
+  /* dark outline for title over bright sky */
   .banner.platformer h1{ filter:drop-shadow(2px 3px 0 rgba(10,26,54,0.92)) drop-shadow(0 1px 2px rgba(0,0,0,0.45)); }
   .banner.platformer .tagline{ color:#fff; text-shadow:1px 1px 0 rgba(10,26,54,0.95), 0 0 3px rgba(10,26,54,0.6); }
-  /* ---- GAME BOY theme: DMG boot screen, monochrome LCD ---- */
+  /* game boy theme */
   .banner.gameboy{ background:#9bbc0f; }
   .banner.gameboy::before{
     content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
@@ -211,11 +210,11 @@
   .banner.gameboy h1{
     background:none; -webkit-background-clip:border-box; background-clip:border-box;
     color:#0f380f; -webkit-text-fill-color:#0f380f;
-    filter:none; text-shadow:none;   /* flat dark-on-LCD reads cleanest for the dense pixel type */
-    overflow:hidden;                 /* clips the shine sweep to the text box */
-    padding:0 0.14em 0.2em;          /* ...but leave room for the italic 'y' descender */
+    filter:none; text-shadow:none;
+    overflow:hidden;                 /* clip shine sweep */
+    padding:0 0.14em 0.2em;          /* room for italic y descender */
   }
-  /* OG-style shine sweep, once the logo has landed */
+  /* shine sweep after logo lands */
   .banner.gameboy h1::after{
     content:""; position:absolute; top:0; left:0; height:100%; width:55%;
     background:linear-gradient(105deg, transparent 32%, rgba(255,255,255,0.6) 50%, transparent 68%);
@@ -236,18 +235,14 @@
     opacity:0;
   }
   @keyframes gbBlink{ 0%,100%{ opacity:1; } 50%{ opacity:0; } }
-  /* The DMG boot is a one-shot that must play AFTER the splash clears, not on
-     page load behind it. Gate it on body.entered and delay ~0.8s past the 0.9s
-     splash fade. 'backwards' fill keeps the logo clipped above during the delay;
-     we deliberately DON'T hold it forwards, so after it lands the transform is
-     freed for the :hover grow/tilt (a forwards fill would override hover). It
-     ends at translateY(0) = the base position, so there's no snap. The dependent
-     delays are shifted by the same 0.8s to preserve the OG boot choreography. */
+  /* boot plays after the splash clears; delay ~0.8s past the 0.9s fade.
+     backwards fill keeps the logo clipped during the delay and frees the
+     transform for :hover afterward. dependent delays shift by the same 0.8s. */
   body.entered .banner.gameboy h1{ animation:gbBoot 2s linear 0.8s backwards; }
   body.entered .banner.gameboy h1::after{ animation:gbShine 0.85s ease-in 2.3s 1; }
   body.entered .banner.gameboy .tagline{ animation:gbFadeIn 0.5s ease 2.05s both; }
   body.entered .banner.gameboy .gb-start{ animation:gbBlink 1.05s steps(2) infinite 2.3s; }
-  /* ---- DEFEND.EXE theme: pixel space shooter ---- */
+  /* defend.exe theme */
   .banner.defend{ background:radial-gradient(ellipse at 50% 22%, #14134a 0%, #06030f 72%); }
   .def-scene{ display:none; position:absolute; inset:0; z-index:0; overflow:hidden; }
   .banner.defend .def-scene{ display:block; }
@@ -266,14 +261,14 @@
     content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
     background:radial-gradient(ellipse 60% 70% at 50% 52%, rgba(6,3,15,0.7) 0%, rgba(6,3,15,0.3) 55%, transparent 80%);
   }
-  /* CRT: pronounced scanlines + a tube vignette (overrides the light banner scanlines) */
+  /* scanlines + vignette, overrides the banner scanlines */
   .banner.defend::after{
     content:""; position:absolute; inset:0; z-index:3; pointer-events:none;
     background:
       repeating-linear-gradient(0deg, rgba(0,0,0,0.28) 0 1px, transparent 1px 3px),
       radial-gradient(ellipse 108% 116% at 50% 50%, transparent 52%, rgba(0,0,0,0.55) 100%);
   }
-  /* the banner is glass too — faint scanlines + a diagonal glare */
+  /* faint scanlines + diagonal glare */
   .banner::after{
     content:"";
     position:absolute; inset:0;
@@ -310,14 +305,14 @@
     color:#FFF6FB;
     text-shadow:1px 1px 0 rgba(30,10,60,0.9);
   }
-  /* cheesy early-web starburst sticker slapped on the corner */
+  /* corner starburst sticker */
   .net-badge{
     position:absolute;
     top:8px; right:12px;
     z-index:4;
     width:clamp(66px, 12vw, 104px);
     height:auto;
-    transform:rotate(11deg);          /* static — breathing it aliased the edges */
+    transform:rotate(11deg);
     transform-origin:center;
     filter:drop-shadow(2px 2px 0 rgba(11,4,40,0.7)) drop-shadow(0 0 8px rgba(255,60,172,0.55));
   }
@@ -329,7 +324,7 @@
   @keyframes carpetDrift{ to{ transform:translate(-240px, -160px); } }
   @media (max-width:520px){ .net-badge{ top:4px; right:6px; } }
 
-  /* ============ NAV — beveled buttons, as God intended ============ */
+  /* nav */
   .navbar{
     display:flex;
     flex-wrap:wrap;
@@ -354,7 +349,7 @@
   .navbtn:hover{ background:#FBF9FF; color:var(--ink) !important; }
   .navbtn:active{ border-style:inset; }
 
-  /* ============ MARQUEE ============ */
+  /* marquee */
   .newsbar{
     margin-top:14px;
     border:2px inset var(--bevel-hi);
@@ -376,7 +371,7 @@
   @keyframes crawl{ to{ transform:translateX(-100%); } }
   .newsbar b{ color:var(--magenta); }
 
-  /* ============ WINDOWS — every section is a window ============ */
+  /* windows */
   .window{
     margin-top:26px;
     border:2px outset var(--bevel-hi);
@@ -402,7 +397,7 @@
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-    min-width:0; /* allow the label to shrink + ellipsize in the flex titlebar */
+    min-width:0; /* allow label to shrink and ellipsize */
   }
   .titlebar .t-btns{ display:flex; gap:4px; flex-shrink:0; }
   .titlebar .t-btns i{
@@ -471,10 +466,10 @@
     background:repeating-linear-gradient(90deg, var(--magenta) 0 14px, var(--cyan) 14px 28px);
   }
 
-  /* ============ WORK.EXE note line ============ */
+  /* work.exe note line */
   .table-note{ margin-top:16px; font-size:12.5px; color:var(--ink-soft); }
 
-  /* two-column layout inside windows (channel) */
+  /* two-column layout inside windows */
   .cols{ display:grid; grid-template-columns:3fr 2fr; gap:26px; align-items:start; }
   @media (max-width:700px){ .cols{ grid-template-columns:1fr; } }
 
@@ -516,7 +511,7 @@
   }
   .nowplaying a{ color:var(--gold); }
 
-  /* a tiny "watch" link on the resume entry, opens the player in a modal */
+  /* watch link opens the player in a modal */
   .rez-watch{
     display:inline-block;
     margin-left:12px;
@@ -693,7 +688,7 @@
     color:#8F85B8;
   }
 
-  /* ============ FOOTER — badges, counter, webring ============ */
+  /* footer */
   .footer{
     margin-top:30px;
     text-align:center;
@@ -708,7 +703,6 @@
     margin-bottom:18px;
   }
   .badges svg{
-    /* 88x31 in spirit, 1.5x in practice — honor the format, respect the reader */
     width:132px; height:46.5px;
     image-rendering:pixelated;
     border:1px solid rgba(255,255,255,0.25);
@@ -748,7 +742,7 @@
   .f-legal{ margin-top:10px; line-height:2; }
   .f-legal a{ color:#CFC6E8; }
 
-  /* ============ ENTER SITE — the classic way ============ */
+  /* enter site */
   .splash{
     position:fixed; inset:0;
     z-index:800;
@@ -773,7 +767,7 @@
     transition:opacity 0.9s ease, visibility 0.9s ease;
   }
   .splash.hidden{ opacity:0; visibility:hidden; }
-  /* the rainbow divider — a load-bearing gradient bar */
+  /* rainbow divider */
   .sp-divider{
     width:min(560px, 82vw);
     height:6px;
@@ -830,14 +824,12 @@
     animation:enterBlink 1.1s infinite;
     transition:transform 0.15s ease;
   }
-  /* hard on/off via opacity percents — restarts from the visible phase on unhover,
-     unlike a paused visibility animation, which can resume mid-"off" frame */
+  /* hard on/off via opacity so unhover restarts from the visible phase */
   @keyframes enterBlink{ 0%, 54%{ opacity:1; } 55%, 100%{ opacity:0; } }
   .splash:hover .sp-enter{ transform:scale(1.06); animation:none; opacity:1; }
   .sp-divider.btm{ margin-top:46px; }
-  /* the award sticker — an honor this site bestowed upon itself.
-     anchored to center and offset down-right, so it hangs off the main info
-     instead of drifting to the viewport corner on big screens */
+  /* award sticker, offset down-right from center so it hangs off the info
+     instead of drifting to the corner on big screens */
   .sp-award{
     position:absolute;
     left:calc(50% + clamp(100px, 26vw, 290px));
@@ -850,7 +842,7 @@
     0%,100%{ transform:rotate(-8deg); }
     50%{ transform:rotate(6deg); }
   }
-  /* nyan cat — commutes across the bottom, JS flies it and lays the trail */
+  /* nyan cat, JS moves it and draws the trail */
   .sp-cat{
     position:absolute;
     top:0; left:0;
@@ -878,7 +870,7 @@
   }
   .splash-hint b{ color:var(--gold); }
 
-  /* the deck — winamp-shaped, appears only if the music actually plays */
+  /* winamp deck, shown only when music plays */
   .winamp{
     position:fixed;
     bottom:18px; right:18px;
@@ -982,10 +974,10 @@
     padding:0;
   }
   .wa-shade:active{ border-style:inset; }
-  /* windowshade mode — just the titlebar, like the real thing */
+  /* windowshade mode, titlebar only */
   .winamp.shade .wa-lcd, .winamp.shade .wa-ctrl{ display:none; }
   .winamp.shade{ padding-bottom:0; width:170px; }
-  /* mobile: a slim bottom bar instead of a corner deck */
+  /* mobile: slim bottom bar */
   @media (max-width:700px){
     .winamp{
       left:8px; right:8px; bottom:8px;
@@ -1020,10 +1012,10 @@
     width:100%; height:100%;
     z-index:600;
     pointer-events:none;
-    display:none; /* only composited while sparkles are on screen */
+    display:none;
   }
 
-  /* the site cat — free-range, and clickable: it divides under observation */
+  /* site cat, clickable */
   .page-cat{
     position:fixed;
     top:0; left:0;
@@ -1042,12 +1034,12 @@
     width:100%; height:100%;
     z-index:589;
     pointer-events:none;
-    image-rendering:pixelated; /* trail canvas is rendered sub-resolution; keep the upscale crisp */
+    image-rendering:pixelated; /* keep the sub-resolution upscale crisp */
   }
 
-  /* ============ SCREENSAVER — a bouncing DVD-logo tribute (wait for the corner) ============ */
+  /* screensaver */
   #dkk-saver{
-    position:fixed; inset:0; z-index:1050; /* over everything but the confetti/toast payoff */
+    position:fixed; inset:0; z-index:1050; /* over everything but confetti/toast */
     background:#05030f; cursor:pointer; overflow:hidden;
     animation:ssFade 0.4s ease;
   }
@@ -1066,7 +1058,7 @@
     text-transform:uppercase; color:rgba(255,255,255,0.32);
   }
 
-  /* ============ the popup engine — OMNICAST™ technology, road-legal edition ============ */
+  /* popup engine */
   .popup{
     position:fixed;
     width:min(320px, 86vw);
@@ -1105,7 +1097,7 @@
   .popup-btns button:active{ border-style:inset; }
   .popup-btns button:hover{ background:#FBF9FF; }
 
-  /* NEW! blinkers — the tag that built the web */
+  /* new! blinkers */
   .blink{
     display:inline-block;
     font-family:Verdana, Geneva, sans-serif;
@@ -1121,7 +1113,7 @@
   }
   @keyframes blinker{ to{ visibility:hidden; } }
 
-  /* ============ THE KENNEDY TOOLBAR — docked to the browser, like real chrome ============ */
+  /* kennedy toolbar */
   .ktb{
     position:fixed;
     top:0; left:0; right:0;
@@ -1174,13 +1166,13 @@
   }
   .ktb .found{ animation:ktbFound 0.5s steps(2) 3; }
   @keyframes ktbFound{ 50%{ background:var(--gold); } }
-  /* the certificate link — earned, gilded, right-aligned just left of search */
+  /* certificate link, right-aligned left of search */
   .ktb [data-k="cert"]{ background:#FFF3C9; margin-left:auto; }
   .ktb [data-k="cert"]:hover{ background:#FFF9E2; }
   .ktb [data-k="cert"] ~ .ktb-search{ margin-left:0; }
   @media (max-width:640px){ .ktb-search{ margin-left:0; } }
 
-  /* ============ DKK MEGA-STORE — genuine early-internet commerce ============ */
+  /* dkk mega-store */
   .store-popup{ width:min(430px, 94vw); }
   .store-popup input{
     display:block;
@@ -1240,7 +1232,7 @@
   .store-price s{ color:var(--ink-soft); }
   .store-price b{ color:var(--magenta); font-size:19px; }
   .store-soldout{ color:#E03C31; font-size:16px; letter-spacing:0.06em; }
-  /* sold out: the product reads as clearly disabled */
+  /* sold out: product looks disabled */
   .store-prod.soldout{ opacity:0.6; }
   .store-prod.soldout .store-name{ text-decoration:line-through; color:var(--ink-soft); }
   .store-prod.soldout .store-img{ filter:grayscale(0.9); opacity:0.7; }
@@ -1382,7 +1374,7 @@
   .cert-inner .c-sub{ font-size:9.5px; letter-spacing:0.12em; color:var(--ink-soft); margin-top:4px; }
   .cert-btns{ display:flex; justify-content:center; gap:10px; padding:2px 10px 12px; }
 
-  /* ============ WEATHER.SYS — full-screen forecasts, 1990s edition ============ */
+  /* weather.sys */
   #weatherCanvas{
     position:fixed; inset:0;
     width:100%; height:100%;
@@ -1410,7 +1402,7 @@
     to{ background-position:100% 0, 60% 0, 30% 0, 80% 0; transform:translateX(2%) scaleY(1.18); }
   }
 
-  /* ============ MEMORY PURGE — the recycle bin, emotionally ============ */
+  /* memory purge */
   .purge-popup{ width:min(360px, 92vw); }
   .purge-anim{
     display:flex;
@@ -1446,7 +1438,7 @@
     color:var(--ink-soft);
   }
 
-  /* ============ WORK.EXE — a card grid, screenshots front and center ============ */
+  /* work.exe */
   .work-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
@@ -1460,7 +1452,7 @@
     background:#FBF9FF;
     box-shadow:3px 3px 0 rgba(0,0,0,0.3);
   }
-  /* the screenshot frame — one fixed aspect for every card, so the grid aligns */
+  /* screenshot frame, fixed aspect so the grid aligns */
   .wc-shot{
     position:relative;
     display:block;
@@ -1479,7 +1471,7 @@
     object-fit:cover;
     display:block;
   }
-  /* little corner glyphs over a photo */
+  /* corner glyphs over a photo */
   .wc-zoom, .wc-count{
     position:absolute;
     background:rgba(11,4,40,0.82);
@@ -1494,7 +1486,7 @@
   }
   .wc-zoom{ top:7px; right:7px; }
   .wc-count{ bottom:7px; right:7px; opacity:1; }
-  /* the non-photo tiles — same frame, different content */
+  /* non-photo tiles */
   .wc-redacted, .wc-play, .wc-none{
     display:flex;
     flex-direction:column;
@@ -1611,7 +1603,7 @@
     padding:8px 6px 4px;
   }
 
-  /* ============ retro scrollbar — chunky, beveled, correct ============ */
+  /* retro scrollbar */
   ::-webkit-scrollbar{ width:16px; height:16px; }
   ::-webkit-scrollbar-track{ background:var(--win-2); border:1px solid var(--bevel-lo); }
   ::-webkit-scrollbar-thumb{
@@ -1620,7 +1612,7 @@
   }
   ::-webkit-scrollbar-thumb:active{ border-style:inset; }
 
-  /* titlebar buttons are live now */
+  /* titlebar buttons */
   .titlebar .t-btns i{ cursor:pointer; }
   .window.min .win-body{ display:none; }
   .window.shake{ animation:winShake 0.3s ease; }
@@ -1630,22 +1622,21 @@
     75%{ transform:translateX(5px); }
   }
 
-  /* [□] collapses a section into a tiny draggable live preview.
-     the WHOLE window is scaled by one transform (JS sets the scale + width),
-     so it stays a true uniform miniature — no titlebar/body proportion shift */
+  /* collapses a section into a small draggable live preview.
+     the whole window is scaled by one transform (JS sets scale + width)
+     so it stays a uniform miniature */
   .window.mini{
     position:fixed;
     margin:0 !important;
     z-index:715;
-    overflow:hidden;              /* clips the scaled body to the tile */
+    overflow:hidden;              /* clip scaled body to tile */
     box-shadow:5px 5px 0 rgba(0,0,0,0.55);
   }
-  .window.mini .titlebar{ cursor:grab; }        /* full-size: buttons stay clickable */
+  .window.mini .titlebar{ cursor:grab; }
   .window.mini .titlebar:active{ cursor:grabbing; }
   .window.mini .win-body{ transform-origin:top left; pointer-events:none; }
   .window.mini.min .win-body{ display:none; }
-  /* a soft fade at the bottom — only when the body is taller than the tile,
-     signalling "there's more below" */
+  /* fade at bottom when the body is taller than the tile */
   .window.mini.clipped::after{
     content:"";
     position:absolute; left:0; right:0; bottom:0; height:46px;
@@ -1653,7 +1644,7 @@
     pointer-events:none;
   }
 
-  /* netscape-style status bar — shows where links go */
+  /* status bar, shows where links go */
   #statusBar{
     position:fixed;
     left:0; bottom:0;
@@ -1673,7 +1664,7 @@
   }
   @media (hover:none){ #statusBar{ display:none !important; } }
 
-  /* ============ DEFEND.EXE ============ */
+  /* defend.exe */
   #gameOverlay{
     position:fixed; inset:0;
     z-index:850;
@@ -1721,9 +1712,9 @@
     padding:2px 4px 4px;
   }
 
-  /* ============ HOVER PASS — the whole page notices your cursor ============ */
+  /* hover pass */
   .navbtn{ position:relative; overflow:hidden; }
-  /* the glossy sweep — every good button deserves a glare */
+  /* glossy sweep */
   .navbtn::after{
     content:"";
     position:absolute; inset:0;
@@ -1733,13 +1724,12 @@
   }
   @keyframes navSheen{ to{ transform:translateX(101%); } }
   .banner-carpet{ transition:opacity 0.35s ease; }
-  /* inline-block so the name's hover zone is the name, not the whole row;
-     the springy bezier gives the grow-and-tilt a little bounce */
+  /* inline-block so the hover zone is the name, not the whole row */
   .banner h1, .sp-title{
     display:inline-block;
     transition:filter 0.3s ease, transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
   }
-  /* the floor scrolls toward you, one grid cell per loop — seamless */
+  /* floor scrolls one grid cell per loop */
   @keyframes gridScroll{ to{ background-position:0 0, 0 26px, 0 0; } }
 
   @media (hover:hover) and (pointer:fine){
@@ -1750,7 +1740,7 @@
                  color 0.1s ease, filter 0.16s ease, border-color 0.14s ease;
     }
 
-    /* bevel buttons rise to meet the pointer, press down on click */
+    /* bevel buttons rise on hover, press on click */
     .navbtn:hover, .gb-btn:hover{
       transform:translate(-1px,-1px);
       box-shadow:3px 3px 0 rgba(0,0,0,0.35);
@@ -1761,17 +1751,16 @@
     .popup-btns button:hover{ transform:translate(-1px,-1px); box-shadow:2px 2px 0 rgba(0,0,0,0.3); }
     .popup-btns button:active{ transform:translate(1px,1px); box-shadow:none; }
 
-    /* hovered window = focused window; titlebar wakes up, shadow warms */
+    /* hovered window reads as focused */
     .window:hover{ box-shadow:4px 4px 0 rgba(0,0,0,0.45), 7px 7px 0 rgba(255,60,172,0.22); }
     .window:hover > .titlebar{ filter:saturate(1.35) brightness(1.06); }
     .titlebar .t-btns i:hover{ background:#FBF9FF; color:var(--violet); }
-    /* the X glows menacing — it knows what it does */
     .titlebar .t-btns i:last-child:hover{ background:var(--magenta); color:#fff; }
 
-    /* banner: the carpet brightens a touch (it already drifts on its own) */
+    /* carpet brightens on hover */
     .banner:hover .banner-carpet{ opacity:1; }
     .banner:hover h1{ filter:drop-shadow(2px 3px 0 rgba(30,10,60,0.85)) drop-shadow(0 0 28px rgba(0,229,255,0.6)); }
-    /* the name itself: grows, tilts, and goes full neon */
+    /* name grows, tilts, neon */
     .banner h1:hover, .sp-title:hover{
       transform:scale(1.07) rotate(-2.5deg);
       filter:drop-shadow(2px 3px 0 rgba(30,10,60,0.85))
@@ -1779,23 +1768,23 @@
              drop-shadow(0 0 48px rgba(255,60,172,0.55));
     }
 
-    /* terminals glow like warm phosphor */
+    /* terminal panels glow on hover */
     .newsbar:hover{ box-shadow:inset 0 0 16px rgba(0,229,255,0.22); }
     .specs:hover{ box-shadow:inset 0 0 18px rgba(0,229,255,0.2); }
     .statbox .sb-row{ transition:background 0.1s ease; }
     .statbox .sb-row:hover{ background:rgba(0,229,255,0.09); }
     .statbox .sb-row:hover b{ text-shadow:0 0 9px rgba(0,229,255,0.9); }
 
-    /* resume rows step forward when called on */
+    /* resume rows step forward on hover */
     .rez-row{ transition:background 0.12s ease, box-shadow 0.12s ease, padding 0.12s ease; }
     .rez-row:hover{ background:rgba(122,43,217,0.07); box-shadow:inset 3px 0 0 var(--magenta); padding-left:12px; }
     .rez-row:hover .rez-when{ color:var(--magenta); }
 
-    /* extras cards pop off the desk */
+    /* extras cards lift on hover */
     .extra:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 rgba(0,0,0,0.4); background:#FFFFFF; }
     .extra:hover b{ color:var(--violet); }
 
-    /* work cards lift off the desk; their screenshot pushes in slightly */
+    /* work cards lift, screenshot zooms slightly */
     .work-card{ transition:transform 0.12s ease, box-shadow 0.16s ease; }
     .work-card:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 rgba(0,0,0,0.4), 8px 8px 0 rgba(255,60,172,0.2); }
     .wc-shot img{ transition:transform 0.28s ease, filter 0.2s ease; }
@@ -1805,14 +1794,14 @@
     .work-card:hover .wc-play{ filter:brightness(1.2); }
 
 
-    /* contact: the email plate lights up, MySpace does a little dance */
+    /* email plate lights up on hover */
     .email-big:hover{
       transform:translate(-1px,-1px);
       box-shadow:0 0 0 1px rgba(0,229,255,0.35), 0 0 18px rgba(0,229,255,0.35);
       text-shadow:0 0 10px rgba(255,211,77,0.6);
     }
     .myspace-cta:hover img{ transform:scale(1.06); }
-    /* list links invert like 90s selected text */
+    /* list links invert on hover */
     .linklist a:hover, .webring a:hover, .f-legal a:hover, .table-note a:hover{
       background:var(--magenta); color:#fff !important; text-decoration:none;
     }
@@ -1822,14 +1811,14 @@
     /* the deck */
     .wa-ctrl button:hover, .wa-shade:hover{ background:#FBF9FF; color:var(--magenta); }
 
-    /* footer trinkets earn their keep */
+    /* footer items on hover */
     .badges svg:hover{ transform:scale(1.12) rotate(-2deg); filter:drop-shadow(0 0 9px rgba(0,229,255,0.55)); border-color:rgba(0,229,255,0.8); }
     .counter .digits i{ transition:color 0.15s ease, text-shadow 0.15s ease; }
     .counter:hover .digits i{ color:#7CFF9E; text-shadow:0 0 9px rgba(60,255,110,0.9); }
     .dancing-baby:hover img{ transform:scale(1.18); filter:drop-shadow(0 0 12px rgba(255,60,172,0.55)); }
     .webring:hover{ box-shadow:0 0 0 1px rgba(0,229,255,0.35), 0 0 16px rgba(0,229,255,0.25); }
 
-    /* the award sticker basks in its own honor */
+    /* award sticker on hover */
     .sp-award:hover{ filter:drop-shadow(0 4px 10px rgba(0,0,0,0.55)) drop-shadow(0 0 14px rgba(255,211,77,0.85)); }
   }
 
@@ -1837,7 +1826,7 @@
     .splash, .winamp, #sparkleCanvas, .blink, #gameOverlay, #statusBar, .page-cat, #nyanPageCanvas, #weatherCanvas, .weather-aurora{ display:none !important; }
     .stars, .crt-overlay, #confettiCanvas, .toast, .navbar, .newsbar, .badges, .counter, .webring, .ktb, .popup, #shotOverlay, #ytModal{ display:none !important; }
     body:not(.cert-mode) #certOverlay{ display:none !important; }
-    /* CERTIFICATE.EXE print mode — the certificate, and nothing else */
+    /* certificate print mode */
     body.cert-mode > :not(#certOverlay){ display:none !important; }
     body.cert-mode #certOverlay{ display:block; position:static; background:none; padding:0; }
     body.cert-mode .cert-win{ border:none; box-shadow:none; max-width:none; max-height:none; overflow:visible; }

@@ -1,5 +1,5 @@
-/* Extracted from index.html. Classic script — shares global scope; load order matters (see index.html). */
-  // ===== IMAGEVIEW.EXE — the screenshot lightbox, with gallery nav =====
+/* Extracted from index.html. Classic script; shares global scope, load order matters (see index.html). */
+  // imageview.exe: screenshot lightbox with gallery nav
   (function(){
     const overlay = document.getElementById('shotOverlay');
     const win = overlay && overlay.querySelector('.shot-win');
@@ -43,7 +43,7 @@
     });
   })();
 
-  // ===== CERTIFICATE.EXE — a real document, suitable for framing =====
+  // certificate.exe: printable certificate modal
   const CERT = (function(){
     const overlay = document.getElementById('certOverlay');
     function show(name, orderNo){
@@ -65,7 +65,7 @@
     return { show };
   })();
 
-  // ===== DKK MEGA-STORE — genuine early-internet commerce, one product strong =====
+  // dkk mega-store: checkout flow for the certificate
   const STORE = (function(){
     let win = null, certName = 'ANONYMOUS VISITOR', orders = 0;
     let purchased = false;
@@ -143,7 +143,7 @@
         notify('CHECKOUT ABANDONED. YOUR CART WILL BE SAVED FOREVER.');
       });
       document.body.appendChild(win);
-      // the storefront drags by its titlebar, like every good window
+      // drag by titlebar
       makeDraggable(win, win.querySelector('.titlebar'));
     }
 
@@ -239,7 +239,7 @@
     function stepConfirm(){
       orders++;
       const orderNo = 'DKK-' + String((window.VISITOR_N || 1337) * 10 + orders).padStart(7, '0');
-      purchased = true; // the last of the infinite stock, gone
+      purchased = true; // mark as sold out
       try { localStorage.setItem('dkk_cert', JSON.stringify({ n: certName, o: orderNo })); } catch(e){}
       TOOLBAR.certLink();
       popup('DKKSTORE&trade;.COM &mdash; Receipt',
@@ -254,7 +254,7 @@
     return { open: stepProduct };
   })();
 
-  // ===== WEATHER.SYS — full-screen forecasts, 1990s edition =====
+  // weather.sys: full-screen weather effects
   const WEATHER = (function(){
     const MODES = ['MISSING', 'SNOW', 'RAIN', 'STATIC', 'AURORA', 'MIDI'];
     const TOASTS = {
@@ -329,7 +329,7 @@
           if (p.y > innerHeight + 4){ p.y = -4; p.x = Math.random() * innerWidth; }
           if (p.x > innerWidth + 4) p.x = -4;
           if (p.x < -4) p.x = innerWidth + 4;
-          ctx.fillRect(p.x, p.y, p.s, p.s); // square flakes — pixelated, as is right
+          ctx.fillRect(p.x, p.y, p.s, p.s); // square flakes
         }
       } else if (mode === 'RAIN'){
         ctx.strokeStyle = 'rgba(0,229,255,0.5)';
@@ -344,7 +344,7 @@
         }
         ctx.stroke();
       } else if (mode === 'MIDI'){
-        // the site's native precipitation — notes fall gently, swaying like snow
+        // notes fall and sway like snow
         ctx.textBaseline = 'top';
         for (const p of parts){
           p.y += p.v * dt;
@@ -359,7 +359,7 @@
         }
         ctx.globalAlpha = 1;
       } else if (mode === 'STATIC'){
-        // crunchy 12fps noise, rendered tiny and scaled up like a bad antenna
+        // low-res noise scaled up
         if (!noiseC || now - lastNoise > 80){
           lastNoise = now;
           if (!noiseC){ noiseC = document.createElement('canvas'); noiseC.width = 160; noiseC.height = 100; }
@@ -403,9 +403,9 @@
       return next;
     }
     function reset(){ set('MISSING'); try { localStorage.removeItem('dkk_weather'); } catch(e){} }
-    // resume the last chosen forecast on load
+    // resume last mode on load
     try { const saved = localStorage.getItem('dkk_weather'); if (saved && MODES.indexOf(saved) > 0) set(saved); } catch(e){}
-    // spare the CPU when the tab is hidden — a background forecast helps no one
+    // pause animation when tab hidden
     document.addEventListener('visibilitychange', () => {
       if (document.hidden){ if (raf){ cancelAnimationFrame(raf); raf = null; } }
       else if (!raf && !prefersReducedMotion && mode !== 'MISSING' && mode !== 'AURORA'){ last = 0; raf = requestAnimationFrame(frame); }
@@ -413,7 +413,7 @@
     return { cycle, reset, get mode(){ return mode; } };
   })();
 
-  // ===== SCREENSAVER — a bouncing DVD-logo tribute; everyone waits for the corner =====
+  // screensaver: bouncing dvd-style logo
   const SCREENSAVER = (function(){
     const COLORS = ['#FF3CAC', '#00E5FF', '#FFD34D', '#3CFF6E', '#B29CE8', '#FF6B4A', '#FFFFFF'];
     let el = null, logo = null, raf = null, last = 0;
@@ -421,7 +421,7 @@
     let corners = 0, tHitX = -1e9, tHitY = -1e9, lastCorner = -1e9;
 
     function nextColor(){
-      // advance to a different colour on every wall bounce
+      // pick a different color on each bounce
       ci = (ci + 1 + (Math.random() * (COLORS.length - 1) | 0)) % COLORS.length;
       logo.style.color = COLORS[ci];
     }
@@ -455,7 +455,7 @@
       if (hitX){ tHitX = now; }
       if (hitY){ tHitY = now; }
       if (hitX || hitY) nextColor();
-      // a "corner" = both walls struck within a blink of each other (the white whale)
+      // corner hit: both walls struck within ~70ms
       if ((hitX || hitY) && Math.abs(tHitX - tHitY) < 70 && now - lastCorner > 600){
         lastCorner = now; corners++;
         burstConfetti();
@@ -486,7 +486,7 @@
       addEventListener('keydown', onKey, true);
       document.addEventListener('visibilitychange', onVis);
       if (prefersReducedMotion){
-        // honour reduced motion — park it centred, no bounce, no strobing colour
+        // reduced motion: park centered, no animation
         x = (innerWidth - w) / 2; y = (innerHeight - h) / 2;
         logo.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
         return;
@@ -497,7 +497,7 @@
     return { start, stop };
   })();
 
-  // ===== THE KENNEDY TOOLBAR — it does nothing, but it's yours =====
+  // kennedy toolbar
   const TOOLBAR = (function(){
     const KEY = 'dkk_toolbar';
     let bar = null, unArm = null;
@@ -510,7 +510,7 @@
       'BASE TOUCHED. THE BASE SAYS HI.'
     ];
     let synIdx = 0;
-    // the weather button wears the forecast
+    // weather button icon per mode
     const WX_ICONS = {
       'MISSING': '&#10067;',
       'SNOW': '&#10052;&#65039;',
@@ -520,7 +520,7 @@
       'MIDI': '&#127925;'
     };
 
-    // the page scoots down exactly one toolbar-height; rewraps on resize
+    // offset body by toolbar height; recompute on resize
     function pad(){
       document.body.style.paddingTop = bar ? bar.offsetHeight + 'px' : '';
     }
@@ -552,7 +552,7 @@
       syn.addEventListener('click', () => {
         if (syn.disabled) return;
         notify(SYNERGY[synIdx++ % SYNERGY.length]);
-        // synergy must recharge — no spamming the paradigm
+        // cooldown to prevent spam
         syn.disabled = true;
         let t = 5;
         syn.innerHTML = '&#8987; Recharging ' + t + 's';
@@ -582,7 +582,7 @@
           bar.remove(); bar = null;
           document.body.classList.remove('has-ktb');
           pad();
-          WEATHER.reset(); // clear the forecast — the toolbar owned the weather
+          WEATHER.reset(); // clear the weather effect
           try { localStorage.removeItem(KEY); } catch(e){}
           notify('TOOLBAR UNINSTALLED. IT LEFT A NOTE: "NO HARD FEELINGS."');
         } else {
@@ -595,7 +595,7 @@
           }, 6000);
         }
       });
-      certLink(); // returning owners get their certificate button back
+      certLink(); // restore cert button if owned
       const form = bar.querySelector('.ktb-search');
       form.addEventListener('submit', e => {
         e.preventDefault();
@@ -604,7 +604,7 @@
         const hits = Array.from(bar.querySelectorAll('button')).filter(b => b.textContent.toLowerCase().includes(q));
         if (hits.length){
           hits.forEach(b => b.classList.remove('found'));
-          void bar.offsetWidth; // restart the flash on all matches at once
+          void bar.offsetWidth; // force reflow to restart the flash
           hits.forEach(b => b.classList.add('found'));
           notify(hits.length + ' RESULT' + (hits.length === 1 ? '' : 'S') + ' FOUND. ' +
                  (hits.length === 1 ? 'IT WAS' : 'ALL') + ' IN THE TOOLBAR.');
@@ -614,7 +614,7 @@
       });
     }
 
-    // the proudest button: proof of purchase, docked at the far right
+    // cert button, shown only if a cert was purchased
     function certLink(){
       if (!bar || bar.querySelector('[data-k="cert"]')) return;
       let saved = null;
@@ -635,12 +635,12 @@
       burstConfetti();
       notify('KENNEDY TOOLBAR INSTALLED. IT DOES NOTHING. IT IS YOURS.');
     }
-    // returning visitors get their toolbar back, silently, like it never left
+    // rebuild toolbar for returning visitors
     try { if (localStorage.getItem(KEY)) build(); } catch(e){}
     return { install, certLink, get installed(){ return !!bar; } };
   })();
 
-  // ===== the popup engine — OMNICAST™ technology, road-legal edition =====
+  // popup engine
   (function(){
     const MAX = matchMedia('(max-width: 700px)').matches ? 2 : 3;
     let visible = 0;
@@ -673,7 +673,7 @@
     }
     refill();
 
-    // ===== the survey has feelings — a short RPG about a concerned popup =====
+    // survey dialog tree
     const DIALOG = {
       concern: { t: 'VISITOR SURVEY', b: 'Oh no. Oh no no no.<br><br>The popup leans in, as far as a popup can lean.<br><br>&ldquo;What&rsquo;s wrong?&rdquo;', btns: [
         { l: 'Oh, Nothing', a: 'dlg', arg: 'nothing' },
@@ -699,7 +699,7 @@
         { l: 'Same, Popup', a: 'toast', arg: 'THE POPUP IS TOUCHED. IT HAS NO HANDS, BUT IT IS TOUCHED.' } ] }
     };
 
-    // a soft, polite ding — this engine has manners now
+    // notification ding
     let pac = null;
     function ding(){
       try {
@@ -718,7 +718,7 @@
     }
 
     function act(a, arg, el){
-      const px = el.style.left, py = el.style.top; // the conversation stays where it started
+      const px = el.style.left, py = el.style.top; // keep next dialog at same spot
       dismiss(el);
       if (a === 'toast') notify(arg);
       else if (a === 'contact') document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
@@ -735,7 +735,7 @@
       visible--;
     }
 
-    // ===== the memory purge — Empty Recycle Bin, but it's your childhood =====
+    // fake "empty recycle bin" animation
     function purge(){
       const MEMORIES = [
         'my first field trip',
@@ -802,7 +802,7 @@
       el.querySelector('.t-btns i').addEventListener('click', () => {
         stop(idx >= MEMORIES.length ? '' : 'DELETION CANCELLED. THE MEMORIES REMAIN. THEY ALWAYS DO.');
       });
-      // rises when touched, drags by the titlebar — house rules
+      // raise on click, drag by titlebar
       el.addEventListener('pointerdown', () => { el.style.zIndex = ++zTop; });
       const bar = el.querySelector('.titlebar');
       bar.addEventListener('pointerdown', e => {
@@ -844,9 +844,9 @@
         btnRow.appendChild(btn);
       });
       el.querySelector('.t-btns i').addEventListener('click', () => dismiss(el));
-      // dialogs rise when touched
+      // raise on click
       el.addEventListener('pointerdown', () => { el.style.zIndex = ++zTop; });
-      // and drag by the titlebar, as nature intended
+      // drag by titlebar
       const bar = el.querySelector('.titlebar');
       bar.addEventListener('pointerdown', e => {
         if (e.target.closest('.t-btns')) return;
@@ -863,7 +863,7 @@
       });
       document.body.appendChild(el);
       visible++;
-      // keyboard users land on the first choice, not adrift behind the dialog
+      // focus first button for keyboard users
       const firstBtn = el.querySelector('.popup-btns button');
       if (firstBtn) firstBtn.focus({ preventScroll: true });
       return el;
@@ -872,7 +872,7 @@
     function spawn(){
       let cfg = POOL[bag.pop()];
       if (!bag.length) refill();
-      // once the toolbar is real, the offer becomes a status report
+      // swap offer for status if toolbar already installed
       if (cfg.t === 'TOOLBAR OFFER' && TOOLBAR.installed){
         cfg = { t: 'TOOLBAR STATUS', b: 'The Kennedy Toolbar is functioning nominally. No action is required. No action is possible.', btns: [{ l: 'Good' }] };
       }
@@ -889,13 +889,12 @@
     }
     schedule(true);
 
-    // welcome back — popups can't spawn while the tab is hidden, so returning
-    // after a while greets you with a small burst instead of dead air
+    // on return after a long hidden period, spawn a small burst
     let hiddenAt = 0;
     document.addEventListener('visibilitychange', () => {
       if (document.hidden){ hiddenAt = performance.now(); return; }
       if (!entered || DEFEND.running || !hiddenAt) return;
-      if (performance.now() - hiddenAt < 30000) return; // only after a real absence
+      if (performance.now() - hiddenAt < 30000) return; // only after 30s+ away
       hiddenAt = 0;
       const burst = Math.min(MAX - visible, 3);
       for (let i = 0; i < burst; i++){
@@ -906,7 +905,7 @@
     });
   })();
 
-  // ===== the guestbook — public, anonymous-friendly, proprietor-moderated =====
+  // guestbook
   (function(){
     // Firebase Realtime Database REST endpoint. Once the project exists, set:
     //   const GB_DB = 'https://YOUR-PROJECT-default-rtdb.firebaseio.com';
@@ -977,7 +976,7 @@
 
     if (!GB_DB) loadLocal();
     render();
-    loadRemote(); // fetch signatures up front — the count on the button should be honest
+    loadRemote(); // preload so the button count is accurate
 
     toggle.addEventListener('click', () => {
       const opening = wrap.style.display === 'none';
@@ -988,7 +987,7 @@
 
     form.addEventListener('submit', ev => {
       ev.preventDefault();
-      if (honeyEl.value) return; // robots sign no books
+      if (honeyEl.value) return; // honeypot: skip bots
       const n = (nameEl.value.trim() || 'ANONYMOUS').slice(0, 24);
       const m = msgEl.value.trim().slice(0, 280);
       if (!m) return;
@@ -1013,7 +1012,7 @@
           localStorage.setItem('dkk_guestbook', JSON.stringify(mine.slice(-30)));
         } catch(e){}
       }
-      // heads-up copy to the proprietor either way
+      // also email a copy
       fetch('https://formsubmit.co/ajax/hello@drewkkennedy.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -1022,14 +1021,14 @@
     });
   })();
 
-  // ===== Nintendrew video — opens in a modal, loads YouTube only on click =====
+  // nintendrew video modal, loads youtube on click
   (function(){
     const modal = document.getElementById('ytModal');
     const frame = document.getElementById('ytFrame');
     if (!modal || !frame) return;
     let resumeMusic = false;
     function open(id){
-      // duck the site music while the video plays; remember to bring it back
+      // pause site music during video, resume after
       resumeMusic = PLAYER.isPlaying;
       if (resumeMusic) PLAYER.pause();
       const f = document.createElement('iframe');
@@ -1054,7 +1053,7 @@
     addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('on')) close(); });
   })();
 
-  // ===== keyboard a11y — role=button elements fire on Enter/Space; Esc closes the top popup =====
+  // keyboard a11y: role=button fires on enter/space, esc closes top popup
   document.addEventListener('keydown', e => {
     const t = e.target;
     if ((e.key === 'Enter' || e.key === ' ') && t && t.getAttribute && t.getAttribute('role') === 'button'){
@@ -1071,7 +1070,7 @@
     if (closeI) closeI.click();
   });
 
-  // ===== DEFEND.EXE banner — a tiny live shooter, only when that theme is showing =====
+  // defend.exe banner: mini shooter, only on that theme
   (function(){
     const banner = document.getElementById('top');
     if (!banner || !banner.classList.contains('defend')) return;
@@ -1084,7 +1083,7 @@
     function pickTarget(){
       const alive = inv.filter(v => v.alive);
       if (!alive.length){ target = null; return; }
-      // random among the few nearest — a purposeful hunt, not a random patrol
+      // random pick among the nearest few
       alive.sort((a, b) => Math.abs((a.bx + marchX) - px) - Math.abs((b.bx + marchX) - px));
       target = alive[Math.floor(Math.random() * Math.min(3, alive.length))];
     }
@@ -1109,7 +1108,7 @@
       g.fillStyle = '#06030f'; g.fillRect(x-5, y, 3, 3); g.fillRect(x+2, y, 3, 3);
     }
     function drawCannon(x, y){
-      // matches the real DEFEND.EXE ship: cyan triangle-stack + magenta feet + flame
+      // cannon: cyan body, magenta feet, flame
       const fl = 6 + Math.random() * 5;
       g.fillStyle = PINK;
       g.beginPath(); g.moveTo(x-4, y+8); g.lineTo(x+4, y+8); g.lineTo(x, y+8+fl); g.closePath(); g.fill();
@@ -1138,14 +1137,13 @@
       if (!running) return;
       if (last && now - last < 33){ raf = requestAnimationFrame(frame); return; } // 30fps
       const dt = Math.min((now - (last || now)) / 1000, 0.06); last = now;
-      // ship: constant-speed bursts toward a random nearby invader, then holds
-      // still and fires — only ever fully stopped or at max speed
+      // ship moves in constant-speed bursts toward a target, then holds and fires
       const SPEED = 95;
       if (moveT > 0){
         moveT -= dt;
         px += sdir * SPEED * dt;
         if (px < 30){ px = 30; moveT = 0; } else if (px > W - 30){ px = W - 30; moveT = 0; }
-        if (moveT <= 0) restT = 0.3 + Math.random() * 0.7; // arrived → hold & shoot
+        if (moveT <= 0) restT = 0.3 + Math.random() * 0.7; // arrived, hold and shoot
       } else {
         restT -= dt;
         if (restT <= 0){
@@ -1164,7 +1162,7 @@
       if (marchX > 26 || marchX < -26){
         marchX = Math.max(-26, Math.min(26, marchX));
         marchDir *= -1;
-        // step down on 2 reversals, then up on 2 — a gentle rise-and-fall march
+        // step down for 2 reversals, then up for 2
         marchY += revCount < 2 ? 9 : -9;
         revCount = (revCount + 1) % 4;
       }
@@ -1196,6 +1194,6 @@
     sync();
   })();
 
-  // for the ones who open the console
+  // console easter egg
   console.log('%c↑↑↓↓←→←→BA', 'font-family: monospace; font-size: 16px; font-weight: bold; color: #FF3CAC;');
   console.log('%cYou found the back door. Two tips: never click the X on a window you love, and the code above still works.\nhello@drewkkennedy.com', 'font-family: monospace; font-size: 11px; color: #5C5478;');

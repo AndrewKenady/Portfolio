@@ -1,5 +1,4 @@
-/* Extracted from index.html. Classic script — shares global scope; load order matters (see index.html). */
-  // ===== drag anything by a handle — decks, dialogs, mini windows =====
+  // drag any element by a handle (decks, dialogs, mini windows)
   let floatZ = 840;
   function makeDraggable(el, handle, opts){
     opts = opts || {};
@@ -28,12 +27,12 @@
     });
   }
 
-  // ===== window controls — [_] minimizes, [□] pops a tiny preview, [×] fights back =====
+  // window controls: minimize, mini preview, close
   let miniCascade = { x: 40, y: 96 };
   const MINI_EASE = 'cubic-bezier(0.22,0.75,0.3,1)';
   const MINI_MS = 340;
-  const MINI_W = 320;   // on-screen width of the mini tile
-  const MINI_BODY_H = 230; // on-screen height of the scaled body preview
+  const MINI_W = 320;   // mini tile width
+  const MINI_BODY_H = 230; // scaled body preview height
 
   function clearMiniInline(win){
     win.style.position = win.style.left = win.style.top = win.style.right = win.style.bottom =
@@ -43,9 +42,8 @@
     if (body){ body.style.width = body.style.transform = body.style.transition = ''; }
   }
 
-  // titlebar height stays fixed; only the body scales, and the window's own
-  // width/height animate (clipping the body) — so the top bar never shrinks,
-  // the title just truncates, and the top edge stays anchored
+  // titlebar height stays fixed; only the body scales while the window's
+  // width/height animate and clip it, so the top edge stays anchored
   function toggleMini(win){
     const goingMini = !win.classList.contains('mini');
     const first = win.getBoundingClientRect();
@@ -53,7 +51,7 @@
     const tb = win.querySelector('.titlebar');
 
     if (goingMini){
-      // current in-flow height — small if the window is minimized (titlebar only)
+      // current in-flow height (titlebar only if minimized)
       const footprintH = win.offsetHeight;
       const cs = getComputedStyle(win);
       const mt = cs.marginTop, mb = cs.marginBottom;
@@ -65,21 +63,20 @@
       win.parentNode.insertBefore(ph, win);
       win._ph = ph; win._mt = mt; win._mb = mb;
 
-      // mini and min are mutually exclusive: un-minimize so the body shows, then
-      // measure the TRUE full geometry (a minimized window would otherwise report
-      // titlebar-only height and a zero-size body, breaking the restore)
+      // mini and min are exclusive: un-minimize first so the body shows and we
+      // measure true full geometry (else height is titlebar-only and body is zero)
       win.classList.remove('min');
       win.classList.add('mini');
       win.style.right = 'auto'; win.style.bottom = 'auto';
       const fullW = first.width;
-      win.style.width = fullW + 'px';              // lock full width (fixed shrink-to-fits otherwise)
-      const fullH = win.offsetHeight;              // full height with the body shown
-      const k = MINI_W / fullW;                    // body shrinks by this
+      win.style.width = fullW + 'px';              // lock full width
+      const fullH = win.offsetHeight;              // full height with body shown
+      const k = MINI_W / fullW;                    // body scale factor
       const bodyW = body.offsetWidth;
       const scaledBodyH = Math.round(body.offsetHeight * k);
       const visBodyH = Math.min(MINI_BODY_H, scaledBodyH);
-      const endH = tb.offsetHeight + visBodyH;     // titlebar (full) + (maybe clipped) body
-      // only show the "more below" fade when the body is actually taller than the tile
+      const endH = tb.offsetHeight + visBodyH;     // full titlebar + clipped body
+      // fade only when the body is taller than the tile
       win.classList.toggle('clipped', scaledBodyH > MINI_BODY_H + 1);
       win._fullW = fullW; win._fullH = fullH; win._bodyW = bodyW; win._k = k; win._endH = endH;
 
@@ -87,12 +84,11 @@
       miniCascade.x += 30; miniCascade.y += 30;
       if (miniCascade.y > innerHeight - 200){ miniCascade = { x: 40, y: 96 }; }
 
-      body.style.width = bodyW + 'px';             // lock so it won't reflow
+      body.style.width = bodyW + 'px';             // lock to stop reflow
       body.style.transformOrigin = 'top left';
       floatZ = floatZ >= 884 ? 841 : floatZ + 1; win.style.zIndex = floatZ;
 
-      // start frame: current on-screen spot, full width, current footprint height —
-      // so a minimized window unfolds from titlebar-only into the mini tile
+      // start frame: current spot, full width, current footprint height
       win.style.transition = body.style.transition = 'none';
       win.style.left = first.left + 'px'; win.style.top = first.top + 'px';
       win.style.height = footprintH + 'px';
@@ -129,15 +125,14 @@
         return;
       }
       const phRect = ph.getBoundingClientRect();
-      // the placeholder's top margin is currently collapsed to 0; the restored
-      // window will sit that margin lower, so target its true resting top
+      // placeholder top margin is collapsed to 0; add it back for the true resting top
       const homeLeft = phRect.left, homeTop = phRect.top + parseFloat(win._mt || 0);
       // reopen the space, sliding the page back down
       const T = MINI_MS + 'ms ' + MINI_EASE;
       ph.style.transition = 'height ' + T + ', margin ' + T;
       ph.style.height = win._fullH + 'px';
       ph.style.marginTop = win._mt; ph.style.marginBottom = win._mb;
-      // window grows back to full at home; body un-scales
+      // grow back to full at home; body un-scales
       win.style.transition = body.style.transition = 'none';
       void win.offsetWidth;
       win.style.transition = 'left ' + T + ', top ' + T + ', width ' + T + ', height ' + T;
@@ -159,8 +154,7 @@
     const [minB, maxB, closeB] = btns.querySelectorAll('i');
     if (minB) minB.addEventListener('click', () => win.classList.toggle('min'));
     if (maxB) maxB.addEventListener('click', () => {
-      // mini preview needs a precise pointer to drag/restore — on touch/narrow
-      // screens fall back to the harmless shake instead
+      // mini preview needs a precise pointer; on touch/narrow screens shake instead
       if (matchMedia('(max-width:760px)').matches || matchMedia('(pointer:coarse)').matches){
         win.classList.remove('shake');
         void win.offsetWidth; // restart the animation
@@ -173,18 +167,18 @@
       notify('GADZOOKS! THE SITE IS FIGHTING BACK!');
       DEFEND.open(false);
     });
-    // once mini, the whole window can be shoved around by its titlebar
+    // once mini, drag the whole window by its titlebar
     makeDraggable(win, win.querySelector('.titlebar'), { enabled: () => win.classList.contains('mini'), raise: true });
   });
 
-  // the deck is a proper window — drag it by its top strip (desktop only)
+  // drag the deck by its top strip (desktop only)
   (function(){
     const deck = document.getElementById('winamp');
     const grip = deck && deck.querySelector('.wa-top');
     if (deck && grip) makeDraggable(deck, grip, { enabled: () => !matchMedia('(max-width:700px)').matches, raise: true });
   })();
 
-  // ===== status bar — where links go, announced honestly =====
+  // status bar: show a link's target on hover
   const statusBar = document.getElementById('statusBar');
   if (window.matchMedia('(hover:hover)').matches){
     document.querySelectorAll('a[href]').forEach(a => {

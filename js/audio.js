@@ -1,18 +1,15 @@
-/* Extracted from index.html. Classic script — shares global scope; load order matters (see index.html). */
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // effect canvases render at capped DPI — it's all chunky pixel art anyway,
-  // and full retina on 4-5 fullscreen canvases is where the frame budget went
+  // cap DPI for effect canvases (pixel art, keeps fullscreen canvases cheap)
   const fxDpr = () => Math.min(window.devicePixelRatio || 1, 1.5);
 
-  // ===== the enter page — first input doubles as audio consent =====
+  // splash gate: first input is the audio user-gesture
   const splash = document.getElementById('splash');
   let entered = false;
 
-  // the gate greets everyone, every time — that's how the music gets its user gesture
   document.body.style.overflow = 'hidden';
   splash.focus({ preventScroll: true });
 
-  // marquee the page title while the door is still closed
+  // scroll the title while the splash is up
   const REAL_TITLE = document.title;
   let tstr = '★ DREW K. KENNEDY ★ GAME DEVELOPER ★ CONTENT CREATOR ★ HOST & PANELIST ';
   let titleTimer = setInterval(() => {
@@ -20,7 +17,7 @@
     document.title = tstr;
   }, 400);
 
-  // ===== MIDI ENGINE — because the background music is a real .mid file =====
+  // midi engine
   const MIDI = (function(){
     let notes = [], duration = 0, loaded = false;
     let actx = null, master = null, schedTimer = null, songStart = 0, cursor = 0, playing = false;
@@ -61,8 +58,7 @@
             if (type === 0x51) tempos.push({ tick, uspq: (dv.getUint8(p.i)<<16) | (dv.getUint8(p.i+1)<<8) | dv.getUint8(p.i+2) });
             p.i += mlen;
           } else if (status === 0xF0 || status === 0xF7){
-            // evaluate varlen FIRST — `p.i += varlen(...)` reads the old p.i before
-            // varlen advances it past the length byte, skidding the parser off-axis
+            // call varlen before advancing p.i (it advances p.i itself)
             const slen = varlen(dv, p);
             p.i += slen;
           }
@@ -70,7 +66,7 @@
         }
         pos = end;
       }
-      // ticks → seconds via the tempo map
+      // ticks to seconds via the tempo map
       tempos.sort((a,b) => a.tick - b.tick);
       function toSec(tick){
         let s = 0, lt = 0, u = 500000;
@@ -94,19 +90,19 @@
         }
       }
       notes.sort((a,b) => a.t - b.t);
-      // trim dead air — some MIDIs sit silent for seconds before the first note
+      // trim leading silence
       if (notes.length){
         const lead = notes[0].t;
         if (lead > 0.5){ for (const nt of notes) nt.t -= (lead - 0.3); }
       }
       duration = notes.length ? notes[notes.length-1].t + 2 : 0;
-      loaded = notes.length > 60; // a real song, not a parse accident
+      loaded = notes.length > 60; // enough notes to be a real song
       return loaded;
     }
 
     function voice(nt, when){
       const t = when, vel = (nt.v / 127) * 0.85;
-      if (nt.ch === 9){ // drums: pitched thump for kicks, noise for the rest
+      if (nt.ch === 9){ // drums: pitched kick, noise for the rest
         const g = actx.createGain();
         g.gain.setValueAtTime(vel * 0.5, t);
         g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
@@ -127,7 +123,7 @@
         }
         return;
       }
-      // polyphony guard — phones deserve music too, just less of it at once
+      // polyphony guard: drop quiet notes when busy
       if (MIDI.voices > 40 && vel < 0.5) return;
       const o = actx.createOscillator();
       o.type = CH_WAVE[nt.ch] || 'square';
@@ -153,12 +149,12 @@
         const when = songStart + nt.t;
         if (when > now - 0.05) voice(nt, when);
       }
-      if (cursor >= notes.length && now > songStart + duration){ // side A over
+      if (cursor >= notes.length && now > songStart + duration){ // track finished
         if (MIDI.onEnded){
           playing = false;
           clearInterval(schedTimer);
           MIDI.onEnded();
-        } else { // no playlist? loop the tape
+        } else { // no playlist, loop
           songStart = now + 1.2;
           cursor = 0;
         }
@@ -171,9 +167,7 @@
       voices: 0,
       load(buf){ return parse(buf); },
       get loaded(){ return loaded; },
-      // hard cut: notes are scheduled up to 0.8s ahead, so severing master from
-      // the output is the only way to silence in-flight voices instantly.
-      // start() rebuilds master via its own guard.
+      // hard cut: disconnect master to silence notes scheduled ahead; start() rebuilds it
       stop(){
         playing = false;
         clearInterval(schedTimer);
@@ -204,7 +198,7 @@
     };
   })();
 
-  // ===== the playlist — shuffled fresh on every visit =====
+  // playlist, shuffled each visit
   const PLAYLIST = [
     { f: 'September.mid',                                          t: 'Earth, Wind & Fire — September' },
     { f: 'Queen - Bohemian Rhapsody.mid',                          t: 'Queen — Bohemian Rhapsody' },
@@ -241,21 +235,19 @@
     function cur(){ return PLAYLIST[order[pos]]; }
     function setLcdRaw(base){
       lcd.textContent = base;
-      // crawl only if the title overflows the LCD — short titles sit still,
-      // long ones parade. rotating a string that fits just looks broken.
+      // only crawl if the title overflows the lcd
       crawl = lcd.offsetWidth > lcd.parentNode.clientWidth - 17;
       marqStr = crawl ? base + '  ★  ' : base;
     }
     function setLcd(){
       setLcdRaw((pos + 1) + '/' + order.length + '  ' + cur().t);
     }
-    // the LCD crawls (when it must), as is right and proper
     setInterval(() => {
       if (!playing || !crawl || !marqStr) return;
       marqStr = marqStr.slice(1) + marqStr[0];
       lcd.textContent = marqStr;
     }, 260);
-    // LCD width changes with the viewport — re-judge the crawl
+    // recheck crawl on resize
     addEventListener('resize', () => { if (everStarted) setLcd(); });
 
     function loadAndPlay(){
@@ -275,7 +267,7 @@
         box.classList.remove('paused');
         setLcd();
       }).catch(() => {
-        // unreadable or missing (e.g., file:// preview) — skip, but don't spin forever
+        // unreadable or missing: skip without spinning forever
         if (++skips < PLAYLIST.length) next();
         else box.style.display = 'none';
       });
@@ -283,7 +275,7 @@
     function next(){
       MIDI.stop();
       pos++;
-      if (pos >= order.length){ shuffle(); pos = 0; } // reshuffle each full spin
+      if (pos >= order.length){ shuffle(); pos = 0; } // reshuffle after a full pass
       loadAndPlay();
     }
     function prev(){
@@ -303,8 +295,7 @@
         box.classList.remove('paused');
       }
     }
-    // the dancing baby's b-side — off the shuffle rotation, on demand only.
-    // always restarts from the top, cutting whatever's currently playing.
+    // secret track, on demand only; always restarts from the top
     function playSecret(){
       const key = 'secret/Hooked-On-A-Feeling.mid';
       MIDI.stop();
@@ -333,7 +324,7 @@
       const shaded = box.classList.toggle('shade');
       btnShade.innerHTML = shaded ? '&#9652;' : '&#9662;';
       btnShade.setAttribute('aria-label', shaded ? 'Expand player' : 'Collapse player');
-      if (!shaded && everStarted) setLcd(); // the LCD was hidden — re-measure the crawl
+      if (!shaded && everStarted) setLcd(); // lcd was hidden, re-measure crawl
     });
     return {
       start(){ shuffle(); pos = 0; loadAndPlay(); },
@@ -344,7 +335,7 @@
     };
   })();
 
-  // ===== the dancing baby spins its record — a hidden B.J.-Thomas b-side =====
+  // dancing baby plays the secret track
   (function(){
     const baby = document.querySelector('.dancing-baby');
     if (!baby) return;
@@ -364,13 +355,12 @@
     if (entered) return;
     entered = true;
     if (titleTimer){ clearInterval(titleTimer); document.title = REAL_TITLE; }
-    PLAYER.start(); // the click is the user gesture the audio needs
+    PLAYER.start(); // the click is the audio user-gesture
     splash.classList.add('hidden');
-    document.body.classList.add('entered'); // one-shot intros (e.g. Game Boy boot) start now, not behind the splash
+    document.body.classList.add('entered'); // triggers one-shot intros
     document.body.style.overflow = '';
-    if (!location.hash) window.scrollTo(0, 0); // reveal the top of the page, never a restored mid-page scroll
-    // once faded, drop the splash entirely — it's a full-screen gradient layer
-    // plus the splash trail canvas, both pure overhead after entering
+    if (!location.hash) window.scrollTo(0, 0); // start at top unless there's a hash
+    // drop the splash after the fade
     setTimeout(() => { splash.style.display = 'none'; }, 1000);
   }
   splash.addEventListener('click', enterSite);

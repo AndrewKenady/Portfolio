@@ -1,5 +1,5 @@
-/* Extracted from index.html. Classic script — shares global scope; load order matters (see index.html). */
-  // ===== DEFEND.EXE — full arcade: entrances, divers, shop, bosses, leaderboard =====
+/* extracted from index.html. classic script, shares global scope; load order matters. */
+  // defend.exe arcade game
   const DEFEND = (function(){
     const overlay = document.getElementById('gameOverlay');
     const cv = document.getElementById('gameCanvas');
@@ -33,7 +33,7 @@
     let fireHeld = false, moveL = false, moveR = false, moveU = false, moveD = false;
     let touchX = null, touchY = null, invuln = 0;
     let shipTrail = [];
-    const Y_MIN = H - 175, Y_MAX = H - 34; // the flight band — low orbit only
+    const Y_MIN = H - 175, Y_MAX = H - 34; // flight band
     let modeT = 0;           // seconds in current mode
     let shopSel = 0, shopItems = [];
     let entry = { chars:[0,0,0], slot:0 };
@@ -41,7 +41,7 @@
     let stars = [];
     for (let i = 0; i < 60; i++) stars.push({ x: Math.random()*W, y: Math.random()*H, s: 0.3 + Math.random()*1.4 });
 
-    // deterministic per-level RNG — the "procedural" in procedurally generated
+    // deterministic per-level rng
     function rng(seed){
       let a = (seed * 2654435761) >>> 0;
       return function(){
@@ -112,7 +112,7 @@
           hp: 50 + tier * 40, hpMax: 50 + tier * 40,
           tier, t: 0, flash: 0, minionT: 6
         };
-        jingle([220, 185, 156, 131], 0.16, 0.22, 'sawtooth', 0.05); // alarm
+        jingle([220, 185, 156, 131], 0.16, 0.22, 'sawtooth', 0.05); // boss alarm
         return;
       }
       const cols = 7;
@@ -159,7 +159,7 @@
       else if (it.id === 'speed') up.speed++;
       else if (it.id === 'shield') shields++;
       else if (it.id === 'life') lives++;
-      jingle([784, 1046], 0.07, 0.09, 'triangle', 0.05); // cha-ching
+      jingle([784, 1046], 0.07, 0.09, 'triangle', 0.05); // purchase sound
       buildShop();
       shopSel = Math.min(shopSel, shopItems.length - 1);
       syncHud();
@@ -310,7 +310,7 @@
 
       const spec = levelSpec(level);
 
-      // ship — full 2D flight within the band
+      // ship: 2d flight within the band
       const spd = 280 * Math.pow(1.2, up.speed);
       let dx = 0, dy = 0;
       if (moveL) dx -= spd * dt;
@@ -327,7 +327,7 @@
       // afterimage trail
       shipTrail.push({ x: ship.x, y: ship.y, tilt: ship.tilt });
       if (shipTrail.length > 12) shipTrail.shift();
-      // engine wash — burns hotter under thrust
+      // engine wash, more particles under thrust
       const thrust = (Math.abs(dx) + Math.abs(dy)) > 0.1;
       if (Math.random() < (thrust ? 0.9 : 0.4)){
         parts.push({
@@ -433,7 +433,7 @@
         if (boss && s.y > -50 &&
             s.x > boss.x - boss.w/2 && s.x < boss.x + boss.w/2 &&
             s.y > boss.y - boss.h/2 && s.y < boss.y + boss.h/2){
-          // the × button is the weak point, naturally
+          // close button is the weak point
           const xbX = boss.x + boss.w/2 - 18, xbY = boss.y - boss.h/2 + 10;
           const crit = Math.abs(s.x - xbX) < 12 && Math.abs(s.y - xbY) < 12;
           boss.hp -= crit ? 3 : 1;
@@ -538,7 +538,7 @@
       g.fillStyle = grad; g.fillRect(bx, by, boss.w, 20);
       g.fillStyle = '#FFFFFF'; g.font = 'bold 11px Courier New'; g.textAlign = 'left';
       g.fillText('FATAL_ERROR.EXE — TIER ' + boss.tier, bx + 8, by + 14);
-      // the × button (weak point) — hit it for triple damage
+      // close button, weak point for triple damage
       const xbX = boss.x + boss.w/2 - 18, xbY = by + 10;
       g.fillStyle = '#F0EDF5'; g.fillRect(xbX - 9, xbY - 8, 18, 16);
       g.strokeStyle = '#8E86A8'; g.lineWidth = 2; g.strokeRect(xbX - 9, xbY - 8, 18, 16);
@@ -557,10 +557,10 @@
     }
 
     function shipGeo(alpha, hot){
-      // drawn at origin — caller sets the transform
+      // drawn at origin, caller sets the transform
       g.globalAlpha = alpha;
       if (hot){
-        // engine flame — flickers every frame
+        // engine flame, flickers each frame
         const fl = 9 + Math.random() * 7;
         g.fillStyle = '#FF3CAC';
         g.beginPath();
@@ -609,7 +609,7 @@
 
     function centerText(txt, y, size, color, bold){
       g.fillStyle = color;
-      // +20% — the menu screens' text was hard to read through the CRT scanlines
+      // scale up 20% for readability through the crt scanlines
       g.font = (bold ? 'bold ' : '') + (size * 1.2) + 'px Courier New';
       g.textAlign = 'center';
       g.fillText(txt, W/2, y);
