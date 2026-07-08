@@ -75,7 +75,7 @@
   #confettiCanvas{
     position:fixed; inset:0;
     width:100%; height:100%;
-    z-index:910;
+    z-index:1100; /* celebration sits above all chrome, incl. the toolbar and the screensaver */
     pointer-events:none;
     display:none; /* only composited while confetti is actually flying */
   }
@@ -84,7 +84,7 @@
     position:fixed;
     bottom:26px; left:50%;
     transform:translate(-50%, 20px);
-    z-index:950;
+    z-index:1200; /* transient feedback always on top, even over the screensaver */
     background:var(--ink);
     color:#fff;
     border:2px outset var(--bevel-hi);
@@ -1041,6 +1041,27 @@
     z-index:589;
     pointer-events:none;
     image-rendering:pixelated; /* trail canvas is rendered sub-resolution; keep the upscale crisp */
+  }
+
+  /* ============ SCREENSAVER — a bouncing DVD-logo tribute (wait for the corner) ============ */
+  #dkk-saver{
+    position:fixed; inset:0; z-index:1050; /* over everything but the confetti/toast payoff */
+    background:#05030f; cursor:pointer; overflow:hidden;
+    animation:ssFade 0.4s ease;
+  }
+  @keyframes ssFade{ from{ opacity:0; } to{ opacity:1; } }
+  #dkk-saver .ss-logo{
+    position:absolute; top:0; left:0; will-change:transform;
+    font-family:'Times New Roman', Times, serif; font-style:italic; font-weight:bold;
+    font-size:clamp(40px, 8vw, 78px); line-height:1; letter-spacing:0.01em;
+    padding:8px 20px 14px; white-space:nowrap; user-select:none;
+    color:#FF3CAC; text-shadow:0 0 22px currentColor;
+    transition:color 0.25s ease;
+  }
+  #dkk-saver .ss-hint{
+    position:absolute; left:0; right:0; bottom:22px; text-align:center; pointer-events:none;
+    font-family:'Courier New', Courier, monospace; font-size:12px; letter-spacing:0.24em;
+    text-transform:uppercase; color:rgba(255,255,255,0.32);
   }
 
   /* ============ the popup engine — OMNICAST™ technology, road-legal edition ============ */

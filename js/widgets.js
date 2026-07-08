@@ -413,6 +413,90 @@
     return { cycle, reset, get mode(){ return mode; } };
   })();
 
+  // ===== SCREENSAVER — a bouncing DVD-logo tribute; everyone waits for the corner =====
+  const SCREENSAVER = (function(){
+    const COLORS = ['#FF3CAC', '#00E5FF', '#FFD34D', '#3CFF6E', '#B29CE8', '#FF6B4A', '#FFFFFF'];
+    let el = null, logo = null, raf = null, last = 0;
+    let x = 0, y = 0, vx = 130, vy = 108, w = 0, h = 0, ci = 0;
+    let corners = 0, tHitX = -1e9, tHitY = -1e9, lastCorner = -1e9;
+
+    function nextColor(){
+      // advance to a different colour on every wall bounce
+      ci = (ci + 1 + (Math.random() * (COLORS.length - 1) | 0)) % COLORS.length;
+      logo.style.color = COLORS[ci];
+    }
+    function onKey(e){
+      if (e.key === 'Tab' || e.metaKey || e.ctrlKey || e.altKey) return; // let browser shortcuts through
+      e.preventDefault(); stop();
+    }
+    function onVis(){
+      if (document.hidden){ if (raf){ cancelAnimationFrame(raf); raf = null; } }
+      else if (el && !raf){ last = 0; raf = requestAnimationFrame(frame); }
+    }
+    function stop(){
+      if (!el) return;
+      if (raf) cancelAnimationFrame(raf); raf = null;
+      removeEventListener('keydown', onKey, true);
+      document.removeEventListener('visibilitychange', onVis);
+      const gone = el; el = null; logo = null;
+      gone.style.animation = 'ssFade 0.28s ease reverse both';
+      setTimeout(() => gone.remove(), 270);
+    }
+    function frame(now){
+      if (!last) last = now;
+      const dt = Math.min((now - last) / 1000, 0.05); last = now;
+      const W = innerWidth, H = innerHeight;
+      x += vx * dt; y += vy * dt;
+      let hitX = false, hitY = false;
+      if (x <= 0){ x = 0; vx = Math.abs(vx); hitX = true; }
+      else if (x + w >= W){ x = W - w; vx = -Math.abs(vx); hitX = true; }
+      if (y <= 0){ y = 0; vy = Math.abs(vy); hitY = true; }
+      else if (y + h >= H){ y = H - h; vy = -Math.abs(vy); hitY = true; }
+      if (hitX){ tHitX = now; }
+      if (hitY){ tHitY = now; }
+      if (hitX || hitY) nextColor();
+      // a "corner" = both walls struck within a blink of each other (the white whale)
+      if ((hitX || hitY) && Math.abs(tHitX - tHitY) < 70 && now - lastCorner > 600){
+        lastCorner = now; corners++;
+        burstConfetti();
+        notify(corners === 1
+          ? 'PERFECT CORNER HIT. YOUR LUCK IS SPENT FOR THE DAY.'
+          : 'ANOTHER CORNER?! THIS IS STATISTICALLY RUDE. (' + corners + ')');
+      }
+      logo.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
+      raf = requestAnimationFrame(frame);
+    }
+    function start(){
+      if (el) return;
+      el = document.createElement('div');
+      el.id = 'dkk-saver';
+      el.setAttribute('role', 'button');
+      el.setAttribute('aria-label', 'Screensaver. Click or press any key to wake.');
+      el.innerHTML = '<div class="ss-logo">DKK</div><div class="ss-hint">Click anywhere to wake</div>';
+      document.body.appendChild(el);
+      logo = el.querySelector('.ss-logo');
+      ci = 0; logo.style.color = COLORS[0];
+      w = logo.offsetWidth; h = logo.offsetHeight;
+      x = (innerWidth - w) * (0.2 + Math.random() * 0.5);
+      y = (innerHeight - h) * (0.2 + Math.random() * 0.5);
+      vx = (Math.random() < 0.5 ? -1 : 1) * 130;
+      vy = (Math.random() < 0.5 ? -1 : 1) * 108;
+      logo.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
+      el.addEventListener('pointerdown', stop);
+      addEventListener('keydown', onKey, true);
+      document.addEventListener('visibilitychange', onVis);
+      if (prefersReducedMotion){
+        // honour reduced motion — park it centred, no bounce, no strobing colour
+        x = (innerWidth - w) / 2; y = (innerHeight - h) / 2;
+        logo.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
+        return;
+      }
+      last = 0; tHitX = tHitY = lastCorner = -1e9;
+      raf = requestAnimationFrame(frame);
+    }
+    return { start, stop };
+  })();
+
   // ===== THE KENNEDY TOOLBAR — it does nothing, but it's yours =====
   const TOOLBAR = (function(){
     const KEY = 'dkk_toolbar';
@@ -453,6 +537,7 @@
         '<button type="button" data-k="syn">&#129309; Synergize</button>' +
         '<button type="button" data-k="wx">' + WX_ICONS[WEATHER.mode] + ' Weather: ' + WEATHER.mode + '</button>' +
         '<button type="button" data-k="store">&#128722; Store</button>' +
+        '<button type="button" data-k="ss">&#128421;&#65039; Screensaver</button>' +
         '<button type="button" data-k="un">&#128465;&#65039; Uninstall</button>' +
         '<form class="ktb-search"><input type="text" maxlength="32" placeholder="Search the toolbar..." aria-label="Search the toolbar"><button type="submit">&#128269; Go</button></form>';
       document.body.appendChild(bar);
@@ -487,6 +572,10 @@
         wx.innerHTML = WX_ICONS[m] + ' Weather: ' + m;
       });
       bar.querySelector('[data-k="store"]').addEventListener('click', () => STORE.open());
+      bar.querySelector('[data-k="ss"]').addEventListener('click', () => {
+        SCREENSAVER.start();
+        notify('SCREENSAVER ENGAGED. DO NOT LOOK AWAY.');
+      });
       const un = bar.querySelector('[data-k="un"]');
       un.addEventListener('click', () => {
         if (un.dataset.armed){
