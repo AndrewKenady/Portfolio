@@ -368,6 +368,7 @@
     splash.classList.add('hidden');
     document.body.classList.add('entered'); // one-shot intros (e.g. Game Boy boot) start now, not behind the splash
     document.body.style.overflow = '';
+    if (!location.hash) window.scrollTo(0, 0); // reveal the top of the page, never a restored mid-page scroll
     // once faded, drop the splash entirely — it's a full-screen gradient layer
     // plus the splash trail canvas, both pure overhead after entering
     setTimeout(() => { splash.style.display = 'none'; }, 1000);
