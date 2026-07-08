@@ -212,7 +212,7 @@
     color:#0f380f; -webkit-text-fill-color:#0f380f;
     filter:none; text-shadow:none;
     overflow:hidden;                 /* clip shine sweep */
-    padding:0 0.14em 0.2em;          /* room for italic y descender */
+    padding:0 0.14em 0.36em;         /* room for the italic y descender under overflow:hidden */
   }
   /* shine sweep after logo lands */
   .banner.gameboy h1::after{

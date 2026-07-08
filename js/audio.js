@@ -222,6 +222,8 @@
     const btnPlay = document.getElementById('waPlay');
     const btnNext = document.getElementById('waNext');
     let order = [], pos = 0, playing = false, everStarted = false, skips = 0;
+    let secret = false, loadSeq = 0; // secret = the bonus track owns the readout; loadSeq guards against stale async loads
+    const SECRET_LABEL = 'SECRET  Blue Swede — Hooked on a Feeling';
     const cache = new Map();
     let marqStr = '', crawl = false;
 
@@ -239,9 +241,10 @@
       crawl = lcd.offsetWidth > lcd.parentNode.clientWidth - 17;
       marqStr = crawl ? base + '  ★  ' : base;
     }
-    function setLcd(){
-      setLcdRaw((pos + 1) + '/' + order.length + '  ' + cur().t);
+    function label(){
+      return secret ? SECRET_LABEL : (pos + 1) + '/' + order.length + '  ' + cur().t;
     }
+    function setLcd(){ setLcdRaw(label()); }
     setInterval(() => {
       if (!playing || !crawl || !marqStr) return;
       marqStr = marqStr.slice(1) + marqStr[0];
@@ -252,13 +255,16 @@
 
     function loadAndPlay(){
       const tr = cur();
+      const my = ++loadSeq;
       const got = cache.has(tr.f)
         ? Promise.resolve(cache.get(tr.f))
         : fetch('misc/' + encodeURIComponent(tr.f))
             .then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
             .then(b => { cache.set(tr.f, b); return b; });
       got.then(buf => {
+        if (my !== loadSeq) return; // a newer request superseded this one
         if (!MIDI.load(buf)) throw 0;
+        secret = false;
         skips = 0;
         MIDI.start();
         playing = true;
@@ -267,6 +273,7 @@
         box.classList.remove('paused');
         setLcd();
       }).catch(() => {
+        if (my !== loadSeq) return;
         // unreadable or missing: skip without spinning forever
         if (++skips < PLAYLIST.length) next();
         else box.style.display = 'none';
@@ -299,19 +306,22 @@
     function playSecret(){
       const key = 'secret/Hooked-On-A-Feeling.mid';
       MIDI.stop();
+      const my = ++loadSeq;
       const got = cache.has(key)
         ? Promise.resolve(cache.get(key))
         : fetch('misc/secret/' + encodeURIComponent('Hooked-On-A-Feeling.mid'))
             .then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
             .then(b => { cache.set(key, b); return b; });
       got.then(buf => {
+        if (my !== loadSeq) return; // superseded (e.g. the user hit next/prev)
         if (!MIDI.load(buf)) throw 0;
+        secret = true;
         MIDI.start();
         playing = true;
         everStarted = true;
         box.style.display = 'block';
         box.classList.remove('paused', 'shade');
-        setLcdRaw('SECRET  Blue Swede — Hooked on a Feeling');
+        setLcd();
       }).catch(() => {});
     }
 
