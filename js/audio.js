@@ -359,7 +359,7 @@
     splash.classList.add('hidden');
     document.body.classList.add('entered'); // triggers one-shot intros
     document.body.style.overflow = '';
-    if (!location.hash) window.scrollTo(0, 0); // start at top unless there's a hash
+    if (!location.hash){ window.scrollTo(0, 0); document.body.scrollTop = 0; } // start at top unless there's a hash
     // drop the splash after the fade
     setTimeout(() => { splash.style.display = 'none'; }, 1000);
   }

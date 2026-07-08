@@ -520,9 +520,10 @@
       'MIDI': '&#127925;'
     };
 
-    // offset body by toolbar height; recompute on resize
+    // publish toolbar height as a CSS var; the offset/scroll model lives in CSS
     function pad(){
-      document.body.style.paddingTop = bar ? bar.offsetHeight + 'px' : '';
+      if (bar) document.body.style.setProperty('--ktb-h', bar.offsetHeight + 'px');
+      else document.body.style.removeProperty('--ktb-h');
     }
     addEventListener('resize', () => { if (bar) pad(); });
 
@@ -542,6 +543,7 @@
         '<form class="ktb-search"><input type="text" maxlength="32" placeholder="Search the toolbar..." aria-label="Search the toolbar"><button type="submit">&#128269; Go</button></form>';
       document.body.appendChild(bar);
       document.body.classList.add('has-ktb');
+      document.documentElement.classList.add('ktb-lock');
       pad();
 
       bar.querySelector('[data-k="home"]').addEventListener('click', () => {
@@ -581,6 +583,7 @@
         if (un.dataset.armed){
           bar.remove(); bar = null;
           document.body.classList.remove('has-ktb');
+          document.documentElement.classList.remove('ktb-lock');
           pad();
           WEATHER.reset(); // clear the weather effect
           try { localStorage.removeItem(KEY); } catch(e){}

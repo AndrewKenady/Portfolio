@@ -1128,8 +1128,23 @@
     box-shadow:0 2px 0 rgba(0,0,0,0.35);
     padding:5px 8px;
   }
+  /* push content below the docked toolbar */
+  body.has-ktb{ padding-top:var(--ktb-h, 44px); }
   /* anchor jumps clear the docked toolbar */
   body.has-ktb .window, body.has-ktb .banner{ scroll-margin-top:44px; }
+  /* on desktop, hand the scrollbar to the body so it starts below the full-width
+     toolbar instead of running up alongside it. mobile keeps document scroll
+     (overlay scrollbars, and 100vh is unreliable there). */
+  @media (min-width:761px){
+    html.ktb-lock{ height:100%; overflow:hidden; }
+    html.ktb-lock body.has-ktb{
+      margin-top:var(--ktb-h, 44px);
+      height:calc(100vh - var(--ktb-h, 44px));
+      padding-top:0;
+      overflow-y:auto;
+      overflow-x:hidden;
+    }
+  }
   .ktb-logo{
     font-family:'Courier New', Courier, monospace;
     font-weight:bold;
