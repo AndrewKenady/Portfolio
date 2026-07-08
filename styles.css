@@ -214,18 +214,16 @@
     filter:none; text-shadow:2px 2px 0 #306230;
     overflow:hidden;                 /* clips the shine sweep to the text box */
     padding:0 0.14em 0.2em;          /* ...but leave room for the italic 'y' descender */
-    animation:gbBoot 2s linear;      /* scroll down from above the masked edge, then hold */
   }
   /* OG-style shine sweep, once the logo has landed */
   .banner.gameboy h1::after{
     content:""; position:absolute; top:0; left:0; height:100%; width:55%;
     background:linear-gradient(105deg, transparent 32%, rgba(255,255,255,0.6) 50%, transparent 68%);
     transform:translateX(-200%); pointer-events:none;
-    animation:gbShine 0.85s ease-in 1.5s 1;
   }
   @keyframes gbBoot{ 0%{ transform:translateY(-230%); } 62%{ transform:translateY(0); } 100%{ transform:translateY(0); } }
   @keyframes gbShine{ to{ transform:translateX(240%); } }
-  .banner.gameboy .tagline{ color:#0f380f; text-shadow:1px 1px 0 rgba(48,98,48,0.55); animation:gbFadeIn 0.5s ease 1.25s both; }
+  .banner.gameboy .tagline{ color:#0f380f; text-shadow:1px 1px 0 rgba(48,98,48,0.55); }
   @keyframes gbFadeIn{ from{ opacity:0; } to{ opacity:1; } }
   .banner.gameboy .net-badge{ filter:drop-shadow(2px 2px 0 rgba(15,56,15,0.5)); }
   .banner.gameboy .net-badge path{ fill:#306230; stroke:#9bbc0f; }
@@ -235,9 +233,18 @@
     display:block; position:absolute; left:0; right:0; bottom:12px; z-index:2;
     text-align:center; font-family:'Courier New', Courier, monospace; font-weight:bold;
     font-size:12px; letter-spacing:0.22em; color:#0f380f;
-    opacity:0; animation:gbBlink 1.05s steps(2) infinite 1.5s;
+    opacity:0;
   }
   @keyframes gbBlink{ 0%,100%{ opacity:1; } 50%{ opacity:0; } }
+  /* The DMG boot is a one-shot that must play AFTER the splash clears, not on
+     page load behind it. Gate it on body.entered and delay ~0.8s past the 0.9s
+     splash fade. 'both' keeps the logo clipped above during the delay and at
+     rest after it lands; the dependent delays are shifted by the same 0.8s to
+     preserve the original OG boot choreography. */
+  body.entered .banner.gameboy h1{ animation:gbBoot 2s linear 0.8s both; }
+  body.entered .banner.gameboy h1::after{ animation:gbShine 0.85s ease-in 2.3s 1; }
+  body.entered .banner.gameboy .tagline{ animation:gbFadeIn 0.5s ease 2.05s both; }
+  body.entered .banner.gameboy .gb-start{ animation:gbBlink 1.05s steps(2) infinite 2.3s; }
   /* ---- DEFEND.EXE theme: pixel space shooter ---- */
   .banner.defend{ background:radial-gradient(ellipse at 50% 22%, #14134a 0%, #06030f 72%); }
   .def-scene{ display:none; position:absolute; inset:0; z-index:0; overflow:hidden; }

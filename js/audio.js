@@ -366,6 +366,7 @@
     if (titleTimer){ clearInterval(titleTimer); document.title = REAL_TITLE; }
     PLAYER.start(); // the click is the user gesture the audio needs
     splash.classList.add('hidden');
+    document.body.classList.add('entered'); // one-shot intros (e.g. Game Boy boot) start now, not behind the splash
     document.body.style.overflow = '';
     // once faded, drop the splash entirely — it's a full-screen gradient layer
     // plus the splash trail canvas, both pure overhead after entering
