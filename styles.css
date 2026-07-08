@@ -792,6 +792,7 @@
     background-clip:text;
     color:transparent;
     filter:drop-shadow(2px 3px 0 rgba(30,10,60,0.85)) drop-shadow(0 0 18px rgba(0,229,255,0.35));
+    padding-bottom:0.16em; margin-bottom:-0.16em; /* paint the italic y descender (see .banner h1) */
   }
   .sp-sub{
     margin-top:14px;
