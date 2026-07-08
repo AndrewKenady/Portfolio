@@ -220,6 +220,70 @@
   /* stronger dark outline so the chrome title reads over the bright sky */
   .banner.platformer h1{ filter:drop-shadow(2px 3px 0 rgba(10,26,54,0.92)) drop-shadow(0 1px 2px rgba(0,0,0,0.45)); }
   .banner.platformer .tagline{ color:#fff; text-shadow:1px 1px 0 rgba(10,26,54,0.95), 0 0 3px rgba(10,26,54,0.6); }
+  /* ---- GAME BOY theme: DMG boot screen, monochrome LCD ---- */
+  .banner.gameboy{ background:#9bbc0f; }
+  .banner.gameboy::before{
+    content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+    mix-blend-mode:multiply;
+    background:
+      radial-gradient(circle, rgba(15,56,15,0.18) 22%, transparent 26%) 0 0 / 4px 4px,
+      repeating-linear-gradient(0deg, rgba(15,56,15,0.07) 0 1px, transparent 1px 3px);
+  }
+  .banner.gameboy h1{
+    background:none; -webkit-background-clip:border-box; background-clip:border-box;
+    color:#0f380f; -webkit-text-fill-color:#0f380f;
+    filter:none; text-shadow:2px 2px 0 #306230;
+    overflow:hidden;                 /* clips the shine sweep to the text box */
+    animation:gbBoot 2s linear;      /* scroll down from above the masked edge, then hold */
+  }
+  /* OG-style shine sweep, once the logo has landed */
+  .banner.gameboy h1::after{
+    content:""; position:absolute; top:0; left:0; height:100%; width:55%;
+    background:linear-gradient(105deg, transparent 32%, rgba(255,255,255,0.6) 50%, transparent 68%);
+    transform:translateX(-200%); pointer-events:none;
+    animation:gbShine 0.85s ease-in 1.5s 1;
+  }
+  @keyframes gbBoot{ 0%{ transform:translateY(-230%); } 62%{ transform:translateY(0); } 100%{ transform:translateY(0); } }
+  @keyframes gbShine{ to{ transform:translateX(240%); } }
+  .banner.gameboy .tagline{ color:#0f380f; text-shadow:1px 1px 0 rgba(48,98,48,0.55); animation:gbFadeIn 0.5s ease 1.25s both; }
+  @keyframes gbFadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  .banner.gameboy .net-badge{ filter:drop-shadow(2px 2px 0 rgba(15,56,15,0.5)); }
+  .banner.gameboy .net-badge path{ fill:#306230; stroke:#9bbc0f; }
+  .banner.gameboy .net-badge text{ fill:#0f380f !important; }
+  .gb-start{ display:none; }
+  .banner.gameboy .gb-start{
+    display:block; position:absolute; left:0; right:0; bottom:12px; z-index:2;
+    text-align:center; font-family:'Courier New', Courier, monospace; font-weight:bold;
+    font-size:12px; letter-spacing:0.22em; color:#0f380f;
+    opacity:0; animation:gbBlink 1.05s steps(2) infinite 1.5s;
+  }
+  @keyframes gbBlink{ 0%,100%{ opacity:1; } 50%{ opacity:0; } }
+  /* ---- DEFEND.EXE theme: pixel space shooter ---- */
+  .banner.defend{ background:radial-gradient(ellipse at 50% 22%, #14134a 0%, #06030f 72%); }
+  .def-scene{ display:none; position:absolute; inset:0; z-index:0; overflow:hidden; }
+  .banner.defend .def-scene{ display:block; }
+  .def-stars{
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(1px 1px at 20px 24px, #fff, transparent),
+      radial-gradient(1px 1px at 130px 60px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1.5px 1.5px at 80px 100px, var(--cyan), transparent),
+      radial-gradient(1px 1px at 190px 40px, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1px 1px at 50px 140px, rgba(255,60,172,0.8), transparent);
+    background-size:220px 170px;
+  }
+  .def-canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .banner.defend::before{
+    content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse 60% 70% at 50% 52%, rgba(6,3,15,0.7) 0%, rgba(6,3,15,0.3) 55%, transparent 80%);
+  }
+  /* CRT: pronounced scanlines + a tube vignette (overrides the light banner scanlines) */
+  .banner.defend::after{
+    content:""; position:absolute; inset:0; z-index:3; pointer-events:none;
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.28) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse 108% 116% at 50% 50%, transparent 52%, rgba(0,0,0,0.55) 100%);
+  }
   /* the banner is glass too — faint scanlines + a diagonal glare */
   .banner::after{
     content:"";
@@ -1769,11 +1833,11 @@
     body.cert-mode .cert-win .titlebar, body.cert-mode .cert-btns{ display:none; }
     body{ background:#fff; }
     .window{ box-shadow:none; border-color:#999; }
-    .banner, .banner.sunset{ background:#fff !important; padding:20px; }
-    .banner h1{ color:#000; background:none; filter:none; }
-    .banner-carpet, .net-badge, .banner .sun, .banner .grid-floor{ display:none !important; }
-    .banner.arcade::before{ display:none; }
-    .banner .tagline{ color:#333; text-shadow:none; }
+    .banner, .banner.sunset, .banner.gameboy, .banner.defend{ background:#fff !important; padding:20px; }
+    .banner h1{ color:#000 !important; -webkit-text-fill-color:#000 !important; background:none; filter:none; text-shadow:none; }
+    .banner-carpet, .net-badge, .banner .sun, .banner .grid-floor, .pf-scene, .def-scene, .gb-start{ display:none !important; }
+    .banner.arcade::before, .banner.platformer::before, .banner.gameboy::before, .banner.defend::before{ display:none; }
+    .banner .tagline{ color:#333 !important; text-shadow:none; }
   }
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
@@ -2023,6 +2087,13 @@
           <circle class="pf-coin" cx="1466" cy="22" r="9" fill="#FFD34D" stroke="#C98A1E" stroke-width="2.5"/>
         </svg>
       </div>
+      <!-- GAME BOY theme decor -->
+      <div class="gb-start" aria-hidden="true">&#9654; PRESS START</div>
+      <!-- DEFEND.EXE theme decor -->
+      <div class="def-scene" aria-hidden="true">
+        <div class="def-stars"></div>
+        <canvas class="def-canvas"></canvas>
+      </div>
       <h1>Drew K. Kennedy</h1>
       <div class="tagline">Game Developer &nbsp;&bull;&nbsp; Content Creator &nbsp;&bull;&nbsp; Host &amp; Panelist</div>
       <svg class="net-badge" viewBox="0 0 120 120" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
@@ -2031,7 +2102,7 @@
         <text x="60" y="76" text-anchor="middle" font-family="Verdana, sans-serif" font-size="22" font-weight="bold" fill="#FFD34D">NET!</text>
       </svg>
     </header>
-    <script>/* cycle the banner theme in order each load; add more to THEMES as we make them */(function(){var THEMES=['arcade','sunset','platformer'];var i=0;try{i=(parseInt(localStorage.getItem('dkk_banner_i'),10)||0)+1;if(i>=THEMES.length)i=0;localStorage.setItem('dkk_banner_i',i);}catch(e){i=0;}document.getElementById('top').classList.add(THEMES[i]||THEMES[0]);})();</script>
+    <script>/* cycle the banner theme in order each load; add more to THEMES as we make them */(function(){var THEMES=['arcade','sunset','platformer','gameboy','defend'];var i=0;try{i=(parseInt(localStorage.getItem('dkk_banner_i'),10)||0)+1;if(i>=THEMES.length)i=0;localStorage.setItem('dkk_banner_i',i);}catch(e){i=0;}document.getElementById('top').classList.add(THEMES[i]||THEMES[0]);})();</script>
 
     <!-- ============ NAV ============ -->
     <nav class="navbar" aria-label="Primary">
@@ -3999,7 +4070,8 @@
 
     function centerText(txt, y, size, color, bold){
       g.fillStyle = color;
-      g.font = (bold ? 'bold ' : '') + size + 'px Courier New';
+      // +20% — the menu screens' text was hard to read through the CRT scanlines
+      g.font = (bold ? 'bold ' : '') + (size * 1.2) + 'px Courier New';
       g.textAlign = 'center';
       g.fillText(txt, W/2, y);
     }
@@ -4075,18 +4147,18 @@
           g.fillRect(40, y - 24, W - 80, 48);
           g.strokeStyle = '#00E5FF'; g.lineWidth = 2;
           g.strokeRect(40, y - 24, W - 80, 48);
-          g.fillStyle = '#00E5FF'; g.font = 'bold 16px Courier New'; g.textAlign = 'left';
+          g.fillStyle = '#00E5FF'; g.font = 'bold 19px Courier New'; g.textAlign = 'left';
           g.fillText('>', 50, y + 5);
         }
         g.textAlign = 'left';
         g.fillStyle = maxed ? '#8F85B8' : (afford ? '#F0EDF5' : '#8F85B8');
-        g.font = 'bold 15px Courier New';
+        g.font = 'bold 18px Courier New';
         g.fillText(it.name + (it.id !== 'skip' && it.max <= 3 ? ' ' + '◆'.repeat(it.have()) : ''), 70, y);
-        g.font = '11px Courier New';
+        g.font = '13px Courier New';
         g.fillStyle = '#8F85B8';
         g.fillText(it.desc, 70, y + 16);
         g.textAlign = 'right';
-        g.font = 'bold 14px Courier New';
+        g.font = 'bold 17px Courier New';
         if (it.id === 'skip'){ g.fillStyle = '#3CFF6E'; g.fillText('FREE', W - 56, y + 5); }
         else if (maxed){ g.fillStyle = '#8F85B8'; g.fillText('MAX', W - 56, y + 5); }
         else { g.fillStyle = afford ? '#FFD34D' : '#E03C31'; g.fillText(it.cost + 'B', W - 56, y + 5); }
@@ -4106,8 +4178,8 @@
         g.lineWidth = 2;
         g.strokeRect(x - 22, 250, 44, 56);
         g.fillStyle = sel ? '#00E5FF' : '#F0EDF5';
-        g.font = 'bold 34px Courier New'; g.textAlign = 'center';
-        g.fillText(CHARSET[entry.chars[i]], x, 292);
+        g.font = 'bold 41px Courier New'; g.textAlign = 'center';
+        g.fillText(CHARSET[entry.chars[i]], x, 294);
         if (sel && (time % 0.8) < 0.4){
           g.fillStyle = '#00E5FF';
           g.fillRect(x - 14, 312, 28, 3);
@@ -4121,7 +4193,7 @@
       board.forEach((e, i) => {
         const y = 130 + i * 34;
         const isNew = e.score === score && mode === 'board' && e.lv === level;
-        g.font = 'bold 15px Courier New';
+        g.font = 'bold 18px Courier New';
         g.textAlign = 'left';
         g.fillStyle = isNew ? '#FFD34D' : (i === 0 ? '#3CFF6E' : '#F0EDF5');
         g.fillText(String(i + 1).padStart(2, ' ') + '.', 92, y);
@@ -5216,6 +5288,122 @@
     const closeI = top.querySelector('.t-btns i');
     if (closeI) closeI.click();
   });
+
+  // ===== DEFEND.EXE banner — a tiny live shooter, only when that theme is showing =====
+  (function(){
+    const banner = document.getElementById('top');
+    if (!banner || !banner.classList.contains('defend')) return;
+    const cv = banner.querySelector('.def-canvas');
+    if (!cv) return;
+    const g = cv.getContext('2d');
+    const GREEN = '#3CFF6E', PINK = '#FF3CAC', CYAN = '#00E5FF';
+    let W = 0, H = 0, inv = [], bullets = [], sparks = [];
+    let marchX = 0, marchDir = 1, marchY = 0, revCount = 0, px = 0, pcool = 0.6, target = null;
+    function pickTarget(){
+      const alive = inv.filter(v => v.alive);
+      if (!alive.length){ target = null; return; }
+      // random among the few nearest — a purposeful hunt, not a random patrol
+      alive.sort((a, b) => Math.abs((a.bx + marchX) - px) - Math.abs((b.bx + marchX) - px));
+      target = alive[Math.floor(Math.random() * Math.min(3, alive.length))];
+    }
+
+    function size(){ W = banner.clientWidth; H = banner.clientHeight; cv.width = W; cv.height = H; }
+    function layout(){
+      inv = [];
+      const cols = Math.max(4, Math.min(9, Math.floor(W / 96)));
+      const gx = (W - 80) / (cols - 1 || 1);
+      for (let r = 0; r < 2; r++) for (let c = 0; c < cols; c++)
+        inv.push({ bx: 40 + c * gx, by: 24 + r * 30, alive: true, resp: 0, col: r % 2 ? PINK : GREEN });
+      px = W / 2;
+    }
+    size(); layout();
+    addEventListener('resize', () => { size(); layout(); });
+
+    function drawInvader(x, y, col){
+      g.fillStyle = col;
+      g.fillRect(x-9, y-2, 18, 9); g.fillRect(x-6, y-8, 3, 6); g.fillRect(x+3, y-8, 3, 6);
+      g.fillRect(x-12, y+1, 3, 6); g.fillRect(x+9, y+1, 3, 6);
+      g.fillRect(x-6, y+7, 3, 3); g.fillRect(x+3, y+7, 3, 3);
+      g.fillStyle = '#06030f'; g.fillRect(x-5, y, 3, 3); g.fillRect(x+2, y, 3, 3);
+    }
+    function drawCannon(x, y){
+      // matches the real DEFEND.EXE ship: cyan triangle-stack + magenta feet + flame
+      const fl = 6 + Math.random() * 5;
+      g.fillStyle = PINK;
+      g.beginPath(); g.moveTo(x-4, y+8); g.lineTo(x+4, y+8); g.lineTo(x, y+8+fl); g.closePath(); g.fill();
+      g.fillStyle = '#FFD34D';
+      g.beginPath(); g.moveTo(x-2, y+8); g.lineTo(x+2, y+8); g.lineTo(x, y+8+fl*0.55); g.closePath(); g.fill();
+      g.fillStyle = CYAN;
+      g.fillRect(x-15, y, 30, 8);
+      g.fillRect(x-9, y-6, 18, 6);
+      g.fillRect(x-2.5, y-12, 5, 6);
+      g.fillStyle = PINK;
+      g.fillRect(x-15, y+8, 6, 3);
+      g.fillRect(x+9, y+8, 6, 3);
+    }
+    function render(){
+      g.clearRect(0, 0, W, H);
+      for (const v of inv) if (v.alive) drawInvader(v.bx + marchX, v.by + marchY, v.col);
+      g.fillStyle = CYAN;
+      for (const b of bullets) g.fillRect(b.x - 1.5, b.y - 8, 3, 10);
+      for (const s of sparks){ g.globalAlpha = Math.max(0, s.life / 0.5); g.fillStyle = s.col; g.fillRect(s.x-1.5, s.y-1.5, 3, 3); }
+      g.globalAlpha = 1;
+      drawCannon(px, H - 20);
+    }
+
+    let last = 0, raf = null, running = false, onScreen = true;
+    function frame(now){
+      if (!running) return;
+      if (last && now - last < 33){ raf = requestAnimationFrame(frame); return; } // 30fps
+      const dt = Math.min((now - (last || now)) / 1000, 0.06); last = now;
+      // hunt: glide at a constant speed under a random nearby invader, fire, repeat
+      if (!target || !target.alive) pickTarget();
+      const tx = target ? target.bx + marchX : px;
+      const d = tx - px;
+      if (Math.abs(d) > 2) px += Math.sign(d) * Math.min(Math.abs(d), 90 * dt);
+      else px = tx;
+      px = Math.max(30, Math.min(W - 30, px));
+      pcool -= dt;
+      if (target && Math.abs(px - tx) < 6 && pcool <= 0 && bullets.length < 4){
+        bullets.push({ x: px, y: H - 32 });
+        pcool = 0.35 + Math.random() * 0.4;
+        pickTarget(); // line up on someone new
+      }
+      marchX += marchDir * 26 * dt;
+      if (marchX > 26 || marchX < -26){
+        marchX = Math.max(-26, Math.min(26, marchX));
+        marchDir *= -1;
+        // step down on 2 reversals, then up on 2 — a gentle rise-and-fall march
+        marchY += revCount < 2 ? 9 : -9;
+        revCount = (revCount + 1) % 4;
+      }
+      for (const b of bullets) b.y -= 300 * dt;
+      for (const b of bullets) for (const v of inv){
+        if (!v.alive) continue;
+        if (Math.abs(b.x - (v.bx + marchX)) < 12 && Math.abs(b.y - (v.by + marchY)) < 9){
+          v.alive = false; v.resp = 1.8 + Math.random() * 1.6; b.y = -999;
+          for (let i = 0; i < 6; i++) sparks.push({ x: v.bx + marchX, y: v.by + marchY, vx:(Math.random()-0.5)*140, vy:(Math.random()-0.5)*140, life:0.5, col:v.col });
+          break;
+        }
+      }
+      bullets = bullets.filter(b => b.y > -20);
+      for (const v of inv) if (!v.alive){ v.resp -= dt; if (v.resp <= 0) v.alive = true; }
+      for (const s of sparks){ s.x += s.vx*dt; s.y += s.vy*dt; s.life -= dt; }
+      sparks = sparks.filter(s => s.life > 0);
+      render();
+      raf = requestAnimationFrame(frame);
+    }
+    function start(){ if (running) return; running = true; last = 0; raf = requestAnimationFrame(frame); }
+    function stop(){ running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
+    function sync(){ (onScreen && !document.hidden) ? start() : stop(); }
+
+    if (prefersReducedMotion){ render(); return; } // static formation, no loop
+    document.addEventListener('visibilitychange', sync);
+    if ('IntersectionObserver' in window){
+      new IntersectionObserver(es => { onScreen = es[0].isIntersecting; sync(); }, { threshold: 0.01 }).observe(banner);
+    }
+    sync();
+  })();
 
   // for the ones who open the console
   console.log('%c↑↑↓↓←→←→BA', 'font-family: monospace; font-size: 16px; font-weight: bold; color: #FF3CAC;');
