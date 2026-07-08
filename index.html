@@ -277,7 +277,7 @@
         <text x="60" y="76" text-anchor="middle" font-family="Verdana, sans-serif" font-size="22" font-weight="bold" fill="#FFD34D">NET!</text>
       </svg>
     </header>
-    <script>/* the splash gates entry, so never restore a prior scroll position underneath it — start at the top */if('scrollRestoration' in history){history.scrollRestoration='manual';}/* cycle the banner theme in order each load; add more to THEMES as we make them */(function(){var THEMES=['arcade','sunset','platformer','gameboy','defend'];var i=0;try{i=(parseInt(localStorage.getItem('dkk_banner_i'),10)||0)+1;if(i>=THEMES.length)i=0;localStorage.setItem('dkk_banner_i',i);}catch(e){i=0;}document.getElementById('top').classList.add(THEMES[i]||THEMES[0]);})();</script>
+    <script>/* the splash gates entry, so never restore a prior scroll position underneath it — start at the top */if('scrollRestoration' in history){history.scrollRestoration='manual';}/* cycle the banner theme in order each load; add more to THEMES as we make them */(function(){var THEMES=['arcade','sunset','platformer','gameboy','defend'];var i=0;try{i=(parseInt(localStorage.getItem('dkk_banner_i'),10)||0)+1;if(i>=THEMES.length)i=0;localStorage.setItem('dkk_banner_i',i);}catch(e){i=0;}var t=THEMES[i]||THEMES[0];document.getElementById('top').classList.add(t);if(t==='gameboy'){var l=document.createElement('link');l.rel='stylesheet';l.href='gb-fonts.css';document.head.appendChild(l);}})();</script>
 
     <!-- ============ NAV ============ -->
     <nav class="navbar" aria-label="Primary">
