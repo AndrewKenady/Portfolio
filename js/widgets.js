@@ -895,15 +895,20 @@
       return el;
     }
 
-    function spawn(){
+    // instant=true skips the pop-in animation and the ding, so return-burst
+    // popups feel like they were already sitting there while you were away
+    // rather than arriving live after you switch back.
+    function spawn(instant){
       let cfg = POOL[bag.pop()];
       if (!bag.length) refill();
       // swap offer for status if toolbar already installed
       if (cfg.t === 'TOOLBAR OFFER' && TOOLBAR.installed){
         cfg = { t: 'TOOLBAR STATUS', b: 'The Kennedy Toolbar is functioning nominally. No action is required. No action is possible.', btns: [{ l: 'Good' }] };
       }
-      buildPopup(cfg);
-      ding();
+      const el = buildPopup(cfg);
+      if (instant) el.style.animation = 'none'; // set before paint: no visible pop-in
+      else ding();
+      return el;
     }
 
     function schedule(first){
@@ -920,9 +925,10 @@
       setTimeout(waitForEntry, 500);
     })();
 
-    // on return after a hidden period, spawn a burst scaled by time away:
-    // 1 popup after 30s, 2 after 1 min, up to 3 after 1.5 min. Scaling with
-    // time away avoids the "leave for a second, come back to MAX" feel.
+    // on return after a hidden period, place the popups you "earned" while away
+    // scaled by time gone: 1 after 30s, 2 after 1 min, up to 3 after 1.5 min.
+    // They spawn all at once, instantly and silently, so switching back feels
+    // like they were already waiting for you rather than arriving live.
     let hiddenAt = 0;
     document.addEventListener('visibilitychange', () => {
       if (document.hidden){ hiddenAt = performance.now(); return; }
@@ -932,11 +938,7 @@
       if (away < 30000) return; // only after 30s+ away
       const want = away >= 90000 ? 3 : away >= 60000 ? 2 : 1;
       const burst = Math.min(MAX - visible, want);
-      for (let i = 0; i < burst; i++){
-        setTimeout(() => {
-          if (entered && !document.hidden && !DEFEND.running && visible < MAX) spawn();
-        }, i * 650);
-      }
+      for (let i = 0; i < burst; i++) spawn(true);
     });
   })();
 
