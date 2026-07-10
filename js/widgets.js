@@ -920,9 +920,9 @@
       setTimeout(waitForEntry, 500);
     })();
 
-    // on return after a long hidden period, spawn a gentle burst — one popup,
-    // and a second only if you were away for several minutes. Scaling with time
-    // away avoids the "leave, come back, instantly get MAX" feel.
+    // on return after a hidden period, spawn a burst scaled by time away:
+    // 1 popup after 30s, 2 after 1 min, up to 3 after 1.5 min. Scaling with
+    // time away avoids the "leave for a second, come back to MAX" feel.
     let hiddenAt = 0;
     document.addEventListener('visibilitychange', () => {
       if (document.hidden){ hiddenAt = performance.now(); return; }
@@ -930,7 +930,7 @@
       const away = performance.now() - hiddenAt;
       hiddenAt = 0;
       if (away < 30000) return; // only after 30s+ away
-      const want = away >= 180000 ? 2 : 1; // 2 only after 3+ minutes away
+      const want = away >= 90000 ? 3 : away >= 60000 ? 2 : 1;
       const burst = Math.min(MAX - visible, want);
       for (let i = 0; i < burst; i++){
         setTimeout(() => {
