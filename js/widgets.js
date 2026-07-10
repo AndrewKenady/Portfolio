@@ -907,22 +907,31 @@
     }
 
     function schedule(first){
-      const delay = first ? 40000 + Math.random() * 30000 : 70000 + Math.random() * 60000;
+      const delay = first ? 25000 + Math.random() * 15000 : 70000 + Math.random() * 60000;
       setTimeout(() => {
         if (entered && !document.hidden && !DEFEND.running && visible < MAX) spawn();
         schedule(false);
       }, delay);
     }
-    schedule(true);
+    // start the gradual trickle only once the visitor has entered, so the
+    // countdown reflects real viewing time (not time spent on the splash)
+    (function waitForEntry(){
+      if (entered){ schedule(true); return; }
+      setTimeout(waitForEntry, 500);
+    })();
 
-    // on return after a long hidden period, spawn a small burst
+    // on return after a long hidden period, spawn a gentle burst — one popup,
+    // and a second only if you were away for several minutes. Scaling with time
+    // away avoids the "leave, come back, instantly get MAX" feel.
     let hiddenAt = 0;
     document.addEventListener('visibilitychange', () => {
       if (document.hidden){ hiddenAt = performance.now(); return; }
       if (!entered || DEFEND.running || !hiddenAt) return;
-      if (performance.now() - hiddenAt < 30000) return; // only after 30s+ away
+      const away = performance.now() - hiddenAt;
       hiddenAt = 0;
-      const burst = Math.min(MAX - visible, 3);
+      if (away < 30000) return; // only after 30s+ away
+      const want = away >= 180000 ? 2 : 1; // 2 only after 3+ minutes away
+      const burst = Math.min(MAX - visible, want);
       for (let i = 0; i < burst; i++){
         setTimeout(() => {
           if (entered && !document.hidden && !DEFEND.running && visible < MAX) spawn();
