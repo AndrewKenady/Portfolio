@@ -168,7 +168,7 @@
       }
     });
     if (closeB) closeB.addEventListener('click', () => {
-      notify('GADZOOKS! THE SITE IS FIGHTING BACK!');
+      notify('EGADS! THE SITE IS FIGHTING BACK!');
       DEFEND.open(false);
     });
     // once mini, drag the whole window by its titlebar
