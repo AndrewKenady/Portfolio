@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Interruption Economics Thesis — Drew K. Kennedy</title>
-<meta name="description" content="How I architected, built, and operate a company-wide internal AI platform solo — and the thesis behind it: every answered question is an expert interruption that didn't happen.">
+<meta name="description" content="How I designed, built, and operate a company-wide agentic AI assistant solo — and the thesis behind it: every answered question is an expert interruption that didn't happen.">
 <meta name="theme-color" content="#0B0428">
 <meta property="og:title" content="Interruption Economics — Drew K. Kennedy">
-<meta property="og:description" content="Solo-architected a company-wide agentic AI platform. The thesis: every answered question is an expert interruption that didn't happen — and the value compounds with every discipline it spans.">
+<meta property="og:description" content="Solo-built a company-wide agentic AI assistant with 140+ tools. The thesis: every answered question is an expert interruption that didn't happen — and the value compounds with every discipline it spans.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://drewkkennedy.com/thesis.html">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230B0428'/%3E%3Crect x='1' y='2' width='14' height='3' fill='%23FF3CAC'/%3E%3Crect x='1' y='5' width='14' height='9' fill='%23F0EDF5'/%3E%3Crect x='3' y='7' width='6' height='1.5' fill='%231E1938'/%3E%3Crect x='3' y='10' width='9' height='1.5' fill='%231E1938'/%3E%3C/svg%3E">
@@ -127,10 +127,10 @@
       </div>
       <div class="win-body">
         <h1>Interruption Economics</h1>
-        <div class="sub">Building a company's operating memory &bull; Architect &amp; Owner</div>
+        <div class="sub">Building a company's operating memory &bull; Sole Architect &amp; Engineer</div>
         <hr class="hr90">
 
-        <p class="lead">I architected, built, and operate my company's internal AI platform &mdash; <b>solo, end-to-end</b>. It began as one thesis, and every part of the system is an argument for it.</p>
+        <p class="lead">I designed, built, and operate my company's AI assistant &mdash; <b>solo, end-to-end</b>. LiveOps, support, data, art, and leadership use it every day. It began as one thesis, and every part of the system is an argument for it.</p>
 
         <div class="pull">Every answered question is an expert interruption that didn't happen &mdash; and the value compounds with every discipline it spans.</div>
 
@@ -141,25 +141,26 @@
         <div class="stat-strip">
           <div class="stat"><b>1</b><span>engineer, end-to-end</span></div>
           <div class="stat"><b>20+</b><span>live data sources</span></div>
-          <div class="stat"><b>~95</b><span>agent tools</span></div>
-          <div class="stat"><b>230+</b><span>automated tests</span></div>
+          <div class="stat"><b>140+</b><span>agent tools</span></div>
+          <div class="stat"><b>1,300+</b><span>automated tests</span></div>
         </div>
 
         <h2>How it works</h2>
         <p>It's an agentic system, not a retrieval template &mdash; it reasons about what evidence it needs, gathers it from live systems, and synthesizes an answer that it then verifies before sending.</p>
         <div class="term" role="note" aria-label="Architecture">
           <div class="spec-row"><span class="spec-k">ROUTE</span><span>Tiered models &mdash; a cheap model for quick lookups, the strongest for executive synthesis. Spend scales with difficulty.</span></div>
-          <div class="spec-row"><span class="spec-k">RETRIEVE</span><span>Semantic-first search across 20+ live sources, so meaning matches even when keywords don't.</span></div>
+          <div class="spec-row"><span class="spec-k">RETRIEVE</span><span>140+ tools over the data warehouse, Slack, Notion, GitHub, project tracking, support tickets, Discord, Figma, and the game's admin systems, with semantic-first search so meaning matches even when keywords don't.</span></div>
           <div class="spec-row"><span class="spec-k">CONSULT</span><span>Context-isolated specialist sub-agents per domain; each sees only its own tools; an orchestrator synthesizes.</span></div>
           <div class="spec-row"><span class="spec-k">VERIFY</span><span>A verifier checks every claim against the gathered sources, calibrates confidence, and shows only what's cited.</span></div>
-          <div class="spec-row"><span class="spec-k">GUARDRAILS</span><span>Every write is human-approved. Auth fails closed. Cost is governed. Nothing customer-facing ships without review.</span></div>
+          <div class="spec-row"><span class="spec-k">GUARDRAILS</span><span>Every write to the live product is human-approved. Each user's data is isolated. Auth fails closed. Cost is governed. Nothing customer-facing ships without review.</span></div>
+          <div class="spec-row"><span class="spec-k">REACH</span><span>Slack and the web, plus scheduled briefs, a weekly company digest, daily live-event health checks, and a support mode. Other agents build on it through a REST API and MCP servers.</span></div>
         </div>
 
         <h2>Built like a product, run like a platform</h2>
-        <p>The safety and cost guarantees are <b>enforced in code and pinned by tests</b> &mdash; not merely requested in a prompt. A tripwire fails the build if a customer-facing capability is ever added without review; a model change without its migration fails the build, so production can't silently break. It's exposed as a standard tool-server so other assistants can consult it, and it runs on the same rigor I'd give any shipped product: a full test suite including a safety-focused "trust-spine," continuous integration, and honest failure when a source is down or coverage is thin.</p>
+        <p>The safety and cost guarantees are <b>enforced in code and pinned by tests</b> &mdash; not merely requested in a prompt. A tripwire fails the build if a customer-facing capability is ever added without review; a model change without its migration fails the build, so production can't silently break. It runs on the same rigor I'd give any shipped product: 1,300+ automated tests including a safety-focused "trust-spine," continuous integration, and honest failure when a source is down or coverage is thin. Under the hood: Python, FastAPI, Postgres, and Claude on AWS Bedrock.</p>
 
         <h2>Why it's the work I'm proudest of</h2>
-        <p>Not because of the model &mdash; models are a commodity &mdash; but because it's a <b>platform</b> designed, built, safety-modeled, cost-governed, and rolled out across an organization by one person, and because it serves the whole company rather than one team: leadership, data, ops, engineering, trust &amp; safety, community, and product. The next frontier is longitudinal memory, proactive "what changed / what's at risk" digests for leadership, and a multi-tenant version &mdash; a company's operating memory as a product.</p>
+        <p>Not because of the model &mdash; models are a commodity &mdash; but because it's a <b>platform</b> designed, built, safety-modeled, cost-governed, and rolled out across an organization by one person, and because it serves the whole company rather than one team: leadership, LiveOps, support, data, art, engineering, trust &amp; safety, and community. It's also become infrastructure rather than just a place you go to ask: the weekly digest and live-event checks arrive on their own, and other agents plug into it through its API and MCP servers. A company's operating memory, as a platform.</p>
 
         <p class="note">This describes the platform's architecture and thesis at a general level; specifics, internal names, and data are omitted deliberately. Happy to go deeper in conversation.</p>
 

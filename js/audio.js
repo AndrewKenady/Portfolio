@@ -11,7 +11,7 @@
 
   // scroll the title while the splash is up
   const REAL_TITLE = document.title;
-  let tstr = '★ DREW K. KENNEDY ★ GAME DEVELOPER ★ CONTENT CREATOR ★ HOST & PANELIST ';
+  let tstr = '★ DREW K. KENNEDY ★ APPLIED AI ENGINEER ★ GAME DEVELOPER ★ CONTENT CREATOR ';
   let titleTimer = setInterval(() => {
     tstr = tstr.slice(1) + tstr[0];
     document.title = tstr;

@@ -662,7 +662,7 @@
       { t: 'VISITOR SURVEY', b: 'How is your visit going?', btns: [{ l: 'Great', a: 'toast', arg: 'RESPONSE RECORDED. RESULTS: GREAT.' }, { l: 'Not So Good', a: 'dlg', arg: 'concern' }] },
       { t: 'UPDATE AVAILABLE', b: 'A newer version of this website is available: this one. You&rsquo;re already on it.', btns: [{ l: 'Excellent' }] },
       { t: 'WEATHER ADVISORY', b: 'Today&rsquo;s forecast: 100% chance of static.', btns: [{ l: 'Dress Accordingly' }] },
-      { t: 'ASSISTANT', b: 'It looks like you&rsquo;re trying to hire a game developer. Would you like help?', btns: [{ l: 'Yes', a: 'contact' }, { l: 'I Can Do This Myself', a: 'toast', arg: "OF COURSE. YOU'RE DOING AMAZING. THE CONTACT SECTION WILL BE THERE WHEN YOU'RE READY." }] },
+      { t: 'ASSISTANT', b: 'It looks like you&rsquo;re trying to hire an engineer. Would you like help?', btns: [{ l: 'Yes', a: 'contact' }, { l: 'I Can Do This Myself', a: 'toast', arg: "OF COURSE. YOU'RE DOING AMAZING. THE CONTACT SECTION WILL BE THERE WHEN YOU'RE READY." }] },
       { t: 'FACILITIES', b: 'Gravity is scheduled for maintenance at 3 PM. Please hold onto something.', btns: [{ l: 'Understood' }] },
       { t: 'OMNICAST&trade;', b: 'This popup engine is licensed OMNICAST&trade; technology &mdash; from a surreal web game of overwhelming popups by the same developer.', btns: [{ l: 'See OmniCast', a: 'omni' }, { l: 'One Was Enough' }] }
     ];

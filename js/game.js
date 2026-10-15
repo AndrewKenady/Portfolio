@@ -669,7 +669,7 @@
         centerText('SCORE ' + score + '   LEVEL ' + level, H/2 + 2, 15, '#F0EDF5', true);
         if (qualifies()) centerText('** HIGH SCORE — ENTER YOUR NAME **', H/2 + 34, 13, '#FFD34D', true);
         centerText(qualifies() ? 'PRESS SPACE' : 'SPACE: LEADERBOARD   ESC: TRUCE', H/2 + 62, 13, '#3CFF6E');
-        centerText('p.s. i build games for a living — hire me', H/2 + 96, 12, '#8F85B8');
+        centerText('p.s. i build ai systems & games for a living — hire me', H/2 + 96, 12, '#8F85B8');
       }
     }
 

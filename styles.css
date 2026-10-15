@@ -575,6 +575,9 @@
     margin:2px 0 6px;
   }
   .rez-what p{ color:var(--ink-soft); font-size:13.5px; max-width:64ch; }
+  .rz-list{ margin:8px 0 0 18px; padding:0; color:var(--ink-soft); font-size:13.5px; max-width:64ch; }
+  .rz-list li{ margin-bottom:6px; }
+  .rz-list li b{ font-size:inherit; color:var(--ink); }
   @media (max-width:600px){ .rez-row{ grid-template-columns:1fr; gap:4px; } }
 
   /* extras grid */
