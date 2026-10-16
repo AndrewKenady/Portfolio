@@ -1539,6 +1539,7 @@
     font-size:12px;
   }
   .wc-none .pl-arrow{ font-size:26px; line-height:1; }
+  .wc-diagram svg{ width:100%; height:100%; display:block; }
   .wc-body{ padding:13px 15px 15px; display:flex; flex-direction:column; }
   .wc-title{
     font-family:'Times New Roman', Times, serif;
